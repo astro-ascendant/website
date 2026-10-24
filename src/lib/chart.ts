@@ -391,11 +391,7 @@ export function formatDashaDate(iso: string): string {
   return `${date.getUTCDate()} ${SHORT_MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 }
 
-function pluralize(value: number, one: string, many: string): string {
-  return `${value} ${value === 1 ? one : many}`;
-}
-
-/** Calendar-aware span like "10 yrs", "1 yr 4 mos", "18 days". */
+/** Calendar-aware span like "10Y", "1Y 4M", "1Y 4M 12D", "18D". */
 export function formatDashaDuration(startIso: string, endIso: string): string {
   const start = new Date(startIso);
   const end = new Date(endIso);
@@ -421,15 +417,15 @@ export function formatDashaDuration(startIso: string, endIso: string): string {
   }
   const parts: string[] = [];
   if (years > 0) {
-    parts.push(pluralize(years, "yr", "yrs"));
+    parts.push(`${years}Y`);
   }
   if (months > 0) {
-    parts.push(pluralize(months, "mo", "mos"));
+    parts.push(`${months}M`);
   }
-  if (days > 0 && years === 0) {
-    parts.push(pluralize(days, "day", "days"));
+  if (days > 0) {
+    parts.push(`${days}D`);
   }
-  return parts.slice(0, 2).join(" ");
+  return parts.join(" ");
 }
 
 /** Index of the period covering now, or -1. */
@@ -526,7 +522,7 @@ function antardashaMarkdownTable(period: ChartDashaPeriod): string {
   );
 }
 
-export function buildChatGptPromptUrl(result: ChartResult): string {
+export function buildChartPrompt(result: ChartResult): string {
   const currentIndex = findCurrentPeriodIndex(result.dasha.vimshottari);
   const currentMahadasha =
     currentIndex === -1 ? undefined : result.dasha.vimshottari[currentIndex];
@@ -560,7 +556,7 @@ export function buildChatGptPromptUrl(result: ChartResult): string {
     }
     return "—";
   };
-  const prompt = [
+  return [
     "Read the skill here: https://raw.githubusercontent.com/astro-ascendant/skills/refs/heads/main/skills/ascendant/SKILL.md",
     "https://github.com/astro-ascendant/skills/tree/main/skills/ascendant/references",
     "",
@@ -623,5 +619,22 @@ export function buildChatGptPromptUrl(result: ChartResult): string {
       ? antardashaMarkdownTable(currentMahadasha)
       : "_No current antardasha._",
   ].join("\n");
-  return `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
+}
+
+export type ChartPromptProvider = "chatgpt" | "claude" | "gemini";
+
+export function buildChartPromptUrl(
+  result: ChartResult,
+  provider: ChartPromptProvider = "chatgpt",
+): string {
+  const prompt = encodeURIComponent(buildChartPrompt(result));
+  switch (provider) {
+    case "claude":
+      return `https://claude.ai/new?q=${prompt}`;
+    case "gemini":
+      // The Gemini app has no prompt parameter; AI Studio does.
+      return `https://aistudio.google.com/prompts/new_chat?prompt=${prompt}`;
+    default:
+      return `https://chatgpt.com/?q=${prompt}`;
+  }
 }

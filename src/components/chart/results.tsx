@@ -1,4 +1,6 @@
+import { WarningCircleIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -10,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/arc/tabs/tabs";
 import { cn } from "cn";
 import { useChartSession } from "@/components/chart/context";
 import { ChartQuote } from "@/components/chart/quote";
@@ -45,17 +47,41 @@ function ChartCalculating() {
   );
 }
 
-function ChartFailure() {
+function ChartFailure({ onEditDetails }: { onEditDetails?: () => void }) {
   const {
-    state: { errors },
+    state: { failure },
+    actions: { calculate },
   } = useChartSession();
+  // The retry rethrows so the calculate button can fall back to idle; here
+  // there is no button state to reset, so the rejection stops at the click.
+  const retry = () => {
+    void calculate().catch(() => {});
+  };
   return (
-    <Alert variant="destructive">
-      <AlertTitle>Calculation did not complete</AlertTitle>
+    <Alert variant="destructive" className="gap-0.5">
+      <WarningCircleIcon aria-hidden="true" />
+      <AlertTitle>{failure?.title ?? "The chart didn't calculate"}</AlertTitle>
       <AlertDescription>
-        {errors.length > 0
-          ? errors.join(" ")
-          : "Unable to calculate the chart. Check your connection and try again."}
+        <p>
+          {failure?.message ??
+            "Something went wrong while casting this chart. Try again, and if it keeps happening, check the birth date, time and place."}
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={retry}>
+            Try again
+          </Button>
+          {onEditDetails ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-foreground"
+              onClick={onEditDetails}
+            >
+              Edit details
+            </Button>
+          ) : null}
+        </div>
       </AlertDescription>
     </Alert>
   );
@@ -201,8 +227,8 @@ function ChartKpTabs() {
   }
   return (
     <Tabs defaultValue="wheel">
-      <TabsList className="max-w-full self-start overflow-x-auto">
-        <TabsTrigger value="wheel">Circular Chart</TabsTrigger>
+      <TabsList containerClassName="max-w-full self-start">
+        <TabsTrigger value="wheel">Chart</TabsTrigger>
         <TabsTrigger value="planets">Planets</TabsTrigger>
         <TabsTrigger value="cusps">Cusps</TabsTrigger>
         <TabsTrigger value="dasha">Dasha</TabsTrigger>
@@ -237,7 +263,7 @@ function ChartSavTable() {
     result.sav.rows.map((row) => [row.planet, Math.min(...row.points)]),
   );
   return (
-    <Table>
+    <Table className="text-[11px] sm:text-sm [&_td]:px-2 [&_td]:py-2 [&_th]:h-auto [&_th]:px-2 [&_th]:py-2 sm:[&_td]:px-3 sm:[&_td]:py-3 sm:[&_th]:h-12 sm:[&_th]:px-3">
       <TableHeader>
         <TableRow>
           <TableHead>Sign</TableHead>
@@ -292,7 +318,17 @@ function ChartSavTable() {
   );
 }
 
-function ChartSuccess({ tabListClassName }: { tabListClassName?: string }) {
+function ChartSuccess({
+  tabListClassName,
+  tabListContainerClassName,
+  tabListFill,
+  onTabChange,
+}: {
+  tabListClassName?: string;
+  tabListContainerClassName?: string;
+  tabListFill?: boolean;
+  onTabChange?: () => void;
+}) {
   const {
     state: { result },
   } = useChartSession();
@@ -301,39 +337,41 @@ function ChartSuccess({ tabListClassName }: { tabListClassName?: string }) {
   }
   return (
     <div className="flex flex-col gap-4">
-      <Tabs defaultValue="chart">
+      <Tabs defaultValue="chart" onValueChange={onTabChange}>
         <TabsList
-          className={cn(
-            "max-w-full self-start overflow-x-auto",
-            tabListClassName,
+          fill={tabListFill}
+          containerClassName={cn(
+            "max-w-full self-start",
+            tabListContainerClassName,
           )}
+          className={tabListClassName}
         >
           <TabsTrigger value="chart">Chart</TabsTrigger>
-          <TabsTrigger value="kp">KP Chart</TabsTrigger>
+          <TabsTrigger value="kp">KP</TabsTrigger>
           <TabsTrigger value="dasha">Dasha</TabsTrigger>
           <TabsTrigger value="jaimini">Jaimini</TabsTrigger>
           <TabsTrigger value="sav">SAV</TabsTrigger>
         </TabsList>
-        <TabsContent value="chart">
+        <TabsContent value="chart" className="max-md:mt-0!">
           <h2 className="sr-only">Rashi and Navamsha charts</h2>
           <ChartSignHouseCharts />
         </TabsContent>
-        <TabsContent value="kp">
+        <TabsContent value="kp" className="max-md:mt-0!">
           <div className="flex flex-col gap-4">
             <h2 className="sr-only">KP chart</h2>
             <ChartKpCaption />
             <ChartKpTabs />
           </div>
         </TabsContent>
-        <TabsContent value="dasha">
+        <TabsContent value="dasha" className="max-md:mt-0!">
           <h2 className="sr-only">Dasha periods</h2>
           <ChartDashaTimelines />
         </TabsContent>
-        <TabsContent value="jaimini">
+        <TabsContent value="jaimini" className="max-md:mt-0!">
           <h2 className="sr-only">Jaimini</h2>
           <ChartJaiminiTables />
         </TabsContent>
-        <TabsContent value="sav">
+        <TabsContent value="sav" className="flex flex-col gap-4 max-md:mt-0!">
           <h2 className="sr-only">Sarvashtakavarga</h2>
           <ChartQuote>
             SAV scores each sign by how much support it gives your planets. The
@@ -344,7 +382,7 @@ function ChartSuccess({ tabListClassName }: { tabListClassName?: string }) {
           <ChartSavTable />
         </TabsContent>
       </Tabs>
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row items-center gap-2 sm:gap-3">
         <ChartAskChatGPTButton />
         <ChartSavePdfButton />
       </div>
@@ -354,10 +392,23 @@ function ChartSuccess({ tabListClassName }: { tabListClassName?: string }) {
 
 export function ChartResultSwitch({
   tabListClassName,
-}: { tabListClassName?: string } = {}) {
+  tabListContainerClassName,
+  tabListFill,
+  onEditDetails,
+}: {
+  tabListClassName?: string;
+  tabListContainerClassName?: string;
+  tabListFill?: boolean;
+  onEditDetails?: () => void;
+} = {}) {
   const {
     state: { status, result },
   } = useChartSession();
+  // Each outer tab is a fresh view of the report, so start it from the top
+  // instead of leaving the reader halfway down the previous analysis.
+  const handleTabChange = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  };
   return (
     <div role="status" className="flex flex-col gap-4">
       {status === "calculating" && result === null ? (
@@ -368,9 +419,16 @@ export function ChartResultSwitch({
           Recalculating with the updated details…
         </p>
       ) : null}
-      {status === "failure" ? <ChartFailure /> : null}
+      {status === "failure" ? (
+        <ChartFailure onEditDetails={onEditDetails} />
+      ) : null}
       {result !== null ? (
-        <ChartSuccess tabListClassName={tabListClassName} />
+        <ChartSuccess
+          tabListClassName={tabListClassName}
+          tabListContainerClassName={tabListContainerClassName}
+          tabListFill={tabListFill}
+          onTabChange={handleTabChange}
+        />
       ) : null}
     </div>
   );

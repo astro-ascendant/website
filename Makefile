@@ -20,11 +20,11 @@ preview: ## Serve the production build.
 typecheck: ## Generate MDX types and run tsc.
 	bun run types:check
 
-fmt: ## Format the repo with oxfmt.
-	bun run fmt
+fmt: ## Format the repo with Bun's formatter.
+	bun fmt
 
 fmt-check: ## Check formatting without writing.
-	bun run fmt:check
+	bun fmt --check
 
 lint: ## Lint with oxlint.
 	bun run lint

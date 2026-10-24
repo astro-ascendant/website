@@ -1,11 +1,13 @@
 import { createContext, use, useReducer, useRef, type ReactNode } from "react";
 import { buildChartPdf } from "@/lib/chart-pdf";
+import { describeChartError } from "@/lib/chart-errors";
 import { getChart } from "@/server/chart.functions";
 import {
-  buildChatGptPromptUrl,
+  buildChartPromptUrl,
   validateChartInput,
   type ChartBirthInput,
   type ChartFieldKey,
+  type ChartPromptProvider,
   type ChartResult,
 } from "@/lib/chart";
 import {
@@ -15,9 +17,9 @@ import {
 } from "./session-state";
 
 export interface ChartSessionActions {
-  calculate: () => void;
+  calculate: () => Promise<void>;
   savePdf: () => void;
-  askChatGPT: () => void;
+  askAI: (provider: ChartPromptProvider) => void;
 }
 
 export interface ChartSessionValue {
@@ -30,7 +32,7 @@ export interface ChartSessionDeps {
   requestChart: (birth: ChartBirthInput) => Promise<ChartResult>;
   clock: () => string;
   savePdf: (result: ChartResult) => void;
-  askChatGPT: (result: ChartResult) => void;
+  askAI: (result: ChartResult, provider: ChartPromptProvider) => void;
 }
 
 function requestChart(birth: ChartBirthInput): Promise<ChartResult> {
@@ -59,15 +61,15 @@ function downloadPdf(result: ChartResult): void {
   URL.revokeObjectURL(url);
 }
 
-function openChatGpt(result: ChartResult): void {
-  window.open(buildChatGptPromptUrl(result), "_blank", "noopener");
+function openPrompt(result: ChartResult, provider: ChartPromptProvider): void {
+  window.open(buildChartPromptUrl(result, provider), "_blank", "noopener");
 }
 
 const defaultDeps: ChartSessionDeps = {
   requestChart,
   clock: () => new Date().toISOString(),
   savePdf: downloadPdf,
-  askChatGPT: openChatGpt,
+  askAI: openPrompt,
 };
 
 const ChartSessionContext = createContext<ChartSessionValue | null>(null);
@@ -92,9 +94,6 @@ export function ChartSessionProvider({
   return <ChartSessionContext value={value}>{children}</ChartSessionContext>;
 }
 
-const MISSING_CONNECTION =
-  "Unable to calculate the chart. Check your connection and try again.";
-
 export function useChartSessionController({
   birth,
   onInvalid,
@@ -110,7 +109,7 @@ export function useChartSessionController({
     requestChart,
     clock,
     savePdf: savePdfFile,
-    askChatGPT: openPrompt,
+    askAI: openPrompt,
   } = {
     ...defaultDeps,
     ...deps,
@@ -121,38 +120,34 @@ export function useChartSessionController({
   );
   const requestId = useRef(0);
 
-  const calculate = () => {
+  const calculate = async () => {
     const validation = validateChartInput(birth);
     if (!validation.ok) {
       onInvalid(validation.fields);
       dispatch({ type: "reset" });
-      return;
+      throw new Error("Chart details are incomplete.");
     }
     const id = requestId.current + 1;
     requestId.current = id;
-    dispatch({ type: "start" });
+    dispatch({ type: "start", birth });
 
-    void (async () => {
-      try {
-        const result = await requestChart(birth);
-        if (requestId.current !== id) {
-          return;
-        }
-        dispatch({ type: "succeed", result });
-        if (birth.name.trim() !== "") {
-          onSavedProfile(birth);
-        }
-      } catch (error) {
-        if (requestId.current !== id) {
-          return;
-        }
-        console.error(error);
-        dispatch({
-          type: "fail",
-          errors: [error instanceof Error ? error.message : MISSING_CONNECTION],
-        });
+    try {
+      const result = await requestChart(birth);
+      if (requestId.current !== id) {
+        return;
       }
-    })();
+      dispatch({ type: "succeed", result });
+      if (birth.name.trim() !== "") {
+        onSavedProfile(birth);
+      }
+    } catch (error) {
+      if (requestId.current !== id) {
+        return;
+      }
+      console.error("Chart calculation failed", error);
+      dispatch({ type: "fail", failure: describeChartError(error) });
+      throw error;
+    }
   };
 
   const savePdf = () => {
@@ -161,15 +156,15 @@ export function useChartSessionController({
     }
   };
 
-  const askChatGPT = () => {
+  const askAI = (provider: ChartPromptProvider) => {
     if (state.result !== null) {
-      openPrompt(state.result);
+      openPrompt(state.result, provider);
     }
   };
 
   return {
     state,
-    actions: { calculate, savePdf, askChatGPT },
+    actions: { calculate, savePdf, askAI },
     clock,
   };
 }
