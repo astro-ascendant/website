@@ -114,116 +114,116 @@ function AboutPage() {
                   <DialogTitle>Third-Party Notices</DialogTitle>
                 </DialogHeader>
 
-              <div className="divide-y divide-border text-left text-xs leading-relaxed text-muted-foreground">
-                <div className="pt-3 first:pt-1">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://www.astro.com/swisseph/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Swiss Ephemeris (@swisseph/node)
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      GNU AGPL-3.0
-                    </span>
+                <div className="divide-y divide-border text-left text-xs leading-relaxed text-muted-foreground">
+                  <div className="pt-3 first:pt-1">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://www.astro.com/swisseph/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        Swiss Ephemeris (@swisseph/node)
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        GNU AGPL-3.0
+                      </span>
+                    </div>
+                    <p className="mt-1">Swiss Ephemeris binding for node.js.</p>
                   </div>
-                  <p className="mt-1">Swiss Ephemeris binding for node.js.</p>
-                </div>
 
-                <div className="pt-3">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://effect.website"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Effect
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      MIT
-                    </span>
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://effect.website"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        Effect
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        MIT
+                      </span>
+                    </div>
+                    <p className="mt-1">
+                      Build production-ready applications in TypeScript.
+                    </p>
                   </div>
-                  <p className="mt-1">
-                    Build production-ready applications in TypeScript.
-                  </p>
-                </div>
 
-                <div className="pt-3">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://tanstack.com"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      TanStack
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      MIT
-                    </span>
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://tanstack.com"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        TanStack
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        MIT
+                      </span>
+                    </div>
+                    <p className="mt-1">
+                      The open source application stack for the web.
+                    </p>
                   </div>
-                  <p className="mt-1">
-                    The open source application stack for the web.
-                  </p>
-                </div>
 
-                <div className="pt-3">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://fumadocs.dev"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Fumadocs
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      MIT
-                    </span>
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://fumadocs.dev"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        Fumadocs
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        MIT
+                      </span>
+                    </div>
+                    <p className="mt-1">
+                      The beautiful & flexible React.js docs framework.
+                    </p>
                   </div>
-                  <p className="mt-1">
-                    The beautiful & flexible React.js docs framework.
-                  </p>
-                </div>
 
-                <div className="pt-3">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://tailwindcss.com"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Tailwind CSS
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      MIT
-                    </span>
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://tailwindcss.com"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        Tailwind CSS
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        MIT
+                      </span>
+                    </div>
+                    <p className="mt-1">
+                      A utility-first CSS framework for rapid UI development.
+                    </p>
                   </div>
-                  <p className="mt-1">
-                    A utility-first CSS framework for rapid UI development.
-                  </p>
-                </div>
 
-                <div className="pt-3">
-                  <div className="flex items-center justify-between font-mono font-medium text-foreground">
-                    <a
-                      href="https://phosphoricons.com"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Phosphor Icons
-                    </a>
-                    <span className="text-[11px] text-muted-foreground">
-                      MIT
-                    </span>
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between font-mono font-medium text-foreground">
+                      <a
+                        href="https://phosphoricons.com"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        Phosphor Icons
+                      </a>
+                      <span className="text-[11px] text-muted-foreground">
+                        MIT
+                      </span>
+                    </div>
+                    <p className="mt-1">A flexible icon family for everyone.</p>
                   </div>
-                  <p className="mt-1">A flexible icon family for everyone.</p>
-                </div>
                 </div>
               </DialogContent>
             </Dialog>
@@ -251,7 +251,6 @@ function AboutPage() {
                 />
               )}
             </button>
-
           </div>
 
           <div className="flex items-center justify-center gap-3 text-muted-foreground">
@@ -292,10 +291,7 @@ function AboutPage() {
             © 2026 Laxman K R
           </p>
 
-          <div
-            className="mt-2 select-none"
-            aria-hidden="true"
-          >
+          <div className="mt-2 select-none" aria-hidden="true">
             <img
               src={animatedSignature}
               alt=""
