@@ -12,7 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/arc/tabs/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/arc/tabs/tabs";
 import {
   findCurrentPeriodIndex,
   formatDashaDate,
@@ -154,7 +159,11 @@ export function ChartDashaTimelines() {
         ))}
       </TabsList>
       {systems.map((system) => (
-        <TabsContent key={system.name} value={system.name} className="flex flex-col gap-4">
+        <TabsContent
+          key={system.name}
+          value={system.name}
+          className="flex flex-col gap-4"
+        >
           <ChartQuote>{dashaIntros[system.name]}</ChartQuote>
           <DashaSystemTable periods={system.periods} now={now} />
         </TabsContent>

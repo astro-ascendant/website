@@ -97,10 +97,7 @@ function MetaFact({
 }) {
   return (
     <div
-      className={cn(
-        "flex max-w-full min-w-0 items-center gap-1.5",
-        className,
-      )}
+      className={cn("flex max-w-full min-w-0 items-center gap-1.5", className)}
     >
       <Icon
         aria-hidden="true"
@@ -183,7 +180,10 @@ function KpiStrip({
       )}
     >
       {items.map((item) => (
-        <div key={item.label} className="bg-background min-w-0 px-2.5 py-2 sm:px-4 sm:py-3">
+        <div
+          key={item.label}
+          className="bg-background min-w-0 px-2.5 py-2 sm:px-4 sm:py-3"
+        >
           <dt className="text-muted-foreground text-[10px] font-medium tracking-[0.14em] uppercase sm:text-[11px]">
             {item.label}
           </dt>

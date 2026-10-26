@@ -8,270 +8,270 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as ChartRouteImport } from './routes/chart'
-import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
-import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ApiSearchRouteImport } from './routes/api/search'
-import { Route as ApiTimezoneRouteImport } from './routes/api/timezone'
-import { Route as DocsSplatRouteImport } from './routes/docs/$'
-import { Route as DocsChartRouteImport } from './routes/docs/chart'
-import { Route as DocsChar123Char125DotmdRouteImport } from './routes/docs/{$}[.]md'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as AboutRouteImport } from "./routes/about";
+import { Route as ChartRouteImport } from "./routes/chart";
+import { Route as LlmsFullDottxtRouteImport } from "./routes/llms-full[.]txt";
+import { Route as LlmsDottxtRouteImport } from "./routes/llms[.]txt";
+import { Route as RobotsDottxtRouteImport } from "./routes/robots[.]txt";
+import { Route as SitemapDotxmlRouteImport } from "./routes/sitemap[.]xml";
+import { Route as ApiSearchRouteImport } from "./routes/api/search";
+import { Route as ApiTimezoneRouteImport } from "./routes/api/timezone";
+import { Route as DocsSplatRouteImport } from "./routes/docs/$";
+import { Route as DocsChartRouteImport } from "./routes/docs/chart";
+import { Route as DocsChar123Char125DotmdRouteImport } from "./routes/docs/{$}[.]md";
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+  id: "/about",
+  path: "/about",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ChartRoute = ChartRouteImport.update({
-  id: '/chart',
-  path: '/chart',
+  id: "/chart",
+  path: "/chart",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
-  id: '/llms-full.txt',
-  path: '/llms-full.txt',
+  id: "/llms-full.txt",
+  path: "/llms-full.txt",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: '/llms.txt',
-  path: '/llms.txt',
+  id: "/llms.txt",
+  path: "/llms.txt",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
+  id: "/robots.txt",
+  path: "/robots.txt",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+  id: "/sitemap.xml",
+  path: "/sitemap.xml",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiSearchRoute = ApiSearchRouteImport.update({
-  id: '/api/search',
-  path: '/api/search',
+  id: "/api/search",
+  path: "/api/search",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiTimezoneRoute = ApiTimezoneRouteImport.update({
-  id: '/api/timezone',
-  path: '/api/timezone',
+  id: "/api/timezone",
+  path: "/api/timezone",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DocsSplatRoute = DocsSplatRouteImport.update({
-  id: '/docs/$',
-  path: '/docs/$',
+  id: "/docs/$",
+  path: "/docs/$",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DocsChartRoute = DocsChartRouteImport.update({
-  id: '/docs/chart',
-  path: '/docs/chart',
+  id: "/docs/chart",
+  path: "/docs/chart",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DocsChar123Char125DotmdRoute = DocsChar123Char125DotmdRouteImport.update({
-  id: '/docs/{$}.md',
-  path: '/docs/{$}.md',
+  id: "/docs/{$}.md",
+  path: "/docs/{$}.md",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/chart': typeof ChartRoute
-  '/llms-full.txt': typeof LlmsFullDottxtRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/api/search': typeof ApiSearchRoute
-  '/api/timezone': typeof ApiTimezoneRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs/chart': typeof DocsChartRoute
-  '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/chart": typeof ChartRoute;
+  "/llms-full.txt": typeof LlmsFullDottxtRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
+  "/api/search": typeof ApiSearchRoute;
+  "/api/timezone": typeof ApiTimezoneRoute;
+  "/docs/$": typeof DocsSplatRoute;
+  "/docs/chart": typeof DocsChartRoute;
+  "/docs/{$}.md": typeof DocsChar123Char125DotmdRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/chart': typeof ChartRoute
-  '/llms-full.txt': typeof LlmsFullDottxtRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/api/search': typeof ApiSearchRoute
-  '/api/timezone': typeof ApiTimezoneRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs/chart': typeof DocsChartRoute
-  '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/chart": typeof ChartRoute;
+  "/llms-full.txt": typeof LlmsFullDottxtRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
+  "/api/search": typeof ApiSearchRoute;
+  "/api/timezone": typeof ApiTimezoneRoute;
+  "/docs/$": typeof DocsSplatRoute;
+  "/docs/chart": typeof DocsChartRoute;
+  "/docs/{$}.md": typeof DocsChar123Char125DotmdRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/chart': typeof ChartRoute
-  '/llms-full.txt': typeof LlmsFullDottxtRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/api/search': typeof ApiSearchRoute
-  '/api/timezone': typeof ApiTimezoneRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs/chart': typeof DocsChartRoute
-  '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/chart": typeof ChartRoute;
+  "/llms-full.txt": typeof LlmsFullDottxtRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
+  "/api/search": typeof ApiSearchRoute;
+  "/api/timezone": typeof ApiTimezoneRoute;
+  "/docs/$": typeof DocsSplatRoute;
+  "/docs/chart": typeof DocsChartRoute;
+  "/docs/{$}.md": typeof DocsChar123Char125DotmdRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/about'
-    | '/chart'
-    | '/llms-full.txt'
-    | '/llms.txt'
-    | '/robots.txt'
-    | '/sitemap.xml'
-    | '/api/search'
-    | '/api/timezone'
-    | '/docs/$'
-    | '/docs/chart'
-    | '/docs/{$}.md'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/about"
+    | "/chart"
+    | "/llms-full.txt"
+    | "/llms.txt"
+    | "/robots.txt"
+    | "/sitemap.xml"
+    | "/api/search"
+    | "/api/timezone"
+    | "/docs/$"
+    | "/docs/chart"
+    | "/docs/{$}.md";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/about'
-    | '/chart'
-    | '/llms-full.txt'
-    | '/llms.txt'
-    | '/robots.txt'
-    | '/sitemap.xml'
-    | '/api/search'
-    | '/api/timezone'
-    | '/docs/$'
-    | '/docs/chart'
-    | '/docs/{$}.md'
+    | "/"
+    | "/about"
+    | "/chart"
+    | "/llms-full.txt"
+    | "/llms.txt"
+    | "/robots.txt"
+    | "/sitemap.xml"
+    | "/api/search"
+    | "/api/timezone"
+    | "/docs/$"
+    | "/docs/chart"
+    | "/docs/{$}.md";
   id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/chart'
-    | '/llms-full.txt'
-    | '/llms.txt'
-    | '/robots.txt'
-    | '/sitemap.xml'
-    | '/api/search'
-    | '/api/timezone'
-    | '/docs/$'
-    | '/docs/chart'
-    | '/docs/{$}.md'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/about"
+    | "/chart"
+    | "/llms-full.txt"
+    | "/llms.txt"
+    | "/robots.txt"
+    | "/sitemap.xml"
+    | "/api/search"
+    | "/api/timezone"
+    | "/docs/$"
+    | "/docs/chart"
+    | "/docs/{$}.md";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  ChartRoute: typeof ChartRoute
-  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
-  LlmsDottxtRoute: typeof LlmsDottxtRoute
-  RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiSearchRoute: typeof ApiSearchRoute
-  ApiTimezoneRoute: typeof ApiTimezoneRoute
-  DocsSplatRoute: typeof DocsSplatRoute
-  DocsChartRoute: typeof DocsChartRoute
-  DocsChar123Char125DotmdRoute: typeof DocsChar123Char125DotmdRoute
+  IndexRoute: typeof IndexRoute;
+  AboutRoute: typeof AboutRoute;
+  ChartRoute: typeof ChartRoute;
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute;
+  LlmsDottxtRoute: typeof LlmsDottxtRoute;
+  RobotsDottxtRoute: typeof RobotsDottxtRoute;
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute;
+  ApiSearchRoute: typeof ApiSearchRoute;
+  ApiTimezoneRoute: typeof ApiTimezoneRoute;
+  DocsSplatRoute: typeof DocsSplatRoute;
+  DocsChartRoute: typeof DocsChartRoute;
+  DocsChar123Char125DotmdRoute: typeof DocsChar123Char125DotmdRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chart': {
-      id: '/chart'
-      path: '/chart'
-      fullPath: '/chart'
-      preLoaderRoute: typeof ChartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms-full.txt': {
-      id: '/llms-full.txt'
-      path: '/llms-full.txt'
-      fullPath: '/llms-full.txt'
-      preLoaderRoute: typeof LlmsFullDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms.txt': {
-      id: '/llms.txt'
-      path: '/llms.txt'
-      fullPath: '/llms.txt'
-      preLoaderRoute: typeof LlmsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/search': {
-      id: '/api/search'
-      path: '/api/search'
-      fullPath: '/api/search'
-      preLoaderRoute: typeof ApiSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/timezone': {
-      id: '/api/timezone'
-      path: '/api/timezone'
-      fullPath: '/api/timezone'
-      preLoaderRoute: typeof ApiTimezoneRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/$': {
-      id: '/docs/$'
-      path: '/docs/$'
-      fullPath: '/docs/$'
-      preLoaderRoute: typeof DocsSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/chart': {
-      id: '/docs/chart'
-      path: '/docs/chart'
-      fullPath: '/docs/chart'
-      preLoaderRoute: typeof DocsChartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/{$}.md': {
-      id: '/docs/{$}.md'
-      path: '/docs/{$}.md'
-      fullPath: '/docs/{$}.md'
-      preLoaderRoute: typeof DocsChar123Char125DotmdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/about": {
+      id: "/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof AboutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/chart": {
+      id: "/chart";
+      path: "/chart";
+      fullPath: "/chart";
+      preLoaderRoute: typeof ChartRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/llms-full.txt": {
+      id: "/llms-full.txt";
+      path: "/llms-full.txt";
+      fullPath: "/llms-full.txt";
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/llms.txt": {
+      id: "/llms.txt";
+      path: "/llms.txt";
+      fullPath: "/llms.txt";
+      preLoaderRoute: typeof LlmsDottxtRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/robots.txt": {
+      id: "/robots.txt";
+      path: "/robots.txt";
+      fullPath: "/robots.txt";
+      preLoaderRoute: typeof RobotsDottxtRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/sitemap.xml": {
+      id: "/sitemap.xml";
+      path: "/sitemap.xml";
+      fullPath: "/sitemap.xml";
+      preLoaderRoute: typeof SitemapDotxmlRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/search": {
+      id: "/api/search";
+      path: "/api/search";
+      fullPath: "/api/search";
+      preLoaderRoute: typeof ApiSearchRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/timezone": {
+      id: "/api/timezone";
+      path: "/api/timezone";
+      fullPath: "/api/timezone";
+      preLoaderRoute: typeof ApiTimezoneRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/docs/$": {
+      id: "/docs/$";
+      path: "/docs/$";
+      fullPath: "/docs/$";
+      preLoaderRoute: typeof DocsSplatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/docs/chart": {
+      id: "/docs/chart";
+      path: "/docs/chart";
+      fullPath: "/docs/chart";
+      preLoaderRoute: typeof DocsChartRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/docs/{$}.md": {
+      id: "/docs/{$}.md";
+      path: "/docs/{$}.md";
+      fullPath: "/docs/{$}.md";
+      preLoaderRoute: typeof DocsChar123Char125DotmdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -288,17 +288,17 @@ const rootRouteChildren: RootRouteChildren = {
   DocsSplatRoute: DocsSplatRoute,
   DocsChartRoute: DocsChartRoute,
   DocsChar123Char125DotmdRoute: DocsChar123Char125DotmdRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { startInstance } from "./start.ts";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>;
   }
 }

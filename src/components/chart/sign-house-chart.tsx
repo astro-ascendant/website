@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/arc/tabs/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/arc/tabs/tabs";
 import { ChartQuote } from "@/components/chart/quote";
 import {
   buildDivisionView,
