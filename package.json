@@ -25,7 +25,7 @@
     "@radix-ui/react-tabs": "^1.2.1",
     "@tanstack/react-router": "1.170.46",
     "@tanstack/react-start": "1.169.4",
-    "astro-ascendant": "5.1.0",
+    "astro-ascendant": "5.1.1",
     "chrono-node": "^2.10.3",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
