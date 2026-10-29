@@ -2,7 +2,7 @@ import { FilePdfIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/arc/button/button";
 import { SplitButton } from "@/components/arc/split-button/split-button";
 import { ChatGptIcon } from "@/components/chart/chatgpt-icon";
-import { useChartSession } from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 import { ClaudeAiIcon } from "@/components/ui/svgs/claudeAiIcon";
 import { Gemini } from "@/components/ui/svgs/gemini";
 

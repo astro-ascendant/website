@@ -19,7 +19,7 @@ import {
   TabsTrigger,
 } from "@/components/arc/tabs/tabs";
 import { cn } from "cn";
-import { useChartSession } from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 import { ChartQuote } from "@/components/chart/quote";
 import {
   ChartAskChatGPTButton,

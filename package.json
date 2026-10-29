@@ -11,7 +11,10 @@
     "test": "bun test",
     "types:check": "fumadocs-mdx && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
-    "sync:api": "bun run scripts/sync-api.ts"
+    "sync:api": "bun run scripts/sync-api.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "knip": "knip"
   },
   "dependencies": {
     "@astrologer/astro-core": "^1.0.1",
@@ -28,7 +31,6 @@
     "astro-ascendant": "5.1.1",
     "chrono-node": "^2.10.3",
     "class-variance-authority": "^0.7.1",
-    "cmdk": "^1.1.1",
     "cn": "^0.5.0",
     "effect": "^4.0.6",
     "fumadocs-core": "16.17.8",
@@ -53,7 +55,9 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "bun-types": "^1.4.4",
+    "knip": "^6.43.0",
     "nitro": "3.0.260903-beta",
+    "oxlint": "^1.90.0",
     "sharp": "^0.35.5",
     "svgo": "^4.1.0",
     "tailwindcss": "^4.3.3",

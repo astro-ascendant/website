@@ -22,9 +22,9 @@ import {
   findCurrentPeriodIndex,
   formatDashaDate,
   formatDashaDuration,
-  type ChartDashaPeriod,
-} from "@/lib/chart";
-import { useChartSession } from "@/components/chart/context";
+} from "@/lib/dasha-time";
+import type { ChartDashaPeriod } from "@/lib/chart";
+import { useChartSession } from "@/components/chart/session";
 import { ChartQuote } from "@/components/chart/quote";
 
 const dashaIntros: Record<string, string> = {

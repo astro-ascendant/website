@@ -17,7 +17,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import type { TargetAndTransition } from "motion/react";
-import { ChevronDown } from "lucide-react";
+import { CaretDownIcon } from "@phosphor-icons/react";
 import { motionTokens } from "../lib/motion-tokens";
 import styles from "./split-button.module.css";
 
@@ -307,10 +307,9 @@ export function SplitButton({
           aria-label={`${label} more actions`}
           disabled={disabled}
         >
-          <ChevronDown
+          <CaretDownIcon
             className={styles.chevron}
             size={16}
-            strokeWidth={1.75}
             aria-hidden="true"
           />
         </DropdownPrimitive.Trigger>

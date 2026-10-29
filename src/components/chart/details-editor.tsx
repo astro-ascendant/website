@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Chart } from "@/components/chart";
-import { useChartSession } from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 import {
   Dialog,
   DialogContent,

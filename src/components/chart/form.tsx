@@ -1,6 +1,5 @@
 import * as React from "react";
 import type { ReactNode } from "react";
-import { parseDate } from "chrono-node";
 import { CalendarBlankIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,11 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  useChartForm,
-  useChartPlaceSearch,
-  useChartSession,
-} from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 
 export function ChartFormFrame({ children }: { children: ReactNode }) {
   return <div className="flex flex-col gap-6">{children}</div>;
@@ -51,7 +46,7 @@ export function ChartNameField() {
   const {
     state: { birth, savedProfiles, fieldErrors },
     actions: { updateBirth, applyProfile },
-  } = useChartForm();
+  } = useChartSession();
   const error = fieldErrors.name;
   return (
     <div className="flex flex-col gap-1.5">
@@ -100,6 +95,36 @@ function toBirthDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+type DateParser = (text: string) => Date | null;
+
+/** Stand-in until chrono-node loads: the browser's own reading of the text. */
+const nativeParseDate: DateParser = (text) => {
+  const date = new Date(text);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/**
+ * Natural-language date parsing, loaded the first time the field is focused
+ * so chrono-node stays out of the /chart page's initial bundle.
+ */
+function useDateParser(): { parse: DateParser; load: () => void } {
+  const [parse, setParse] = React.useState<DateParser>(() => nativeParseDate);
+  const loading = React.useRef(false);
+  const load = () => {
+    if (loading.current) {
+      return;
+    }
+    loading.current = true;
+    void import("chrono-node").then(
+      ({ parseDate }) => setParse(() => parseDate),
+      () => {
+        loading.current = false;
+      },
+    );
+  };
+  return { parse, load };
+}
+
 function formatBirthDate(date: Date | undefined): string {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
@@ -113,8 +138,9 @@ export function ChartDateField() {
   const {
     state: { birth, fieldErrors },
     actions: { updateBirth },
-  } = useChartForm();
+  } = useChartSession();
   const [open, setOpen] = React.useState(false);
+  const { parse: parseDate, load: loadDateParser } = useDateParser();
   const [text, setText] = React.useState(() =>
     formatBirthDate(parseBirthDate(birth.date)),
   );
@@ -146,6 +172,7 @@ export function ChartDateField() {
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "chart-date-error" : undefined}
+          onFocus={loadDateParser}
           onChange={(event) => setText(event.target.value)}
           onBlur={commitText}
           onKeyDown={(event) => {
@@ -206,7 +233,7 @@ export function ChartTimeField() {
   const {
     state: { birth, fieldErrors },
     actions: { updateBirth },
-  } = useChartForm();
+  } = useChartSession();
   const error = fieldErrors.time;
   return (
     <div className="flex flex-col gap-1.5">
@@ -236,7 +263,7 @@ export function ChartSexField() {
   const {
     state: { birth },
     actions: { updateBirth },
-  } = useChartForm();
+  } = useChartSession();
   const selected = birth.sex ?? "";
   return (
     <fieldset className="m-0 flex flex-col border-0 p-0">
@@ -270,13 +297,9 @@ export function ChartSexField() {
 
 export function ChartPlaceField() {
   const {
-    state: { selectedPlace, fieldErrors },
-    actions: { selectPlace },
-  } = useChartForm();
-  const {
-    state: { placeOptions, searchError },
-    actions: { queryPlaces },
-  } = useChartPlaceSearch();
+    state: { selectedPlace, fieldErrors, placeOptions, searchError },
+    actions: { selectPlace, queryPlaces },
+  } = useChartSession();
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const error = fieldErrors.place;

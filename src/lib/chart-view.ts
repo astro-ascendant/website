@@ -1,32 +1,9 @@
-import {
-  findCurrentPeriodIndex,
-  signShortName,
-  type ChartDashaPeriod,
-  type ChartDivision,
-  type ChartResult,
-} from "./chart";
-import { formatLongitude } from "./longitude";
-
-const BODY_SHORT: Record<string, string> = {
-  Sun: "Su",
-  Moon: "Mo",
-  Mars: "Ma",
-  Mercury: "Me",
-  Jupiter: "Ju",
-  Venus: "Ve",
-  Saturn: "Sa",
-  Rahu: "Ra",
-  Ketu: "Ke",
-  Lagna: "As",
-  RISING: "As",
-};
-
-function bodyShortName(body: string): string {
-  return BODY_SHORT[body] ?? body.slice(0, 2);
-}
+import type { ChartDashaPeriod, ChartDivision } from "./chart";
+import { findCurrentPeriodIndex } from "./dasha-time";
+import { bodyShortName, formatLongitude, signShortName } from "./zodiac";
 
 /** Fixed South Indian rasi boxes, clockwise from Pisces at top-left. */
-export const SOUTH_INDIAN_LAYOUT = [
+const SOUTH_INDIAN_LAYOUT = [
   { sign: "Pisces", area: "pisces" },
   { sign: "Aries", area: "aries" },
   { sign: "Taurus", area: "taurus" },
@@ -184,91 +161,6 @@ function describeDivisionView({
   return `${title} South Indian chart. Lagna ${lagnaSign} ${lagnaDegree}. ${cells
     .map(describeDivisionCell)
     .join(". ")}`;
-}
-
-export interface KpWheelCusp {
-  house: number;
-  sign: string;
-  degree: string;
-  longitude: number;
-}
-
-export interface KpWheelPlanet {
-  body: string;
-  short: string;
-  degree: string;
-  longitude: number;
-  retrograde: boolean;
-}
-
-export interface KpWheelView {
-  ascendant: number;
-  lagnaSign: string;
-  lagnaDegree: string;
-  cusps: KpWheelCusp[];
-  planets: KpWheelPlanet[];
-}
-
-export interface KpWheelInput {
-  readonly kp: ChartResult["kp"];
-  readonly d1: ChartDivision | undefined;
-}
-
-/** Fixed zodiac frame: Aries 0° at the top, longitudes running counterclockwise. */
-export function fixedZodiacAngleFor(longitude: number): number {
-  return (((90 + longitude) % 360) + 360) % 360;
-}
-
-/** Midpoint from angle a to angle b in increasing-longitude direction. */
-export function circularMidAngle(a: number, b: number): number {
-  const delta = (((b - a) % 360) + 360) % 360;
-  return (a + delta / 2) % 360;
-}
-
-/**
- * Circular KP wheel data: unequal Placidus house cusps as absolute sidereal
- * longitudes plus D1 planet longitudes. Cusps or planets without a usable
- * degree are skipped.
- */
-export function buildKpWheelView({ kp, d1 }: KpWheelInput): KpWheelView | null {
-  const cusps: KpWheelCusp[] = [];
-  for (const cusp of kp.cusps) {
-    const longitude = cusp.longitude;
-    if (longitude === null) {
-      continue;
-    }
-    cusps.push({
-      house: cusp.house,
-      sign: cusp.sign,
-      degree: formatLongitude(longitude),
-      longitude,
-    });
-  }
-  if (cusps.length === 0) {
-    return null;
-  }
-  const first = cusps.find((cusp) => cusp.house === 1) ?? cusps[0];
-  const planets: KpWheelPlanet[] = [];
-  for (const planet of d1?.placements ?? []) {
-    const longitude = planet.longitude;
-    if (longitude === null) {
-      continue;
-    }
-    planets.push({
-      body: planet.body,
-      short: bodyShortName(planet.body),
-      degree: formatLongitude(longitude),
-      longitude,
-      retrograde: planet.state === "Retrograde",
-    });
-  }
-  return {
-    ascendant: first?.longitude ?? 0,
-    lagnaSign: first?.sign ?? "",
-    lagnaDegree: first?.degree ?? "",
-    cusps,
-    planets,
-  };
 }
 
 export interface HeadlineInput {

@@ -10,7 +10,7 @@ import { cn } from "cn";
 import { Chart } from "@/components/chart";
 import { ChatGptIcon } from "@/components/chart/chatgpt-icon";
 import { ChartDetailsEditor } from "@/components/chart/details-editor";
-import { useChartSession } from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { buildHeadlineView } from "@/lib/chart-view";

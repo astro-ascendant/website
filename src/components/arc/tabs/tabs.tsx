@@ -11,9 +11,9 @@ import {
 } from "react";
 import type { ComponentPropsWithoutRef, RefObject } from "react";
 import {
-  ChevronLeft as NavArrowLeft,
-  ChevronRight as NavArrowRight,
-} from "lucide-react";
+  CaretLeftIcon as NavArrowLeft,
+  CaretRightIcon as NavArrowRight,
+} from "@phosphor-icons/react";
 import {
   AnimatePresence,
   LayoutGroup,
@@ -205,7 +205,7 @@ export function TabsList({
           disabled={!edges.left}
           onClick={() => scrollTabs(-1)}
         >
-          <NavArrowLeft width={17} height={17} aria-hidden="true" />
+          <NavArrowLeft size={17} aria-hidden="true" />
         </button>
       )}
       <motion.div
@@ -235,7 +235,7 @@ export function TabsList({
           disabled={!edges.right}
           onClick={() => scrollTabs(1)}
         >
-          <NavArrowRight width={17} height={17} aria-hidden="true" />
+          <NavArrowRight size={17} aria-hidden="true" />
         </button>
       )}
     </div>

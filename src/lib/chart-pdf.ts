@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
-import { buildChartMarkdown, type ChartResult } from "@/lib/chart";
+import type { ChartResult } from "@/lib/chart";
+import { buildChartMarkdown } from "@/lib/chart-report";
 
 const MARGIN = 14;
 const PAGE_WIDTH = 210;
