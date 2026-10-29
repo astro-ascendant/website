@@ -89,10 +89,10 @@ async function requestChart(
   return response.result;
 }
 
-/** jsPDF loads on the first save, not with the page. */
+/** The PDF renderer loads on the first save, not with the page. */
 async function downloadPdf(result: ChartResult): Promise<void> {
   const { buildChartPdf } = await import("@/lib/chart-pdf");
-  const url = URL.createObjectURL(buildChartPdf(result));
+  const url = URL.createObjectURL(await buildChartPdf(result));
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = "birth-chart.pdf";
