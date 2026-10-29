@@ -100,13 +100,13 @@ function RootComponent() {
           >
             <a
               href="/docs"
-              aria-label="astro-ascendant 5.0 is here: read the docs"
+              aria-label="astro-ascendant 6.0 is here: read the docs"
               className="absolute inset-0"
             />
             <span aria-hidden="true" className="banner-line" />
             <span className="pointer-events-none flex flex-1 items-center justify-center gap-2">
               <span>
-                <span className="font-mono">astro-ascendant</span> 5.0 is here
+                <span className="font-mono">astro-ascendant</span> 6.0 is here
               </span>
               <ArrowRightIcon size={16} className="banner-arrow shrink-0" />
             </span>
