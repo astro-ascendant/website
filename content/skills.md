@@ -39,6 +39,15 @@ illnesses.
 
 ## Installation
 
+### Universal Install
+
+One command for any skill-compatible agent. From the working directory where
+you want to use Ascendant, run:
+
+```bash
+npx ascendant-skills install
+```
+
 ### OpenCode Plugin
 
 Run:
@@ -64,12 +73,4 @@ Run:
 ```bash
 codex plugin marketplace add astro-ascendant/skills --ref main
 codex plugin add ascendant@ascendant
-```
-
-### Agent Skills
-
-From the working directory where you want to use Ascendant, run:
-
-```bash
-npx skills add astro-ascendant/skills
 ```
