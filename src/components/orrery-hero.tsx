@@ -193,8 +193,7 @@ export function OrreryHero() {
                   y={-size - 3}
                   textAnchor="middle"
                   fontSize={5}
-                  fill="currentColor"
-                  className="font-serif italic"
+                  className="fill-foreground font-serif italic"
                 >
                   {name}
                 </text>
