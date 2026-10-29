@@ -3,7 +3,7 @@ title: Jaimini
 description: Jaimini calculations for Chara Karakas, Rashi Drishti, Karakamsha, Arudha Pada, Upapada, and Argala.
 ---
 
-{/* Generated from astro-ascendant@5.1.1. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/argala`:
 
@@ -38,98 +38,6 @@ const calculate: (placements: Placements) => Effect.Effect<
 >;
 ```
 
-### `compareExactDegrees`
-
-```ts
-const compareExactDegrees: ((
-  right: ExactDegree,
-) => (left: ExactDegree) => number) &
-  ((left: ExactDegree, right: ExactDegree) => number);
-```
-
-### `exactDegreeOf`
-
-```ts
-const exactDegreeOf: (
-  longitude: number & import("effect/Brand").Brand<"Longitude">,
-) => Effect.Effect<
-  {
-    coefficient: bigint;
-    scale: number;
-    value: number & import("effect/Brand").Brand<"Degree">;
-  },
-  ParseError,
-  never
->;
-```
-
-### `targetsOf`
-
-```ts
-const targetsOf: (
-  reference:
-    | "Aquarius"
-    | "Aries"
-    | "Cancer"
-    | "Capricorn"
-    | "Gemini"
-    | "Leo"
-    | "Libra"
-    | "Pisces"
-    | "Sagittarius"
-    | "Scorpio"
-    | "Taurus"
-    | "Virgo",
-) => Effect.Effect<
-  readonly [
-    (
-      | "Aquarius"
-      | "Aries"
-      | "Cancer"
-      | "Capricorn"
-      | "Gemini"
-      | "Leo"
-      | "Libra"
-      | "Pisces"
-      | "Sagittarius"
-      | "Scorpio"
-      | "Taurus"
-      | "Virgo"
-    ),
-    (
-      | "Aquarius"
-      | "Aries"
-      | "Cancer"
-      | "Capricorn"
-      | "Gemini"
-      | "Leo"
-      | "Libra"
-      | "Pisces"
-      | "Sagittarius"
-      | "Scorpio"
-      | "Taurus"
-      | "Virgo"
-    ),
-    (
-      | "Aquarius"
-      | "Aries"
-      | "Cancer"
-      | "Capricorn"
-      | "Gemini"
-      | "Leo"
-      | "Libra"
-      | "Pisces"
-      | "Sagittarius"
-      | "Scorpio"
-      | "Taurus"
-      | "Virgo"
-    ),
-  ],
-  CalculationError | SignIndexError,
-  never
->;
-```
-
 ## Classes
 
 ### `CalculationError`
@@ -152,21 +60,11 @@ class ParseError extends ParseError_base {}
 
 ## Interfaces
 
-### `ExactDegree`
-
-```ts
-interface ExactDegree {
-  readonly coefficient: bigint;
-  readonly scale: number;
-  readonly value: Degree;
-}
-```
-
 ### `RankedHolder`
 
 ```ts
 interface RankedHolder extends Holder {
-  readonly exactDegree: ExactDegree;
+  readonly exactDegree: ExactDegreeValue;
 }
 ```
 
@@ -208,7 +106,9 @@ const Assignments: Schema.$Record<
           "Saturn",
         ]
       >;
-      readonly degree: Schema.brand<Schema.Finite, "Degree">;
+      readonly degree: Schema.brand<Schema.Finite, "Degree"> & {
+        of(longitude: import("../../chart/model.js").Longitude): Degree;
+      };
     }>
   >
 >;
@@ -229,7 +129,9 @@ const Holder: Schema.Struct<{
   readonly planet: Schema.Literals<
     readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
   >;
-  readonly degree: Schema.brand<Schema.Finite, "Degree">;
+  readonly degree: Schema.brand<Schema.Finite, "Degree"> & {
+    of(longitude: import("../../chart/model.js").Longitude): Degree;
+  };
 }>;
 ```
 

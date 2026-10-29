@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreDependencies": ["sharp", "svgo"],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "types": "off"
+  },
+  "ignoreIssues": {
+    "src/components/ui/**": ["exports", "types", "duplicates"],
+    "src/components/arc/**": ["exports", "types", "duplicates"],
+    "src/components/mdx.tsx": ["exports", "duplicates"]
+  }
+}

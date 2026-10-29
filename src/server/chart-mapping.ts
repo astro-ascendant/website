@@ -11,14 +11,15 @@ import type {
 } from "astro-ascendant";
 import { DateTime } from "effect";
 import type { Effect } from "effect";
-import {
-  uniqueHousesInOrder,
-  type ChartDashaPeriod,
-  type ChartResult,
-  type KpCuspRow,
-  type KpSignificatorRow,
+import type {
+  ChartDashaPeriod,
+  ChartResult,
+  KpCuspRow,
+  KpSignificatorRow,
 } from "@/lib/chart";
-import { normalizeLongitude } from "@/lib/longitude";
+import { SIGNS } from "@/lib/zodiac";
+import type { CalculateChartInput } from "./calculate-chart";
+import { kpSubLordOf } from "./kp-sub-lord";
 
 export const HOUSES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
@@ -42,21 +43,6 @@ const SAV_PLANETS = [
   "Jupiter",
   "Venus",
   "Saturn",
-] as const;
-
-const RASHIS = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces",
 ] as const;
 
 type DashaResult = Effect.Success<ReturnType<typeof Dasha.calculate>>;
@@ -88,22 +74,37 @@ export interface ChartMappingOptional {
 }
 
 export interface ChartMappingInput {
+  readonly input: CalculateChartInput;
   readonly calculation: Chart.ChartCalculation;
   readonly kpCalculation: Chart.ChartCalculation;
-  readonly birth: ChartResult["birth"];
   readonly optional: ChartMappingOptional;
 }
 
 /**
  * Pure assembly of the chart contract: the library's calculations and the
  * optional Jaimini, dasha, and Ashtakavarga results become a `ChartResult`.
- * No Effect, no ephemeris, no clock.
+ * No Effect, no ephemeris, no clock. Internal to the chart calculation: only
+ * `calculate-chart.ts` imports this module.
  */
-export function toChartResult(input: ChartMappingInput): ChartResult {
-  const { calculation, kpCalculation, birth, optional } = input;
+export function toChartResult({
+  input,
+  calculation,
+  kpCalculation,
+  optional,
+}: ChartMappingInput): ChartResult {
   const lagna = d1Lagna(calculation);
   return {
-    birth,
+    birth: {
+      name: input.name ?? "",
+      utcIso: DateTime.formatIso(input.moment.date),
+      date: input.localDate ?? "",
+      time: input.localTime ?? "",
+      timeZone: input.timeZone ?? null,
+      utcOffset: input.offset ?? null,
+      place: input.place,
+      latitude: input.latitude,
+      longitude: input.longitude,
+    },
     // Report the method the engine actually used.
     astroParams: {
       ayanamsa: calculation.astroParams.ayanamsa,
@@ -129,11 +130,9 @@ export function toChartResult(input: ChartMappingInput): ChartResult {
   };
 }
 
-function findD1(calculation: Chart.ChartCalculation): Chart.Chart {
-  return (
-    calculation.charts.find((chart) => chart.division === 1) ??
-    calculation.charts[0]
-  );
+/** D1 is always the first chart, and the only one with KP evidence. */
+function findD1(calculation: Chart.ChartCalculation): Chart.D1Chart {
+  return calculation.charts[0];
 }
 
 export function d1Lagna(calculation: Chart.ChartCalculation): {
@@ -149,79 +148,6 @@ export function d1Lagna(calculation: Chart.ChartCalculation): {
     sign: lagnaHouse.sign,
     longitude: lagnaHouse.lagna?.longitude ?? null,
   };
-}
-
-const NAKSHATRA_SPAN = 360 / 27;
-const NAKSHATRA_LORD_CYCLE = [
-  "Ketu",
-  "Venus",
-  "Sun",
-  "Moon",
-  "Mars",
-  "Rahu",
-  "Jupiter",
-  "Saturn",
-  "Mercury",
-] as const;
-const VIMSHOTTARI_YEARS: Record<(typeof NAKSHATRA_LORD_CYCLE)[number], number> =
-  {
-    Ketu: 7,
-    Venus: 20,
-    Sun: 6,
-    Moon: 10,
-    Mars: 7,
-    Rahu: 18,
-    Jupiter: 16,
-    Saturn: 19,
-    Mercury: 17,
-  };
-
-const KP_SIGN_LORDS = [
-  "Mars",
-  "Venus",
-  "Mercury",
-  "Moon",
-  "Sun",
-  "Mercury",
-  "Venus",
-  "Mars",
-  "Jupiter",
-  "Saturn",
-  "Saturn",
-  "Jupiter",
-] as const;
-
-function kpSignLordOf(longitude: number): string {
-  const signIndex = Math.floor(normalizeLongitude(longitude) / 30);
-  return KP_SIGN_LORDS[signIndex] ?? "";
-}
-
-function kpStarLordOf(longitude: number): string {
-  const position = normalizeLongitude(longitude);
-  const starIndex =
-    Math.floor(position / NAKSHATRA_SPAN) % NAKSHATRA_LORD_CYCLE.length;
-  return NAKSHATRA_LORD_CYCLE[starIndex] ?? "";
-}
-
-function kpSubLord(longitude: number): string {
-  const position = normalizeLongitude(longitude);
-  const starIndex =
-    Math.floor(position / NAKSHATRA_SPAN) % NAKSHATRA_LORD_CYCLE.length;
-  const starLord = NAKSHATRA_LORD_CYCLE[starIndex] ?? "Ketu";
-  const ratio = (position % NAKSHATRA_SPAN) / NAKSHATRA_SPAN;
-  const start = NAKSHATRA_LORD_CYCLE.indexOf(starLord);
-  let elapsed = 0;
-  for (let offset = 0; offset < NAKSHATRA_LORD_CYCLE.length; offset += 1) {
-    const planet =
-      NAKSHATRA_LORD_CYCLE[(start + offset) % NAKSHATRA_LORD_CYCLE.length] ??
-      starLord;
-    const width = VIMSHOTTARI_YEARS[planet] / 120;
-    if (ratio < elapsed + width) {
-      return planet;
-    }
-    elapsed += width;
-  }
-  return starLord;
 }
 
 function titleCase(value: string): string {
@@ -332,6 +258,21 @@ function readDivisions(
   });
 }
 
+/** First-seen order across KP signification levels (star, occupancy, ownership). */
+function uniqueHousesInOrder(groups: readonly (readonly number[])[]): number[] {
+  const seen = new Set<number>();
+  const houses: number[] = [];
+  for (const group of groups) {
+    for (const house of group) {
+      if (!seen.has(house)) {
+        seen.add(house);
+        houses.push(house);
+      }
+    }
+  }
+  return houses;
+}
+
 function signifyingHousesOf(
   signification: Chart.PlanetSignification | undefined,
 ): number[] {
@@ -347,7 +288,7 @@ function signifyingHousesOf(
 }
 
 function planetSignification(
-  chart: Chart.Chart,
+  chart: Chart.D1Chart,
   planet: string,
 ): Chart.PlanetSignification | undefined {
   if (planet === "" || planet === "Lagna") {
@@ -356,6 +297,11 @@ function planetSignification(
   return chart.planetSignifications?.[planet as Chart.Planets];
 }
 
+/**
+ * KP significators and cusps, all from the KP calculation (KP ayanamsa,
+ * Placidus). Each row carries the body's KP longitude and the Placidus house
+ * it occupies, so no view has to place Lahiri longitudes into KP cusps.
+ */
 function readKpChart(
   calculation: Chart.ChartCalculation,
   vimshottari: ChartDashaPeriod[],
@@ -364,58 +310,56 @@ function readKpChart(
   const sourceByName = new Map(
     calculation.placements.planets.map((planet) => [planet.name, planet]),
   );
-  const planetByName = new Map<string, Chart.Planet>();
+  const placed = new Map<string, { planet: Chart.Planet; house: number }>();
   for (const houseNumber of HOUSES) {
     for (const planet of d1.houses[houseNumber].planets) {
-      planetByName.set(planet.name, planet);
+      placed.set(planet.name, { planet, house: houseNumber });
     }
   }
 
-  const rows: KpSignificatorRow[] = [];
   const lagnaHouse = d1.houses[1];
-  const lagnaSubLord = lagnaHouse.subLord ?? "";
-  rows.push({
-    name: "Lagna",
-    signLord: lagnaHouse.signLord ?? "",
-    starLord: lagnaHouse.starLord ?? "",
-    subLord: lagnaSubLord,
-    signifyingHouses: signifyingHousesOf(planetSignification(d1, lagnaSubLord)),
-  });
+  const rows: KpSignificatorRow[] = [
+    {
+      name: "Lagna",
+      sign: lagnaHouse.sign,
+      longitude: lagnaHouse.cusp,
+      house: 1,
+      retrograde: false,
+      signLord: lagnaHouse.signLord,
+      starLord: lagnaHouse.starLord,
+      subLord: lagnaHouse.subLord,
+      signifyingHouses: signifyingHousesOf(
+        planetSignification(d1, lagnaHouse.subLord),
+      ),
+    },
+  ];
 
   for (const name of PLANET_ORDER) {
-    const planet = planetByName.get(name);
-    const source = sourceByName.get(name);
+    const entry = placed.get(name);
+    const planet = entry?.planet;
     rows.push({
       name,
+      sign: planet?.sign.name ?? "",
+      longitude: planet?.longitude ?? null,
+      house: entry?.house ?? null,
+      retrograde: planet?.is_retrograde ?? false,
       signLord: planet?.sign.lord ?? "",
-      starLord: source?.star.lord ?? "",
-      subLord: planet === undefined ? "" : kpSubLord(planet.longitude),
+      starLord: sourceByName.get(name)?.star.lord ?? "",
+      subLord: planet === undefined ? "" : kpSubLordOf(planet.longitude),
       signifyingHouses: signifyingHousesOf(planetSignification(d1, name)),
     });
   }
 
   const cusps: KpCuspRow[] = HOUSES.map((houseNumber) => {
     const house = d1.houses[houseNumber];
-    const cusp = house.cusp;
-    if (cusp === undefined) {
-      return {
-        house: houseNumber,
-        sign: house.sign,
-        longitude: null,
-        signLord: house.signLord ?? "",
-        starLord: house.starLord ?? "",
-        subLord: house.subLord ?? "",
-        subSubLord: "",
-      };
-    }
     return {
       house: houseNumber,
       sign: house.sign,
-      longitude: cusp,
-      signLord: kpSignLordOf(cusp),
-      starLord: kpStarLordOf(cusp),
-      subLord: kpSubLord(cusp),
-      subSubLord: house.subSubLord ?? "",
+      longitude: house.cusp,
+      signLord: house.signLord,
+      starLord: house.starLord,
+      subLord: house.subLord,
+      subSubLord: house.subSubLord,
     };
   });
 
@@ -463,16 +407,16 @@ function readJaimini(optional: ChartMappingOptional): ChartResult["jaimini"] {
 
 function readSav(sav: SavResult | null): ChartResult["sav"] {
   if (sav === null) {
-    return { signs: [...RASHIS], rows: [], signTotals: [], total: 0 };
+    return { signs: [...SIGNS], rows: [], signTotals: [], total: 0 };
   }
   return {
-    signs: [...RASHIS],
+    signs: [...SIGNS],
     rows: SAV_PLANETS.map((planet) => ({
       planet,
-      points: RASHIS.map((sign) => sav.bhinna[planet][sign]),
+      points: SIGNS.map((sign) => sav.bhinna[planet][sign]),
       total: sav.totals[planet],
     })),
-    signTotals: RASHIS.map((sign) => sav.sarva[sign]),
+    signTotals: SIGNS.map((sign) => sav.sarva[sign]),
     total: sav.totals.sarva,
   };
 }

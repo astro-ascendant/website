@@ -11,7 +11,7 @@ import {
   SOUTH_INDIAN_GRID_TEMPLATE,
   type DivisionOccupant,
 } from "@/lib/chart-view";
-import { useChartSession } from "@/components/chart/context";
+import { useChartSession } from "@/components/chart/session";
 import { cn } from "@/lib/utils";
 
 function Root({ label, children }: { label: string; children: ReactNode }) {

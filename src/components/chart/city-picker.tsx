@@ -10,7 +10,7 @@ import type { PlaceOption } from "@/lib/place";
 
 interface CityPickerProps {
   value: PlaceOption | null;
-  options: PlaceOption[];
+  options: readonly PlaceOption[];
   open: boolean;
   query: string;
   invalid?: boolean;

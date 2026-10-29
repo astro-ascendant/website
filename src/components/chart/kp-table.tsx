@@ -6,9 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useChartSession } from "@/components/chart/context";
-import { formatSignifyingHouses } from "@/lib/chart";
-import { formatLongitude } from "@/lib/longitude";
+import { useChartSession } from "@/components/chart/session";
+import { formatSignifyingHouses } from "@/lib/chart-report";
+import { formatLongitude } from "@/lib/zodiac";
 import { ChartCode, ChartQuote } from "@/components/chart/quote";
 
 export function ChartKpCaption() {

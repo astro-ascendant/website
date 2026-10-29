@@ -8,11 +8,10 @@ import {
   Karakamsha,
   RashiDrishti,
   SAV,
-  Swisseph,
   Upapada,
 } from "astro-ascendant";
-import { Data, DateTime, Effect, Option } from "effect";
-import { ALL_DIVISIONS, type ChartResult } from "@/lib/chart";
+import { Data, Effect, Option } from "effect";
+import { ALL_DIVISIONS } from "@/lib/chart";
 import {
   HOUSES,
   d1Lagna,
@@ -39,9 +38,7 @@ export interface CalculateChartInput {
   readonly timeZone?: string | null;
 }
 
-export class CalculateChartError extends Data.TaggedError(
-  "CalculateChartError",
-)<{
+class CalculateChartError extends Data.TaggedError("CalculateChartError")<{
   readonly message: string;
 }> {}
 
@@ -86,7 +83,7 @@ export const calculateChart = Effect.fn("Chart.calculate")(
       Effect.withLogSpan("chart.kp"),
     );
 
-    const { lagnaSign, optional } = yield* Effect.gen(function* () {
+    const optional = yield* Effect.gen(function* () {
       const placements = calculation.placements;
       const { sign: lagnaSign } = d1Lagna(calculation);
 
@@ -134,28 +131,13 @@ export const calculateChart = Effect.fn("Chart.calculate")(
         argala: Option.getOrElse(argala, () => null),
         arudha,
       };
-      return { lagnaSign, optional };
+      return optional;
     }).pipe(
       Effect.tap(() => Effect.logInfo("chart stage complete")),
       Effect.withLogSpan("chart.derived"),
     );
 
-    return toChartResult({
-      calculation,
-      kpCalculation,
-      birth: {
-        name: input.name ?? "",
-        utcIso: DateTime.formatIso(moment.date),
-        date: input.localDate ?? "",
-        time: input.localTime ?? "",
-        timeZone: input.timeZone ?? null,
-        utcOffset: input.offset ?? null,
-        place: input.place,
-        latitude: input.latitude,
-        longitude: input.longitude,
-      },
-      optional,
-    });
+    return toChartResult({ input, calculation, kpCalculation, optional });
   },
   (effect) =>
     effect.pipe(

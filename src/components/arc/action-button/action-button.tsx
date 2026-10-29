@@ -10,7 +10,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import type { TargetAndTransition, Variants } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 import { motionTokens } from "../lib/motion-tokens";
 import styles from "./action-button.module.css";
 
@@ -286,7 +286,7 @@ export function ActionButton({
               ) : state === "success" ? (
                 <DrawnCheck reduced={reduceMotion} />
               ) : (
-                <ArrowRight className={styles.arrow} width={17} height={17} />
+                <ArrowRightIcon className={styles.arrow} size={17} />
               )}
             </motion.span>
           </AnimatePresence>

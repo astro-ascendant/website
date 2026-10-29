@@ -1,5 +1,3 @@
-export const appName = "Ascendant";
-
 /**
  * Canonical origin for absolute URLs (canonicals, og:url, sitemap entries).
  *
@@ -32,5 +30,3 @@ export const skillsGitConfig = {
   repo: "skills",
   branch: "main",
 };
-
-export const ASCENDANT_VERSION = "1.0.1";
