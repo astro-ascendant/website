@@ -23,6 +23,7 @@
   "menuAccent": "subtle",
   "registries": {
     "@uiarc": "https://uiarc.dev/r/{name}.json",
-    "@svgl": "https://svgl.app/r/{name}.json"
+    "@svgl": "https://svgl.app/r/{name}.json",
+    "@pdfcn": "https://pdfcn.dev/r/{name}.json"
   }
 }
