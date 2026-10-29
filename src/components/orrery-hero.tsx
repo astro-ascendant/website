@@ -120,10 +120,10 @@ export function OrreryHero() {
 
   return (
     <>
-      <figure className="mx-auto w-full max-w-xs select-none sm:max-w-sm lg:max-w-md">
+      <figure className="me-auto w-full max-w-xs select-none sm:max-w-sm lg:mx-auto lg:max-w-md">
         <svg
           viewBox="-100 -100 200 200"
-          className="h-auto w-full"
+          className="h-auto w-full overflow-visible"
           aria-hidden="true"
           onPointerEnter={() => (targetSpeed.current = HOVER_SPEED)}
           onPointerLeave={() => {

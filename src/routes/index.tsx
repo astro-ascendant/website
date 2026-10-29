@@ -41,7 +41,7 @@ function LandingPage() {
         </a>
 
         <section aria-label="Ascendant horoscope calculator" className="mt-10">
-          <div className="grid w-full items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+          <div className="grid w-full items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
             <div className="flex flex-col items-start">
               <h1 className="font-sans text-lg font-medium tracking-tight text-foreground sm:text-xl">
                 Understand your horoscope.
@@ -62,7 +62,7 @@ function LandingPage() {
               </div>
             </div>
 
-            <div className="order-first lg:order-last">
+            <div>
               <OrreryHero />
             </div>
           </div>
