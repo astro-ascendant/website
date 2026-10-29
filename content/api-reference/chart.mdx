@@ -3,7 +3,7 @@ title: Chart
 description: Chart generation and placement models for D1 and divisional charts.
 ---
 
-{/* Generated from astro-ascendant@5.1.1. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/chart`:
 
@@ -44,28 +44,10 @@ const getDivisionalTarget: (
   division:
     1 | 2 | 3 | 4 | 7 | 9 | 10 | 12 | 16 | 20 | 24 | 27 | 30 | 40 | 45 | 60,
 ) => Effect.Effect<
-  {
-    signIndex: number;
-    degree: number & import("effect/Brand").Brand<"Degree">;
-    longitude: number & import("effect/Brand").Brand<"Longitude">;
-  },
-  DivisionalMappingError | import("../../utils/position.js").LongitudeError,
+  import("./model.js").SourcePosition,
+  DivisionalMappingError,
   never
 >;
-```
-
-### `project`
-
-```ts
-const project: (
-  placements: Placements,
-  divisions?:
-    | readonly (
-        1 | 2 | 3 | 4 | 7 | 9 | 10 | 12 | 16 | 20 | 24 | 27 | 30 | 40 | 45 | 60
-      )[]
-    | undefined,
-  sex?: "Female" | "Male" | undefined,
-) => Effect.Effect<[Chart, ...Chart[]], ChartCalculationError, never>;
 ```
 
 ## Classes
@@ -88,13 +70,31 @@ class DivisionalMappingError extends DivisionalMappingError_base {}
 class LocatedMomentValidationError extends LocatedMomentValidationError_base {}
 ```
 
-### `MissingPlacementError`
+## Interfaces
+
+### `D1Chart`
 
 ```ts
-class MissingPlacementError extends MissingPlacementError_base {}
+interface D1Chart extends Schema.Schema.Type<typeof D1Chart> {}
 ```
 
-## Interfaces
+### `D1House`
+
+```ts
+interface D1House extends Schema.Schema.Type<typeof D1House> {}
+```
+
+### `DivisionalChart`
+
+```ts
+interface DivisionalChart extends Schema.Schema.Type<typeof DivisionalChart> {}
+```
+
+### `DivisionalHouse`
+
+```ts
+interface DivisionalHouse extends Schema.Schema.Type<typeof DivisionalHouse> {}
+```
 
 ### `DivisionalTarget`
 
@@ -125,47 +125,91 @@ interface Subdivision {
 }
 ```
 
+## Types
+
+### `CircleAngle`
+
+```ts
+type CircleAngle = typeof CircleAngleSchema.Type;
+```
+
+### `Degree`
+
+```ts
+type Degree = typeof DegreeSchema.Type;
+```
+
+### `DivisionalDivision`
+
+```ts
+type DivisionalDivision = typeof DivisionalDivision.Type;
+```
+
+### `Longitude`
+
+```ts
+type Longitude = typeof LongitudeSchema.Type;
+```
+
 ## Constants
 
 ### `CalculationCharts`
 
 ```ts
-const CalculationCharts: Schema.NonEmptyArray<Schema.Struct<{
+const CalculationCharts: Schema.TupleWithRest<Schema.Tuple<readonly [Schema.Struct<{
     readonly sex: Schema.optionalKey<Schema.Literals<readonly ["Male", "Female"]>>;
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Ascendant">;
-        readonly method: Schema.Literal<"ascendant-divisional-mapping">;
+        readonly method: Schema.Literal<"house-system-cusps">;
         readonly version: Schema.Literal<1>;
     }>;
-    readonly division: Schema.Literals<readonly [1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60]>;
+    readonly division: Schema.Literal<1>;
     readonly houses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
         readonly sign: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
-        readonly cusp: Schema.brand<Schema.Finite, "Longitude">;
+        readonly cusp: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+            normalize(degrees: number): Longitude;
+            
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+            inSign(signIndex: number, degree: number): Longitude;
+        };
         readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly starLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly subLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly subSubLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury"
+        readonly significations: Schema.$Array<Schema.String>;
+        readonly planets: Schema.$Array<Schema.Struct<{
+            readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars",
 // … truncated
 ```
 
 ### `Chart`
 
 ```ts
-const Chart: Schema.Struct<{
+const Chart: Schema.Union<readonly [Schema.Struct<{
     readonly sex: Schema.optionalKey<Schema.Literals<readonly ["Male", "Female"]>>;
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Ascendant">;
-        readonly method: Schema.Literal<"ascendant-divisional-mapping">;
+        readonly method: Schema.Literal<"house-system-cusps">;
         readonly version: Schema.Literal<1>;
     }>;
-    readonly division: Schema.Literals<readonly [1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60]>;
+    readonly division: Schema.Literal<1>;
     readonly houses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
         readonly sign: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
-        readonly cusp: Schema.brand<Schema.Finite, "Longitude">;
+        readonly cusp: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+            normalize(degrees: number): Longitude;
+            
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+            inSign(signIndex: number, degree: number): Longitude;
+        };
         readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly starLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly subLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-        readonly subSubLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "
+        readonly significations: Schema.$Array<Schema.String>;
+        readonly planets: Schema.$Array<Schema.Struct<{
+            readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "
 // … truncated
 ```
 
@@ -173,15 +217,54 @@ const Chart: Schema.Struct<{
 
 ```ts
 const ChartAngles: Schema.Struct<{
-  readonly ascendant: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly mc: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly armc: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly vertex: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly equatorialAscendant: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly coAscendant1: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly coAscendant2: Schema.brand<Schema.Finite, "CircleAngle">;
-  readonly polarAscendant: Schema.brand<Schema.Finite, "CircleAngle">;
-}>;
+    readonly ascendant: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly mc: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly armc: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly vertex: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly equatorialAscendant: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly coAscendant1: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly coAscendant2: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleAngle;
+    };
+    readonly polarAscendant: Schema.brand<Schema.Finite, "CircleAngle"> & {
+        
+/** Wraps any finite angle onto the circle. */
+
+        normalize(degrees: number): CircleA
+// … truncated
 ```
 
 ### `ChartCalculation`
@@ -191,7 +274,16 @@ const ChartCalculation: Schema.Struct<{
     readonly placements: Schema.Struct<{
         readonly lagna: Schema.Struct<{
             readonly name: Schema.Literal<"Lagna">;
-            readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
+            readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+                
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+                normalize(degrees: number): Longitude;
+                
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+                inSign(signIndex: number, degree: number): Longitude;
+            };
             readonly star: Schema.Struct<{
                 readonly name: Schema.Literals<readonly ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"]>;
                 readonly lord: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
@@ -200,29 +292,7 @@ const ChartCalculation: Schema.Struct<{
         }>;
         readonly planets: Schema.$Array<Schema.Struct<{
             readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-            readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-            readonly is_retrograde: Schema.Boolean;
-            readonly star: Schema.Struct<{
-                readonly name: Schema.Literals<readonly ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "H
-// … truncated
-```
-
-### `ChartHouses`
-
-```ts
-const ChartHouses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
-    readonly sign: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
-    readonly cusp: Schema.brand<Schema.Finite, "Longitude">;
-    readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly starLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly subLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly subSubLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly significations: Schema.$Array<Schema.String>;
-    readonly planets: Schema.$Array<Schema.Struct<{
-        readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-        readonly degree: Schema.brand<Schema.Finite, "Degree">;
-        readonly is_retrograde: Schema.Boolean;
+            reado
 // … truncated
 ```
 
@@ -241,16 +311,46 @@ const ChartParams: Schema.Struct<{
 }>;
 ```
 
-### `CircleAngle`
+### `D1ChartProvenance`
 
 ```ts
-const CircleAngle: Schema.brand<Schema.Finite, "CircleAngle">;
+const D1ChartProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Ascendant">;
+  readonly method: Schema.Literal<"house-system-cusps">;
+  readonly version: Schema.Literal<1>;
+}>;
 ```
 
-### `Degree`
+### `D1Houses`
 
 ```ts
-const Degree: Schema.brand<Schema.Finite, "Degree">;
+const D1Houses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
+    readonly sign: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
+    readonly cusp: Schema.brand<Schema.Finite, "Longitude"> & {
+        
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+        normalize(degrees: number): Longitude;
+        
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+        inSign(signIndex: number, degree: number): Longitude;
+    };
+    readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
+    readonly significations: Schema.$Array<Schema.String>;
+    readonly planets: Schema.$Array<Schema.Struct<{
+        readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+            normalize(degrees: number): Longitude;
+            
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+            inSign(signIndex: number, degree: number): Longitude;
+        };
+// … truncated
 ```
 
 ### `Division`
@@ -261,23 +361,44 @@ const Division: Schema.Literals<
 >;
 ```
 
-### `House`
+### `DivisionalChartProvenance`
 
 ```ts
-const House: Schema.Struct<{
+const DivisionalChartProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Ascendant">;
+  readonly method: Schema.Literal<"whole-sign-from-mapped-lagna">;
+  readonly version: Schema.Literal<1>;
+}>;
+```
+
+### `DivisionalHouses`
+
+```ts
+const DivisionalHouses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
     readonly sign: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
-    readonly cusp: Schema.brand<Schema.Finite, "Longitude">;
+    readonly cusp: Schema.brand<Schema.Finite, "Longitude"> & {
+        
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+        normalize(degrees: number): Longitude;
+        
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+        inSign(signIndex: number, degree: number): Longitude;
+    };
     readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly starLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly subLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
-    readonly subSubLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
     readonly significations: Schema.$Array<Schema.String>;
     readonly planets: Schema.$Array<Schema.Struct<{
         readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-        readonly degree: Schema.brand<Schema.Finite, "Degree">;
-        readonly is_retrograde: Schema.Boolean;
-        readonly in_sign: Schema.$Array<Schema.Literals<readonly ["EXALTED", "MOOLA_TRIKO
+        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+            normalize(degrees: number): Longitude;
+            
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+            inSign(signIndex: number, degree: number): Longitude;
 // … truncated
 ```
 
@@ -475,8 +596,20 @@ const HouseSignificators: Schema.Struct<{
 ```ts
 const Lagna: Schema.Struct<{
   readonly name: Schema.Literal<"Lagna">;
-  readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-  readonly degree: Schema.brand<Schema.Finite, "Degree">;
+  readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+    /** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+    normalize(degrees: number): Longitude;
+
+    /** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+    inSign(signIndex: number, degree: number): Longitude;
+  };
+  readonly degree: Schema.brand<Schema.Finite, "Degree"> & {
+    /** The Degree of a Longitude within the Sign that contains it. */
+
+    of(longitude: Longitude): Degree;
+  };
   readonly sign: Schema.Struct<{
     readonly name: Schema.Literals<
       readonly [
@@ -519,12 +652,6 @@ const LocatedMoment: Schema.Struct<{
 }>;
 ```
 
-### `Longitude`
-
-```ts
-const Longitude: Schema.brand<Schema.Finite, "Longitude">;
-```
-
 ### `Moment`
 
 ```ts
@@ -545,7 +672,16 @@ const Pada: Schema.Literals<readonly [1, 2, 3, 4]>;
 const Placements: Schema.Struct<{
     readonly lagna: Schema.Struct<{
         readonly name: Schema.Literal<"Lagna">;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
+        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+            normalize(degrees: number): Longitude;
+            
+/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+            inSign(signIndex: number, degree: number): Longitude;
+        };
         readonly star: Schema.Struct<{
             readonly name: Schema.Literals<readonly ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"]>;
             readonly lord: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
@@ -554,10 +690,9 @@ const Placements: Schema.Struct<{
     }>;
     readonly planets: Schema.$Array<Schema.Struct<{
         readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-        readonly is_retrograde: Schema.Boolean;
-        readonly star: Schema.Struct<{
-            readonly name: Schema.Literals<readonly ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "S
+        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+            
+/** Wraps any finite angle onto the circle
 // … truncated
 ```
 
@@ -578,8 +713,20 @@ const Planet: Schema.Struct<{
       "Ketu",
     ]
   >;
-  readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
-  readonly degree: Schema.brand<Schema.Finite, "Degree">;
+  readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+    /** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+    normalize(degrees: number): Longitude;
+
+    /** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+    inSign(signIndex: number, degree: number): Longitude;
+  };
+  readonly degree: Schema.brand<Schema.Finite, "Degree"> & {
+    /** The Degree of a Longitude within the Sign that contains it. */
+
+    of(longitude: Longitude): Degree;
+  };
   readonly is_retrograde: Schema.Boolean;
   readonly in_sign: Schema.$Array<
     Schema.Literals<
@@ -722,16 +869,6 @@ const PlanetsLagna: Schema.Union<
 >;
 ```
 
-### `Provenance`
-
-```ts
-const Provenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
-  readonly method: Schema.Literal<"ascendant-divisional-mapping">;
-  readonly version: Schema.Literal<1>;
-}>;
-```
-
 ### `RashiLords`
 
 ```ts
@@ -798,7 +935,15 @@ const Sign: Schema.Struct<{
 ```ts
 const SourceLagna: Schema.Struct<{
   readonly name: Schema.Literal<"Lagna">;
-  readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
+  readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+    /** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+    normalize(degrees: number): Longitude;
+
+    /** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+    inSign(signIndex: number, degree: number): Longitude;
+  };
   readonly star: Schema.Struct<{
     readonly name: Schema.Literals<
       readonly [
@@ -866,7 +1011,15 @@ const SourcePlanet: Schema.Struct<{
       "Ketu",
     ]
   >;
-  readonly longitude: Schema.brand<Schema.Finite, "Longitude">;
+  readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
+    /** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
+
+    normalize(degrees: number): Longitude;
+
+    /** The Longitude at a Degree within the Sign at a 0-based wheel position. */
+
+    inSign(signIndex: number, degree: number): Longitude;
+  };
   readonly is_retrograde: Schema.Boolean;
   readonly star: Schema.Struct<{
     readonly name: Schema.Literals<

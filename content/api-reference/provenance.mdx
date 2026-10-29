@@ -3,7 +3,7 @@ title: Provenance
 description: Method specification and provenance records attached to calculations.
 ---
 
-{/* Generated from astro-ascendant@5.1.1. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/provenance`:
 
@@ -71,38 +71,79 @@ const CharaDashaProvenance: Schema.Struct<{
 }>;
 ```
 
-### `chartProjection`
+### `d1ChartProjection`
 
 ```ts
-const chartProjection: {
+const d1ChartProjection: {
   readonly provenance: {
     readonly school: "Ascendant";
-    readonly method: "ascendant-divisional-mapping";
+    readonly method: "house-system-cusps";
+    readonly version: 1;
+  };
+  readonly steps: readonly [
+    {
+      readonly id: "place-points";
+      readonly description: "Use the Lagna and planets at their source longitudes.";
+    },
+    {
+      readonly id: "build-cusp-houses";
+      readonly description: "Begin each house at the selected House system's cusp.";
+    },
+    {
+      readonly id: "derive-kp";
+      readonly description: "Derive KP lords, significations and ruling planets from the cusps.";
+    },
+  ];
+  readonly verification: readonly [
+    "D1 is an identity projection.",
+    "Planets fall in the house whose cusp span contains them.",
+    "Degenerate cusps fail rather than fall back to equal houses.",
+  ];
+};
+```
+
+### `D1ChartProvenance`
+
+```ts
+const D1ChartProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Ascendant">;
+  readonly method: Schema.Literal<"house-system-cusps">;
+  readonly version: Schema.Literal<1>;
+}>;
+```
+
+### `divisionalChartProjection`
+
+```ts
+const divisionalChartProjection: {
+  readonly provenance: {
+    readonly school: "Ascendant";
+    readonly method: "whole-sign-from-mapped-lagna";
     readonly version: 1;
   };
   readonly steps: readonly [
     {
       readonly id: "map-longitudes";
-      readonly description: "Map Lagna and planets into the requested division.";
+      readonly description: "Map the Lagna and planets into the Division.";
     },
     {
       readonly id: "build-whole-sign-houses";
-      readonly description: "Build twelve houses from the mapped Lagna.";
+      readonly description: "Count twelve whole-sign houses from the mapped Lagna's Sign.";
     },
   ];
   readonly verification: readonly [
-    "D1 is an identity projection.",
-    "Requested divisions are unique and ordered.",
+    "Requested divisions are unique and ordered after D1.",
+    "Each house holds exactly the planets mapped into its Sign.",
   ];
 };
 ```
 
-### `ChartProjectionProvenance`
+### `DivisionalChartProvenance`
 
 ```ts
-const ChartProjectionProvenance: Schema.Struct<{
+const DivisionalChartProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Ascendant">;
-  readonly method: Schema.Literal<"ascendant-divisional-mapping">;
+  readonly method: Schema.Literal<"whole-sign-from-mapped-lagna">;
   readonly version: Schema.Literal<1>;
 }>;
 ```
@@ -319,40 +360,38 @@ const JaiminiUpapadaProvenance: Schema.Struct<{
 
 ```ts
 const methods: {
-    readonly chartProjection: {
+    readonly d1ChartProjection: {
         readonly provenance: {
             readonly school: "Ascendant";
-            readonly method: "ascendant-divisional-mapping";
+            readonly method: "house-system-cusps";
+            readonly version: 1;
+        };
+        readonly steps: readonly [{
+            readonly id: "place-points";
+            readonly description: "Use the Lagna and planets at their source longitudes.";
+        }, {
+            readonly id: "build-cusp-houses";
+            readonly description: "Begin each house at the selected House system's cusp.";
+        }, {
+            readonly id: "derive-kp";
+            readonly description: "Derive KP lords, significations and ruling planets from the cusps.";
+        }];
+        readonly verification: readonly ["D1 is an identity projection.", "Planets fall in the house whose cusp span contains them.", "Degenerate cusps fail rather than fall back to equal houses."];
+    };
+    readonly divisionalChartProjection: {
+        readonly provenance: {
+            readonly school: "Ascendant";
+            readonly method: "whole-sign-from-mapped-lagna";
             readonly version: 1;
         };
         readonly steps: readonly [{
             readonly id: "map-longitudes";
-            readonly description: "Map Lagna and planets into the requested division.";
+            readonly description: "Map the Lagna and planets into the Division.";
         }, {
             readonly id: "build-whole-sign-houses";
-            readonly description: "Build twelve houses from the mapped Lagna.";
+            readonly description: "Count twelve whole-sign houses from the mapped Lagna's Sign.";
         }];
-        readonly verification: readonly ["D1 is an identity projection.", "Requested divisions are unique and ordered."];
-    };
-    readonly jaiminiArgala: {
-        readonly provenance: {
-            readonly school: "Jaimini";
-            readonly method: "structural-positions";
-            readonly version: 1;
-        };
-        readonly steps: readonly [{
-            readonly id: "validate-placements";
-            readonly description: "Require one placement for every planet.";
-        }, {
-            readonly id: "derive-relations";
-            readonly description: "Calculate supporting and obstructing sign positions.";
-        }];
-        readonly verification: readonly ["Ketu reference reverses direction.", "Supporting and obstructing positions are fixed."];
-    };
-    readonly jaiminiArudhaPada: {
-        readonly provenance: {
-            readonly school: "Jaimini";
-            readonly method: "plain-projection";
+        readonly verification: rea
 // … truncated
 ```
 

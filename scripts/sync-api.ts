@@ -4,7 +4,13 @@
 // Usage:
 //   bun run scripts/sync-api.ts          # regenerate pages + meta.json
 //   bun run scripts/sync-api.ts --check  # report drift without writing
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 
@@ -464,15 +470,42 @@ const desiredMeta =
     2,
   ) + "\n";
 
-let dirty: string[] = [];
-if (!existsSync(metaPath) || readFileSync(metaPath, "utf8") !== desiredMeta)
-  dirty.push("meta.json");
-for (const [page, symbols] of pages) {
-  const outPath = join(apiDir, `${page}.mdx`);
-  const content = renderPage(page, PAGES[page], firstSubpathFor(page), symbols);
-  if (!existsSync(outPath) || readFileSync(outPath, "utf8") !== content)
-    dirty.push(`${page}.mdx`);
+/**
+ * Pages exactly as they land in the repo: rendered, then run through
+ * `bun fmt` from inside the repo so its formatter settings apply. Comparing
+ * formatted output keeps `--check` and `make fmt` from fighting.
+ */
+function formattedPages(): Map<string, string> {
+  const scratch = join(docsRoot, ".sync-api-tmp");
+  rmSync(scratch, { recursive: true, force: true });
+  mkdirSync(scratch, { recursive: true });
+  try {
+    writeFileSync(join(scratch, "meta.json"), desiredMeta);
+    for (const [page, symbols] of pages)
+      writeFileSync(
+        join(scratch, `${page}.mdx`),
+        renderPage(page, PAGES[page], firstSubpathFor(page), symbols),
+      );
+    const fmt = Bun.spawnSync(["bun", "fmt", scratch], { cwd: docsRoot });
+    if (fmt.exitCode !== 0)
+      throw new Error(`bun fmt failed: ${fmt.stderr.toString()}`);
+    const names = ["meta.json", ...[...pages.keys()].map((p) => `${p}.mdx`)];
+    return new Map(
+      names.map((name) => [name, readFileSync(join(scratch, name), "utf8")]),
+    );
+  } finally {
+    rmSync(scratch, { recursive: true, force: true });
+  }
 }
+
+const desired = formattedPages();
+const dirty = [...desired].flatMap(([name, content]) => {
+  const outPath = join(apiDir, name);
+  const current = existsSync(outPath)
+    ? readFileSync(outPath, "utf8").replaceAll("\r\n", "\n")
+    : null;
+  return current === content ? [] : [name];
+});
 
 console.log(
   `astro-ascendant ${pkg.version}: ${[...pages.values()].reduce((n, s) => n + s.length, 0)} symbols across ${pages.size} pages`,
@@ -490,12 +523,8 @@ if (checkOnly) {
   console.log("\nGenerated docs are up to date.");
 } else {
   if (!existsSync(apiDir)) mkdirSync(apiDir, { recursive: true });
-  writeFileSync(metaPath, desiredMeta);
-  for (const [page, symbols] of pages)
-    writeFileSync(
-      join(apiDir, `${page}.mdx`),
-      renderPage(page, PAGES[page], firstSubpathFor(page), symbols),
-    );
+  for (const [name, content] of desired)
+    writeFileSync(join(apiDir, name), content);
   console.log(
     dirty.length > 0 ? `\nWrote: ${dirty.join(", ")}.` : "\nNo changes.",
   );

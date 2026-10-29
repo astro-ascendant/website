@@ -3,46 +3,12 @@ title: Dasha
 description: Vimshottari, Chara, and Sthira dasha calculations and queries.
 ---
 
-{/* Generated from astro-ascendant@5.1.1. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/dasha`:
 
 ```ts
 import * as Dasha from "astro-ascendant/dasha";
-```
-
-## Functions
-
-### `at`
-
-```ts
-const at: (timeline: readonly {
-    readonly mahadasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-    readonly start: DateTime.Utc;
-    readonly end: DateTime.Utc;
-    readonly antardashas: readonly {
-        readonly mahadasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-        readonly antardasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-        readonly start: DateTime.Utc;
-        readonly end: DateTime.Utc;
-    }[];
-}[], when?: DateTime.Utc | undefined) => Effect.Effect<{
-    mahadasha: {
-        readonly mahadasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-        readonly start: DateTime.Utc;
-        readonly end: DateTime.Utc;
-        readonly antardashas: readonly {
-            readonly mahadasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-            readonly antardasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-            readonly start: DateTime.Utc;
-            readonly end: DateTime.Utc;
-        }[];
-    };
-    antardasha: {
-        readonly mahadasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-        readonly antardasha: "Jupiter" | "Ketu" | "Mars" | "Mercury" | "Moon" | "Rahu" | "Saturn" | "Sun" | "Venus";
-        readonly start: DateTime.Utc;
-// … truncated
 ```
 
 ## Classes
@@ -181,7 +147,9 @@ const BrahmaCandidateScore: Schema.Struct<{
   readonly charaKarakaBala: Schema.Finite;
   readonly kendradiHouseFromAtmakaraka: Schema.Int;
   readonly kendradiBala: Schema.Finite;
-  readonly exactDegreeWithinSign: Schema.brand<Schema.Finite, "Degree">;
+  readonly exactDegreeWithinSign: Schema.brand<Schema.Finite, "Degree"> & {
+    of(longitude: import("../chart/model.js").Longitude): Degree;
+  };
   readonly naturalStrength: Schema.Int;
   readonly total: Schema.Finite;
 }>;

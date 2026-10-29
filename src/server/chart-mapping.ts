@@ -130,11 +130,9 @@ export function toChartResult({
   };
 }
 
-function findD1(calculation: Chart.ChartCalculation): Chart.Chart {
-  return (
-    calculation.charts.find((chart) => chart.division === 1) ??
-    calculation.charts[0]
-  );
+/** D1 is always the first chart, and the only one with KP evidence. */
+function findD1(calculation: Chart.ChartCalculation): Chart.D1Chart {
+  return calculation.charts[0];
 }
 
 export function d1Lagna(calculation: Chart.ChartCalculation): {
@@ -290,7 +288,7 @@ function signifyingHousesOf(
 }
 
 function planetSignification(
-  chart: Chart.Chart,
+  chart: Chart.D1Chart,
   planet: string,
 ): Chart.PlanetSignification | undefined {
   if (planet === "" || planet === "Lagna") {

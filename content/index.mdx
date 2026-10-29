@@ -8,8 +8,9 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
 
 Ascendant is an Effect-first TypeScript library for sidereal astrology.
 Start by calculating D1 and D9 for a UTC moment and location. The result
-contains shared **Placements** and cusp-aware **Charts** that you can reuse
-with the other calculation modules.
+contains shared **Placements** and the **Charts**: a cusp-aware D1 that
+carries the KP evidence, then whole-sign divisional charts. Reuse the
+placements with the other calculation modules.
 
 <Callout
   type="warn"
@@ -83,8 +84,8 @@ birth sex.
 
 ### Generate D1 and D9
 
-`Chart.generate` always returns D1 first. Passing `[9]` adds the D9 divisional
-chart.
+`Chart.generate` always returns D1 first, as a `D1Chart`. Passing `[9]` adds
+the D9 divisional chart, as a `DivisionalChart`.
 
 ```ts
 const examples = Chart.generate(input, [9]).pipe(Effect.provide(runtimeLayer));
@@ -138,6 +139,13 @@ BunRuntime.runMain(examplesWithOutput);
 
 </Step>
 </Steps>
+
+`calculation.charts` is D1 followed by the requested divisions in numeric
+order, so `calculation.charts[0]` is always the D1. Its houses begin at the
+selected house system's cusps, and only D1 carries the chart angles, the KP
+star, sub and sub-sub lords, planet significations, house significators and
+ruling planets. Each divisional chart's houses are whole signs counted from
+its mapped Lagna. See [Chart](/docs/api-reference/chart) for the full models.
 
 `calculation.placements` contains the shared sidereal positions. Reuse it with
 the [Dasha](/docs/api-reference/dasha), [Ashtakavarga](/docs/api-reference/sav), and
