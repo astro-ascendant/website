@@ -29,15 +29,17 @@ not certainty, and not a substitute for medical, legal, or financial advice.
 
 ## Docs
 
-- [Getting started](content/index.md)
-- [Birth Chart Calculator](content/chart.mdx)
-- API reference: [Chart](content/api-reference/chart.md),
-  [Dasha](content/api-reference/dasha.md), [SAV](content/api-reference/sav.md),
-  [Jaimini](content/api-reference/jaimini.md),
-  [Ephemeris](content/api-reference/ephemeris.md),
-  [AstroParams](content/api-reference/astro-params.md),
-  [Swisseph](content/api-reference/swisseph.md)
+- [Getting started](content/index.mdx) and [Quickstart](content/quickstart.mdx)
+- [Core concepts](content/concepts.mdx)
+- [Build with Agent](content/agents.mdx)
 - [Skills and Plugins](content/skills.md)
+- Developer guides in [content/guides](content/guides)
+- API reference: [Chart](content/api-reference/chart.mdx),
+  [Dasha](content/api-reference/dasha.mdx), [SAV](content/api-reference/sav.mdx),
+  [Jaimini](content/api-reference/jaimini.mdx),
+  [Ephemeris](content/api-reference/ephemeris.mdx),
+  [AstroParams](content/api-reference/astro-params.mdx),
+  [Swisseph](content/api-reference/swisseph.mdx)
 
 ## Contributing
 

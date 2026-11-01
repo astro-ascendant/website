@@ -1,0 +1,239 @@
+---
+title: Transit searches
+description: Find the next or previous sign ingresses, longitude hits, house-cusp crossings, and stations of one graha, and attach charts to each event.
+---
+
+A **transit search** finds when one graha does something specific: enters a
+sign, reaches a longitude, crosses a house cusp, or turns around. You give a
+starting **Located Moment**, and the search returns the next or previous events in
+time order. It reports exact moments and nothing else. There is no
+interpretation in the result.
+
+`Transit.findTransits` is the module's only function. This guide runs a first
+search, explains every request field and event kind, and shows how to handle a
+search that cannot finish.
+
+## Run a first search
+
+Find the next three sign ingresses of Jupiter after 1 November 2026:
+
+```ts
+import { Chart, Runtime, Transit } from "astro-ascendant";
+import { DateTime, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const from = Chart.LocatedMoment.make({
+  moment: Chart.Moment.make({ date: DateTime.makeUnsafe("2026-11-01T00:00:00Z") }),
+  latitude: 12.9716,
+  longitude: 77.5946,
+});
+
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Jupiter",
+    from,
+    count: 3,
+    direction: "forward",
+    kinds: ["sign-ingress"],
+    maxYears: 12,
+  }),
+);
+```
+
+Each event reports where and when:
+
+| Moment (UTC) | Longitude | Sign | Retrograde |
+| --- | --- | --- | --- |
+| `2027-01-25 11:30` | 120° | Cancer | yes |
+| `2027-06-25 13:09` | 120° | Leo | no |
+| `2027-11-25 23:14` | 150° | Virgo | no |
+
+The first event is Jupiter moving backward across the Cancer and Leo boundary
+while retrograde. The search counts **every** crossing in strict time order, so a
+retrograde sweep produces extra events and a boundary can appear three times.
+
+An event's `sign` is the sign the graha moves into at that instant, in the
+direction of the search. Here Jupiter moves back into Cancer, then forward into
+Leo, then Virgo.
+
+## The request
+
+| Field | Meaning |
+| --- | --- |
+| `planet` | The graha to follow. Any of the nine, Rahu and Ketu included. |
+| `from` | The Located Moment to search from. Its location is used for house cusps and attached charts. |
+| `count` | How many events to return, from 1 to 100. |
+| `direction` | `"forward"` for the next events, `"backward"` for the previous ones. |
+| `kinds` | One or more event kinds, listed below. At least one is required. |
+| `targetLongitude` | Required with `longitude-hit`. |
+| `house` | Required with `cusp-crossing`, from 1 to 12. |
+| `maxYears` | How far to search, up to 200. The default is 30. |
+| `precisionMinutes` | How precisely each moment is refined. The default is 1 minute. |
+| `includeCharts` | Divisions to attach to every event. See [Attach charts](#attach-charts). |
+
+The search includes `from` itself: a graha that sits exactly on a boundary, target,
+or cusp at that moment reports it there.
+
+To search into the past, set `direction: "backward"`. The events then come back
+newest first. From 1 November 2026, Jupiter's previous two ingresses were into
+Cancer at `2026-10-30 15:40 UTC` and into Gemini at `2026-06-01 10:36 UTC`.
+
+## Event kinds
+
+| Kind | The event | Needs |
+| --- | --- | --- |
+| `sign-ingress` | The graha crosses a sidereal sign boundary, at a multiple of 30°. | Nothing |
+| `longitude-hit` | The graha reaches an exact longitude. | `targetLongitude` |
+| `cusp-crossing` | The graha crosses the cusp of a house, as that cusp stands at `from`. | `house` |
+| `station` | The graha stops and reverses direction. | Nothing |
+
+You can list several kinds in one search. A missing field fails with a typed
+`TransitValidationError`, for example `targetLongitude is required for
+longitude-hit searches`.
+
+### Sign ingress
+
+This is the search from the first example. It needs no extra fields and returns
+the sign entered.
+
+### Longitude hit
+
+Pass the longitude you want in `targetLongitude`:
+
+```ts
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Saturn",
+    from,
+    count: 2,
+    direction: "forward",
+    kinds: ["longitude-hit"],
+    targetLongitude: Chart.Longitude.make(350),
+  }),
+);
+```
+
+Saturn crosses 350° at `2027-03-10 09:27` and again at `2056-04-17 20:34`, about
+a lap later. Searching the Sun for 100° returns one hit a year: `2027-07-27`,
+`2028-07-26`, `2029-07-26`, and `2030-07-27`.
+
+### Cusp crossing
+
+Name the house, and the search follows the cusp of that house as it stands in the D1
+chart at `from`:
+
+```ts
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Sun",
+    from,
+    count: 2,
+    direction: "forward",
+    kinds: ["cusp-crossing"],
+    house: 10,
+  }),
+);
+```
+
+The cusp comes from the house system in your settings, so a different house system
+gives a different cusp and different crossing times. For the birth location
+above, the tenth cusp is at 91.747°, so the Sun crosses it on `2027-07-18 18:20`,
+in Cancer, and again on `2028-07-18 00:37`.
+
+### Station
+
+A station is the moment a graha's apparent motion reverses:
+
+```ts
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Mercury",
+    from,
+    count: 4,
+    direction: "forward",
+    kinds: ["station"],
+  }),
+);
+```
+
+For Mercury from 1 November 2026:
+
+| Moment (UTC) | Longitude | Sign | What happens | `is_retrograde` |
+| --- | --- | --- | --- | --- |
+| `2026-11-13 15:54` | 190.876° | Libra | Turns direct | `false` |
+| `2027-02-09 17:36` | 311.819° | Aquarius | Turns retrograde | `true` |
+| `2027-03-03 12:32` | 296.760° | Capricorn | Turns direct | `false` |
+| `2027-06-10 18:14` | 72.194° | Gemini | Turns retrograde | `true` |
+
+At a station the speed is zero, so `is_retrograde` reports the motion just after
+it: `true` at a station that starts a retrograde, and `false` at one that ends it.
+
+## Attach charts
+
+Add `includeCharts` to receive a full chart calculation for each event's moment,
+at the location in `from`:
+
+```ts
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Jupiter",
+    from,
+    count: 1,
+    direction: "forward",
+    kinds: ["sign-ingress"],
+    maxYears: 12,
+    includeCharts: [9],
+  }),
+);
+
+const calculation = events[0].calculation; // placements, D1 and D9, and the settings used
+```
+
+The search resolves the moments first and attaches charts afterward, so it costs
+little when you leave `includeCharts` out. D1 is always included.
+
+## When a search cannot finish
+
+The search fails with a typed error rather than returning a short list quietly.
+
+If the window ends before `count` events are found, the error is
+`TransitSearchExhausted`. It carries the events it did find and the time it
+searched until, so you can keep the partial result:
+
+```ts
+import { Effect } from "effect";
+
+const events = await runtime.runPromise(
+  Transit.findTransits({
+    planet: "Saturn",
+    from,
+    count: 100,
+    direction: "forward",
+    kinds: ["sign-ingress"],
+    maxYears: 1,
+  }).pipe(Effect.catchTag("TransitSearchExhausted", (error) => Effect.succeed(error.found))),
+);
+// 2 events: Aries and Pisces
+```
+
+An invalid or incomplete request fails with `TransitValidationError`, and so does a
+search window that leaves the supported Julian Day range. See [Errors and typed
+failures](/docs/guides/errors).
+
+## Speed
+
+A search leaps from the starting moment to the earliest time a graha could reach
+the next boundary, target, or station, and refines each crossing with a few more
+lookups. Per the 6.1.0 release notes, typical searches use 5 to 25 times fewer
+ephemeris calls than before. `Runtime.MainLayer` also uses the cached Swiss
+Ephemeris layer, so repeated and overlapping searches reuse earlier positions. If you build your own layers, use `Swisseph.SwissephCachedLayer`
+and not `Swisseph.SwissephLayer`. See [Ephemeris adapters and
+caching](/docs/guides/ephemeris-and-caching).
+
+## Provenance
+
+Each event records its method: school `Parashari`, method `transit-sample-bisect`,
+version `2026-11-01`. The search leaps from the located moment by the time the graha
+needs to reach the nearest boundary, target, or station, then refines each crossing
+to `precisionMinutes`.

@@ -1,0 +1,200 @@
+---
+title: Provenance and verification
+description: Read the school, method, and version attached to results, look up the method specification behind them, and store what you need to repeat a calculation.
+---
+
+An astrology result is only useful if you can say how it was produced. Ascendant
+answers that in two ways. Every result carries a **provenance**, a short label
+naming the method that made it. And every method has a **method specification** in
+a registry, which lists its steps and the properties it guarantees. This guide shows
+how to read both, how to connect them, and what to store alongside a result.
+
+## What provenance is
+
+A provenance has three fields:
+
+| Field | Meaning | Example |
+| --- | --- | --- |
+| `school` | The tradition the method belongs to: `Parashari`, `Jaimini`, or `Universal`. | `Jaimini` |
+| `method` | The name of the specific method. | `plain-projection` |
+| `version` | The date the method last changed, as `YYYY-MM-DD`. | `2026-11-01` |
+
+Together they identify exactly one specification. Results that came from different
+versions came from different specifications. Today every method has the version
+`2026-11-01`.
+
+A D1 chart is `Universal`, because its houses follow whichever house system and
+ayanamsa you chose. Divisional charts, Placements, Vimshottari, Ashtakavarga, and
+transit events are `Parashari`. The Jaimini results and the Chara and Sthira dashas
+are `Jaimini`.
+
+## Where to find it
+
+Provenance sits on the result itself. This table shows where to find it and which
+method each result reports:
+
+| Result | Where | School / method |
+| --- | --- | --- |
+| Placements | `placements.provenance` | Parashari / `sidereal-ephemeris-placements` |
+| D1 chart | `charts[0].provenance` | Universal / `house-system-cusps` |
+| Divisional chart | `charts[n].provenance` | Parashari / `whole-sign-from-mapped-lagna` |
+| Vimshottari dasha | `timeline[n].provenance`, on each Mahadasha | Parashari / `moon-nakshatra-balance` |
+| Ashtakavarga | `result.provenance` | Parashari / `bphs-bav-trikona-ekadhipatya` |
+| Chara Karakas | `result.provenance` | Jaimini / `exact-degree-shared-roles` |
+| Rashi Drishti | `result.provenance` | Jaimini / `movable-fixed-dual` |
+| Karakamsha | `result.provenance` | Jaimini / `atmakaraka-d9-sign` |
+| Arudha Pada | `result.provenance` | Jaimini / `plain-projection` |
+| Upapada | `result.provenance` | Jaimini / `twelfth-house-plain-projection` |
+| Argala | `result.provenance` | Jaimini / `structural-positions` |
+| Chara dasha | `timeline.provenance` | Jaimini / `kn-rao-co-lord-strength` |
+| Sthira dasha | `timeline.provenance` | Jaimini / `bv-raman-koch-brahma-strength` |
+| Transit event | `event.provenance` | Parashari / `transit-sample-bisect` |
+
+Two details: Vimshottari returns a plain array, so its provenance is on each
+Mahadasha and not on the array. And `placements.provenance` is optional in the
+type, because you can build Placements yourself. `Chart.generate` always fills it.
+
+Reading one is ordinary property access:
+
+```ts
+import { CharaKarakas, Chart, Runtime } from "astro-ascendant";
+import { DateTime, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const located = Chart.LocatedMoment.make({
+  moment: Chart.Moment.make({ date: DateTime.makeUnsafe("2000-01-01T12:00:00Z") }),
+  latitude: 12.9716,
+  longitude: 77.5946,
+});
+
+const { placements, charts } = await runtime.runPromise(Chart.generate(located, [9]));
+const karakas = await runtime.runPromise(CharaKarakas.calculate(placements));
+
+charts[0].provenance; // { school: "Universal", method: "house-system-cusps", version: "2026-11-01" }
+karakas.provenance; // { school: "Jaimini", method: "exact-degree-shared-roles", version: "2026-11-01" }
+```
+
+## The method registry
+
+`Provenance.methods` is the registry. It holds one specification for each method
+in the table above:
+
+| Key | Method |
+| --- | --- |
+| `placements` | Placements from the ephemeris |
+| `d1ChartProjection` | D1 chart from house-system cusps |
+| `divisionalChartProjection` | Divisional chart from the mapped Lagna |
+| `vimshottariDasha` | Vimshottari dasha from the Moon's nakshatra balance |
+| `ashtakavarga` | Ashtakavarga with Trikona and Ekadhipatya reduction |
+| `jaiminiCharaKarakas` | Chara Karakas |
+| `jaiminiRashiDrishti` | Rashi Drishti |
+| `jaiminiKarakamsha` | Karakamsha |
+| `jaiminiArudhaPada` | Arudha Pada |
+| `jaiminiUpapada` | Upapada |
+| `jaiminiArgala` | Argala |
+| `charaDasha` | Chara dasha |
+| `sthiraDasha` | Sthira dasha |
+| `transitSearch` | Transit search |
+
+Each specification has three parts: its `provenance`, an ordered list of `steps`,
+and a `verification` list of the properties it guarantees. Here is the Arudha
+Pada:
+
+```ts
+import { Provenance } from "astro-ascendant";
+
+Provenance.methods.jaiminiArudhaPada;
+// {
+//   provenance: { school: "Jaimini", method: "plain-projection", version: "2026-11-01" },
+//   steps: [
+//     { id: "derive-source", description: "Find the source sign and its lord for the requested house." },
+//     { id: "project", description: "Project the lord's distance from the source sign." },
+//   ],
+//   verification: ["Exactly one placement is required for the house lord."],
+// }
+```
+
+The Chara dasha runs three steps, `derive-direction`, `resolve-co-lords`, and
+`build-periods`. The transit search guarantees that every zero-crossing counts in
+strict time order, that an exhausted search fails with a typed error instead of
+returning a short list, and that it finds the events an hourly scan of the ephemeris
+finds. The Ashtakavarga checks that each planetary table totals its classical
+bindu count and that the Sarvashtakavarga totals 337.
+
+`Provenance.MethodId` is the union of the registry keys, so you can write a lookup
+that TypeScript checks:
+
+```ts
+const id: Provenance.MethodId = "charaDasha";
+Provenance.methods[id].steps.map((step) => step.id);
+// ["derive-direction", "resolve-co-lords", "build-periods"]
+```
+
+## From a result to its specification
+
+To explain a result, find the specification whose provenance matches it:
+
+```ts
+const specificationFor = (provenance: Provenance.CalculationProvenance) =>
+  Object.values(Provenance.methods).find(
+    (spec) =>
+      spec.provenance.school === provenance.school &&
+      spec.provenance.method === provenance.method &&
+      spec.provenance.version === provenance.version,
+  );
+
+const spec = specificationFor(karakas.provenance);
+spec?.steps; // rank, assign
+spec?.verification; // ["All seven classical planet placements are required.", "Exact ties share roles."]
+```
+
+Every provenance in the table above resolves to a specification this way. Use it to
+build a "how was this calculated?" view in your own product, showing the steps in
+plain words next to the result.
+
+## Store what you need to repeat a result
+
+A result is repeatable when you keep its inputs, its settings, and the methods that
+produced it. This record holds all three:
+
+```ts
+const { placements, charts, astroParams } = await runtime.runPromise(
+  Chart.generate(located, [9]),
+);
+
+const record = {
+  moment: DateTime.formatIso(located.moment.date),
+  latitude: located.latitude,
+  longitude: located.longitude,
+  astroParams, // { ayanamsa: "KrishnamurtiVP291", houseSystem: "Placidus" }
+  methods: [charts[0].provenance, charts[1].provenance, karakas.provenance],
+};
+
+const stored = JSON.stringify(record);
+```
+
+When you read it back, validate the provenance with the library's schema before you
+trust it:
+
+```ts
+import { Schema } from "effect";
+
+const restored = JSON.parse(stored) as typeof record;
+const methods = restored.methods.map((method) =>
+  Schema.decodeUnknownSync(Provenance.CalculationProvenance)(method),
+);
+```
+
+A value with a missing field fails with a schema error, so a damaged record does
+not slip through. Also store the version of `astro-ascendant` you ran. It is the
+simplest way to reproduce a result exactly.
+
+## What to show readers
+
+For any reading you present, state:
+
+- The **settings**: ayanamsa and house system, from `calculation.astroParams`.
+- The **school** of each judgment, and that the two schools were not mixed. See
+  [Choose a school and settings](/docs/guides/settings).
+- The **method** and **version** of each result.

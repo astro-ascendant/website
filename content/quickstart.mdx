@@ -1,0 +1,376 @@
+---
+title: Quickstart
+description: Install Ascendant and calculate your first chart and Vimshottari dasha in a few minutes.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+In this guide you will calculate a **D1** chart, a **D9** chart, and the
+**Vimshottari dasha** running today, for one birth. You will finish with a
+single TypeScript file you can run on Bun or Node.js and then grow into a
+real application.
+
+<Callout
+  type="warn"
+  title="Python SDK is not recommended"
+  className="leading-7 [&_p]:leading-7 [&_strong]:leading-7 [&>svg]:mt-1"
+>
+  The Python SDK ([`astro-ascendant`](https://pypi.org/project/astro-ascendant/)
+  on PyPI) shares its name with the TypeScript SDK but is **not at feature
+  parity** and is **not actively developed**. Use the TypeScript SDK instead. If
+  you need it maintained, [fork it on
+  GitHub](https://github.com/astro-ascendant/ascendant).
+</Callout>
+
+## Install
+
+You need an ES module project with TypeScript and Node.js 20 or later, or Bun.
+
+<Tabs items={["Bun", "Node"]} groupId="runtime" persist>
+<Tab value="Bun">
+
+```bash
+bun add astro-ascendant effect
+```
+
+</Tab>
+<Tab value="Node">
+
+```bash
+npm install astro-ascendant effect
+npm install --save-dev tsx
+```
+
+Set `"type": "module"` in your `package.json` so the file below can use
+top-level `await`.
+
+</Tab>
+</Tabs>
+
+<Callout type="info" title="New to Effect?">
+  Ascendant is built on [Effect](https://effect.website). Every calculation
+  returns an `Effect`: a description of work that does nothing until you run it.
+  You write programs with `Effect.gen` and `yield*`, and you run them once, at
+  the edge of your app. This page explains each piece as it appears. To learn
+  Effect itself, start with [effect.website](https://effect.website),
+  [effect.institute](https://effect.institute), or
+  [effect.kitlangton.com](https://effect.kitlangton.com).
+</Callout>
+
+## Build the program
+
+<Steps>
+<Step>
+
+### Create a runtime
+
+```ts
+import { Chart, Dasha, Runtime } from "astro-ascendant";
+import { Console, DateTime, Effect, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const degrees = (value: number) => Number(value.toFixed(2));
+```
+
+`degrees` only rounds longitudes so the tables stay readable. A `ManagedRuntime` is how you run Effect programs from ordinary code, and it
+is the recommended way to do so. You build it once and reuse it for every
+calculation. `Runtime.MainLayer` supplies what Ascendant needs: the Swiss
+Ephemeris, with a cache for repeated position lookups, and the default
+calculation settings (see [Defaults and settings](#defaults-and-settings)).
+
+</Step>
+<Step>
+
+### Describe the birth moment
+
+```ts
+const program = Effect.gen(function* () {
+  const birth = DateTime.makeZonedUnsafe("2000-01-01T17:30:00", {
+    timeZone: "Asia/Kolkata",
+    adjustForTimeZone: true,
+    disambiguation: "reject",
+  });
+  const located = Chart.LocatedMoment.make({
+    moment: Chart.Moment.make({ date: DateTime.toUtc(birth) }),
+    latitude: 12.9716,
+    longitude: 77.5946,
+  });
+```
+
+Ascendant always works in UTC. Here the local wall-clock time and its IANA
+time zone are converted to a UTC `Moment`. A `LocatedMoment` pairs that moment
+with the latitude and longitude where the positions are calculated.
+
+<Callout type="warn" title="Resolve the time zone from the place">
+  This example names the time zone directly. In a real application, you must
+  find the time zone for the birth place and date yourself, because the UTC
+  offset depends on both. See [From local time to a Located
+  Moment](/docs/guides/located-moments).
+</Callout>
+
+</Step>
+<Step>
+
+### Generate the charts
+
+```ts
+  const { placements, charts, astroParams } = yield* Chart.generate(located, [9]);
+```
+
+`Chart.generate` calculates the **Placements** once, then derives the charts
+from them. D1 is always first, and `[9]` adds the D9. `astroParams` records the
+ayanamsa and house system the calculation used. `yield*` runs the effect and
+gives you its result inside `Effect.gen`.
+
+</Step>
+<Step>
+
+### Calculate the dasha
+
+```ts
+  const timeline = yield* Dasha.calculate(located.moment, placements);
+  const current = yield* Dasha.at(timeline);
+```
+
+The dasha reuses the same placements instead of recalculating them.
+`Dasha.calculate` builds the full Vimshottari timeline. `Dasha.at` finds the
+Mahadasha and Antardasha active at a given moment, and now when you pass none.
+
+</Step>
+<Step>
+
+### Print the results
+
+```ts
+  yield* Console.log(`Placements (${astroParams.ayanamsa}, ${astroParams.houseSystem})`);
+  yield* Console.table([
+    {
+      Point: placements.lagna.name,
+      Longitude: degrees(placements.lagna.longitude),
+      Star: placements.lagna.star.name,
+      Pada: placements.lagna.star.pada,
+      Retrograde: "—",
+    },
+    ...placements.planets.map((planet) => ({
+      Point: planet.name,
+      Longitude: degrees(planet.longitude),
+      Star: planet.star.name,
+      Pada: planet.star.pada,
+      Retrograde: planet.is_retrograde,
+    })),
+  ]);
+
+  yield* Console.log("Charts");
+  yield* Console.table(
+    charts.map((chart) => ({
+      Chart: `D${chart.division}`,
+      "Lagna Sign": chart.houses[1].sign,
+    })),
+  );
+
+  if (current) {
+    yield* Console.log("Running dasha");
+    yield* Console.table([
+      {
+        Mahadasha: current.mahadasha.mahadasha,
+        Antardasha: current.antardasha.antardasha,
+        Start: DateTime.formatIso(current.antardasha.start),
+        End: DateTime.formatIso(current.antardasha.end),
+      },
+    ]);
+  }
+});
+
+await runtime.runPromise(program);
+await runtime.dispose();
+```
+
+`Console.log` and `Console.table` are Effect's versions of the console methods.
+They are Effects too, so you `yield*` them inside the program like any other step.
+`Console.table` takes an array of objects and prints one row per object, with the
+keys as column headings.
+
+Nothing has run yet. `runtime.runPromise` runs the program and returns a
+promise. `runtime.dispose()` releases the runtime's resources when you are
+done.
+
+</Step>
+</Steps>
+
+## The full program
+
+Save this as `quickstart.ts`:
+
+```ts title="quickstart.ts"
+import { Chart, Dasha, Runtime } from "astro-ascendant";
+import { Console, DateTime, Effect, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const degrees = (value: number) => Number(value.toFixed(2));
+
+const program = Effect.gen(function* () {
+  const birth = DateTime.makeZonedUnsafe("2000-01-01T17:30:00", {
+    timeZone: "Asia/Kolkata",
+    adjustForTimeZone: true,
+    disambiguation: "reject",
+  });
+  const located = Chart.LocatedMoment.make({
+    moment: Chart.Moment.make({ date: DateTime.toUtc(birth) }),
+    latitude: 12.9716,
+    longitude: 77.5946,
+  });
+
+  const { placements, charts, astroParams } = yield* Chart.generate(located, [9]);
+  const timeline = yield* Dasha.calculate(located.moment, placements);
+  const current = yield* Dasha.at(timeline);
+
+  yield* Console.log(`Placements (${astroParams.ayanamsa}, ${astroParams.houseSystem})`);
+  yield* Console.table([
+    {
+      Point: placements.lagna.name,
+      Longitude: degrees(placements.lagna.longitude),
+      Star: placements.lagna.star.name,
+      Pada: placements.lagna.star.pada,
+      Retrograde: "—",
+    },
+    ...placements.planets.map((planet) => ({
+      Point: planet.name,
+      Longitude: degrees(planet.longitude),
+      Star: planet.star.name,
+      Pada: planet.star.pada,
+      Retrograde: planet.is_retrograde,
+    })),
+  ]);
+
+  yield* Console.log("Charts");
+  yield* Console.table(
+    charts.map((chart) => ({
+      Chart: `D${chart.division}`,
+      "Lagna Sign": chart.houses[1].sign,
+    })),
+  );
+
+  if (current) {
+    yield* Console.log("Running dasha");
+    yield* Console.table([
+      {
+        Mahadasha: current.mahadasha.mahadasha,
+        Antardasha: current.antardasha.antardasha,
+        Start: DateTime.formatIso(current.antardasha.start),
+        End: DateTime.formatIso(current.antardasha.end),
+      },
+    ]);
+  }
+});
+
+await runtime.runPromise(program);
+await runtime.dispose();
+```
+
+## Run it
+
+<Tabs items={["Bun", "Node"]} groupId="runtime" persist>
+<Tab value="Bun">
+
+```bash
+bun run quickstart.ts
+```
+
+</Tab>
+<Tab value="Node">
+
+```bash
+npx tsx quickstart.ts
+```
+
+</Tab>
+</Tabs>
+
+You should see output like this:
+
+```text
+Placements (KrishnamurtiVP291, Placidus)
+┌───┬─────────┬───────────┬───────────────┬──────┬────────────┐
+│   │ Point   │ Longitude │ Star          │ Pada │ Retrograde │
+├───┼─────────┼───────────┼───────────────┼──────┼────────────┤
+│ 0 │ Lagna   │ 69.68     │ Ardra         │ 1    │ —          │
+│ 1 │ Sun     │ 256.59    │ Purva Ashadha │ 1    │ false      │
+│ 2 │ Moon    │ 199.55    │ Swati         │ 4    │ false      │
+│ 3 │ Mars    │ 304.19    │ Dhanishta     │ 4    │ false      │
+│ 4 │ Mercury │ 248.11    │ Mula          │ 3    │ false      │
+│ 5 │ Jupiter │ 1.48      │ Ashwini       │ 1    │ false      │
+│ 6 │ Venus   │ 217.79    │ Anuradha      │ 2    │ false      │
+│ 7 │ Saturn  │ 16.62     │ Bharani       │ 1    │ true       │
+│ 8 │ Rahu    │ 101.26    │ Pushya        │ 3    │ false      │
+│ 9 │ Ketu    │ 281.26    │ Shravana      │ 1    │ false      │
+└───┴─────────┴───────────┴───────────────┴──────┴────────────┘
+Charts
+┌───┬───────┬─────────────┐
+│   │ Chart │ Lagna Sign  │
+├───┼───────┼─────────────┤
+│ 0 │ D1    │ Gemini      │
+│ 1 │ D9    │ Sagittarius │
+└───┴───────┴─────────────┘
+Running dasha
+┌───┬───────────┬────────────┬──────────────────────────┬──────────────────────────┐
+│   │ Mahadasha │ Antardasha │ Start                    │ End                      │
+├───┼───────────┼────────────┼──────────────────────────┼──────────────────────────┤
+│ 0 │ Saturn    │ Sun        │ 2026-08-02T12:48:00.000Z │ 2027-07-15T12:48:00.000Z │
+└───┴───────────┴────────────┴──────────────────────────┴──────────────────────────┘
+```
+
+The positions are fixed by the birth moment, so yours will match. The **Running
+dasha** table depends on the day you run it, and this output is from 1 November
+2026. The unnamed first column is the row number that `Console.table` adds.
+
+## What you got back
+
+- `placements` holds the shared sidereal positions of the Lagna and the nine
+  grahas, each with its star and pada. Reuse it with every other calculation.
+- `charts[0]` is the **D1**. Its houses start at the house system's cusps, and
+  only D1 carries the chart angles and the KP star, sub, and sub-sub lords.
+- `charts[1]` is the **D9**. Its houses are whole signs counted from its mapped
+  Lagna.
+- `timeline` is the full Vimshottari timeline, and `current` is the period
+  active now.
+
+The [Core concepts](/docs/concepts) page explains each of these terms.
+
+## Defaults and settings
+
+`Runtime.MainLayer` uses the library defaults: the KrishnamurtiVP291 ayanamsa
+and Placidus houses. Every calculation records the settings it used, so
+results stay reproducible.
+
+To use Lahiri with whole-sign houses, as Parashari readings do, build the
+runtime from your own settings:
+
+```ts
+import { AstroParams, Swisseph } from "astro-ascendant";
+import { Layer, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(
+  Layer.mergeAll(
+    AstroParams.layer({ ayanamsa: "Lahiri", houseSystem: "WholeSign" }),
+    Swisseph.SwissephCachedLayer,
+  ),
+);
+```
+
+See [Choose a school and settings](/docs/guides/settings) for every
+ayanamsa and house system, and how to pick between them.
+
+## Using it in a long-running app
+
+Create the runtime once, when your server starts, and call
+`runtime.runPromise` in each request handler. The ephemeris and its cache are
+then shared across requests. Call `runtime.dispose()` only when the process
+shuts down. In a short script, as above, dispose at the end.
+
+Every calculation can fail with a typed error, such as an invalid division or
+an exhausted transit search. See [Errors and typed
+failures](/docs/guides/errors) to handle them.

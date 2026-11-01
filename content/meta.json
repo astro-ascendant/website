@@ -1,4 +1,12 @@
 {
   "title": "Ascendant",
-  "pages": ["index", "skills", "api-reference"]
+  "pages": [
+    "index",
+    "quickstart",
+    "concepts",
+    "agents",
+    "skills",
+    "guides",
+    "api-reference"
+  ]
 }

@@ -120,7 +120,7 @@ export function OrreryHero() {
 
   return (
     <>
-      <figure className="me-auto w-full max-w-xs select-none sm:max-w-sm lg:mx-auto lg:max-w-md">
+      <figure className="mx-auto w-full max-w-xs select-none sm:max-w-sm lg:max-w-md">
         <svg
           viewBox="-100 -100 200 200"
           className="h-auto w-full overflow-visible"
