@@ -17,6 +17,21 @@ export const ORRERY_PLANETS = [
 export type OrreryPlanet = (typeof ORRERY_PLANETS)[number];
 
 /**
+ * Geocentric ecliptic longitude of the Moon in degrees, [0, 360). Meeus's
+ * low-precision series (about 0.3° accurate), enough for the orrery's dot.
+ *
+ * Keep this self-contained for the same reason as heliocentricLongitude.
+ */
+export function geocentricMoonLongitude(timeMs: number): number {
+  const DEG = Math.PI / 180;
+  const d = (timeMs - Date.UTC(2000, 0, 1, 12)) / 86_400_000;
+  const meanLongitude = 218.316 + 13.176396 * d;
+  const meanAnomaly = (134.963 + 13.064993 * d) * DEG;
+  const longitude = meanLongitude + 6.289 * Math.sin(meanAnomaly);
+  return ((longitude % 360) + 360) % 360;
+}
+
+/**
  * Heliocentric ecliptic longitude of a planet in degrees, [0, 360).
  *
  * Keep this self-contained (no imports or module-level constants): the

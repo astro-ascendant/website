@@ -1,7 +1,11 @@
 import { useHydrated } from "@tanstack/react-router";
 import { useAnimationFrame, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
-import { heliocentricLongitude, type OrreryPlanet } from "../lib/heliocentric";
+import {
+  geocentricMoonLongitude,
+  heliocentricLongitude,
+  type OrreryPlanet,
+} from "../lib/heliocentric";
 
 const DAY_MS = 86_400_000;
 /** Simulated days per real second, at rest and while the pointer is over the orrery. */
@@ -32,6 +36,9 @@ const ORBITS: {
   { planet: "saturn", name: "Saturn", color: "#b5a48d", radius: 92, size: 5.6 },
 ];
 
+// The Moon orbits Earth, so its radius is measured from Earth, not the sun.
+const MOON = { name: "Moon", color: "#c9c4b8", radius: 7.5, size: 1.2 };
+
 declare global {
   interface Window {
     /** Time the pre-hydration script placed the planets at, so React starts from the same frame. */
@@ -39,8 +46,9 @@ declare global {
   }
 }
 
-// planetTransform, orreryDate and placePlanets run inside the inline script
-// too, so they must stay self-contained: globals only, no imports.
+// planetTransform, orreryDate, placePlanets and the lunar and planet longitude
+// functions run inside the inline script too, so they must stay self-contained:
+// globals only, no imports.
 
 /** Ecliptic longitude to an SVG translate, counter-clockwise as seen from the north. */
 function planetTransform(longitude: number, radius: number) {
@@ -60,16 +68,18 @@ function orreryDate(timeMs: number) {
 
 function placePlanets(
   longitude: typeof heliocentricLongitude,
+  moonLongitude: typeof geocentricMoonLongitude,
   transform: typeof planetTransform,
   formatDate: typeof orreryDate,
-  orbits: [OrreryPlanet, number][],
+  orbits: [OrreryPlanet | "moon", number][],
 ) {
   const time = Date.now();
   window.__ORRERY_TIME__ = time;
-  for (const [planet, radius] of orbits) {
+  for (const [body, radius] of orbits) {
+    const angle = body === "moon" ? moonLongitude(time) : longitude(body, time);
     document
-      .getElementById(`orrery-${planet}`)
-      ?.setAttribute("transform", transform(longitude(planet, time), radius));
+      .getElementById(`orrery-${body}`)
+      ?.setAttribute("transform", transform(angle, radius));
   }
   const caption = document.getElementById("orrery-date");
   if (caption) caption.textContent = formatDate(time);
@@ -80,8 +90,11 @@ function placePlanets(
  * script sits right after the orrery and moves them to the visitor's clock
  * before first paint, so they neither pop in nor jump on hydration.
  */
-const PLACE_PLANETS_SCRIPT = `(${placePlanets})(${heliocentricLongitude},${planetTransform},${orreryDate},${JSON.stringify(
-  ORBITS.map(({ planet, radius }) => [planet, radius]),
+const PLACE_PLANETS_SCRIPT = `(${placePlanets})(${heliocentricLongitude},${geocentricMoonLongitude},${planetTransform},${orreryDate},${JSON.stringify(
+  [
+    ...ORBITS.map(({ planet, radius }) => [planet, radius]),
+    ["moon", MOON.radius],
+  ],
 )})`;
 
 function sunOutline(radius: number, teeth = 28, depth = 0.14) {
@@ -106,7 +119,7 @@ export function OrreryHero() {
       ? window.__ORRERY_TIME__
       : Date.now(),
   );
-  const [hovered, setHovered] = useState<OrreryPlanet | null>(null);
+  const [hovered, setHovered] = useState<OrreryPlanet | "moon" | null>(null);
   const speed = useRef(IDLE_SPEED);
   const targetSpeed = useRef(IDLE_SPEED);
 
@@ -187,6 +200,43 @@ export function OrreryHero() {
                   d="M -1.6 -1.8 q 1.4 -0.6 2.2 0.6 q -0.8 1.2 -2.2 0.4 z M 0.4 1.2 q 1.2 0 1.4 1 q -1 0.6 -1.6 -0.2 z"
                   fill="#5f8a4a"
                 />
+              )}
+              {planet === "earth" && (
+                <>
+                  <circle
+                    r={MOON.radius}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeOpacity={0.14}
+                    strokeWidth={0.35}
+                  />
+                  <g
+                    id="orrery-moon"
+                    transform={planetTransform(
+                      geocentricMoonLongitude(time),
+                      MOON.radius,
+                    )}
+                    onPointerEnter={() => setHovered("moon")}
+                  >
+                    <circle r={MOON.size + 2} fill="transparent" />
+                    <circle
+                      r={MOON.size}
+                      fill={MOON.color}
+                      stroke="currentColor"
+                      strokeWidth={0.4}
+                    />
+                    {hovered === "moon" && (
+                      <text
+                        y={-MOON.size - 2}
+                        textAnchor="middle"
+                        fontSize={3.5}
+                        className="fill-foreground font-serif italic"
+                      >
+                        {MOON.name}
+                      </text>
+                    )}
+                  </g>
+                </>
               )}
               {hovered === planet && (
                 <text
