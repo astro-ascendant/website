@@ -15,7 +15,8 @@
 :root {
   --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
   --font-mono:
-    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
+    "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
   --font-serif: "Libre Baskerville", Georgia, serif;
   --font-heading: var(--font-sans);
 
@@ -212,7 +213,8 @@
   --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
   --font-serif: "Libre Baskerville", Georgia, serif;
   --font-mono:
-    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
+    "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
 }
 
 html {
@@ -271,7 +273,8 @@ body {
   --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono:
-    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
+    "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
   --font-serif: "Libre Baskerville", Georgia, serif;
   --color-gray-1: var(--gray-1);
   --color-gray-2: var(--gray-2);
