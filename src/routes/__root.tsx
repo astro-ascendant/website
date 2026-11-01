@@ -9,7 +9,9 @@ import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import { Banner } from "fumadocs-ui/components/banner";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import favicon from "../../assets/favicon.png";
-import { siteUrl } from "@/lib/shared";
+import { gitConfig, siteUrl } from "@/lib/shared";
+
+const changelogUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/CHANGELOG.md`;
 
 export const Route = createRootRoute({
   head: ({ matches }) => {
@@ -99,14 +101,16 @@ function RootComponent() {
             className="banner group h-auto! min-h-[3rem] px-4 py-2 pe-10 text-center text-xs leading-snug font-medium text-balance sm:text-[13px]"
           >
             <a
-              href="/docs"
-              aria-label="astro-ascendant 6.0 is here: read the docs"
+              href={changelogUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="astro-ascendant 6.1 is here: read the changelog"
               className="absolute inset-0"
             />
             <span aria-hidden="true" className="banner-line" />
             <span className="pointer-events-none flex flex-1 items-center justify-center gap-2">
               <span>
-                <span className="font-mono">astro-ascendant</span> 6.0 is here
+                <span className="font-mono">astro-ascendant</span> 6.1 is here
               </span>
               <ArrowRightIcon size={16} className="banner-arrow shrink-0" />
             </span>
