@@ -165,11 +165,11 @@ function LandingPage() {
           <SectionTitle>What you get</SectionTitle>
           <ul className="mt-2 flex flex-col">
             <PlainRow
-              title="Rashi and Navamsha charts"
-              description="Your main birth chart, and the Navamsha chart beside it"
+              title="Rashi and Varga Charts"
+              description="Your main birth chart, plus fifteen divisional charts from Hora to Shashtiamsa, Navamsha included"
             />
             <PlainRow
-              title="KP chart"
+              title="KP Chart"
               description="Star lords, sub lords, and the houses each planet signifies"
             />
             <PlainRow
