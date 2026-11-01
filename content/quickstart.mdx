@@ -68,12 +68,14 @@ top-level `await`.
 
 ```ts
 import { Chart, Dasha, Runtime } from "astro-ascendant";
-import { DateTime, Effect, ManagedRuntime } from "effect";
+import { Console, DateTime, Effect, ManagedRuntime } from "effect";
 
 const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const degrees = (value: number) => Number(value.toFixed(2));
 ```
 
-A `ManagedRuntime` is how you run Effect programs from ordinary code, and it
+`degrees` only rounds longitudes so the tables stay readable. A `ManagedRuntime` is how you run Effect programs from ordinary code, and it
 is the recommended way to do so. You build it once and reuse it for every
 calculation. `Runtime.MainLayer` supplies what Ascendant needs: the Swiss
 Ephemeris, with a cache for repeated position lookups, and the default
@@ -115,13 +117,13 @@ with the latitude and longitude where the positions are calculated.
 ### Generate the charts
 
 ```ts
-  const { placements, charts } = yield* Chart.generate(located, [9]);
-  const [d1, d9] = charts;
+  const { placements, charts, astroParams } = yield* Chart.generate(located, [9]);
 ```
 
 `Chart.generate` calculates the **Placements** once, then derives the charts
-from them. D1 is always first, and `[9]` adds the D9. `yield*` runs the
-effect and gives you its result inside `Effect.gen`.
+from them. D1 is always first, and `[9]` adds the D9. `astroParams` records the
+ayanamsa and house system the calculation used. `yield*` runs the effect and
+gives you its result inside `Effect.gen`.
 
 </Step>
 <Step>
@@ -143,22 +145,53 @@ Mahadasha and Antardasha active at a given moment, and now when you pass none.
 ### Print the results
 
 ```ts
-  const moon = placements.planets.find((planet) => planet.name === "Moon");
-  console.log(
-    `D1 Lagna: ${d1.houses[1].sign} (${placements.lagna.star.name}, pada ${placements.lagna.star.pada})`,
+  yield* Console.log(`Placements (${astroParams.ayanamsa}, ${astroParams.houseSystem})`);
+  yield* Console.table([
+    {
+      Point: placements.lagna.name,
+      Longitude: degrees(placements.lagna.longitude),
+      Star: placements.lagna.star.name,
+      Pada: placements.lagna.star.pada,
+      Retrograde: "—",
+    },
+    ...placements.planets.map((planet) => ({
+      Point: planet.name,
+      Longitude: degrees(planet.longitude),
+      Star: planet.star.name,
+      Pada: planet.star.pada,
+      Retrograde: planet.is_retrograde,
+    })),
+  ]);
+
+  yield* Console.log("Charts");
+  yield* Console.table(
+    charts.map((chart) => ({
+      Chart: `D${chart.division}`,
+      "Lagna Sign": chart.houses[1].sign,
+    })),
   );
-  console.log(`D9 Lagna: ${d9.houses[1].sign}`);
-  console.log(`Moon: ${moon?.longitude.toFixed(2)}° in ${moon?.star.name}`);
+
   if (current) {
-    console.log(
-      `Running dasha: ${current.antardasha.mahadasha}-${current.antardasha.antardasha}, until ${DateTime.formatIso(current.antardasha.end)}`,
-    );
+    yield* Console.log("Running dasha");
+    yield* Console.table([
+      {
+        Mahadasha: current.mahadasha.mahadasha,
+        Antardasha: current.antardasha.antardasha,
+        Start: DateTime.formatIso(current.antardasha.start),
+        End: DateTime.formatIso(current.antardasha.end),
+      },
+    ]);
   }
 });
 
 await runtime.runPromise(program);
 await runtime.dispose();
 ```
+
+`Console.log` and `Console.table` are Effect's versions of the console methods.
+They are Effects too, so you `yield*` them inside the program like any other step.
+`Console.table` takes an array of objects and prints one row per object, with the
+keys as column headings.
 
 Nothing has run yet. `runtime.runPromise` runs the program and returns a
 promise. `runtime.dispose()` releases the runtime's resources when you are
@@ -173,9 +206,11 @@ Save this as `quickstart.ts`:
 
 ```ts title="quickstart.ts"
 import { Chart, Dasha, Runtime } from "astro-ascendant";
-import { DateTime, Effect, ManagedRuntime } from "effect";
+import { Console, DateTime, Effect, ManagedRuntime } from "effect";
 
 const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const degrees = (value: number) => Number(value.toFixed(2));
 
 const program = Effect.gen(function* () {
   const birth = DateTime.makeZonedUnsafe("2000-01-01T17:30:00", {
@@ -189,21 +224,46 @@ const program = Effect.gen(function* () {
     longitude: 77.5946,
   });
 
-  const { placements, charts } = yield* Chart.generate(located, [9]);
-  const [d1, d9] = charts;
+  const { placements, charts, astroParams } = yield* Chart.generate(located, [9]);
   const timeline = yield* Dasha.calculate(located.moment, placements);
   const current = yield* Dasha.at(timeline);
 
-  const moon = placements.planets.find((planet) => planet.name === "Moon");
-  console.log(
-    `D1 Lagna: ${d1.houses[1].sign} (${placements.lagna.star.name}, pada ${placements.lagna.star.pada})`,
+  yield* Console.log(`Placements (${astroParams.ayanamsa}, ${astroParams.houseSystem})`);
+  yield* Console.table([
+    {
+      Point: placements.lagna.name,
+      Longitude: degrees(placements.lagna.longitude),
+      Star: placements.lagna.star.name,
+      Pada: placements.lagna.star.pada,
+      Retrograde: "—",
+    },
+    ...placements.planets.map((planet) => ({
+      Point: planet.name,
+      Longitude: degrees(planet.longitude),
+      Star: planet.star.name,
+      Pada: planet.star.pada,
+      Retrograde: planet.is_retrograde,
+    })),
+  ]);
+
+  yield* Console.log("Charts");
+  yield* Console.table(
+    charts.map((chart) => ({
+      Chart: `D${chart.division}`,
+      "Lagna Sign": chart.houses[1].sign,
+    })),
   );
-  console.log(`D9 Lagna: ${d9.houses[1].sign}`);
-  console.log(`Moon: ${moon?.longitude.toFixed(2)}° in ${moon?.star.name}`);
+
   if (current) {
-    console.log(
-      `Running dasha: ${current.antardasha.mahadasha}-${current.antardasha.antardasha}, until ${DateTime.formatIso(current.antardasha.end)}`,
-    );
+    yield* Console.log("Running dasha");
+    yield* Console.table([
+      {
+        Mahadasha: current.mahadasha.mahadasha,
+        Antardasha: current.antardasha.antardasha,
+        Start: DateTime.formatIso(current.antardasha.start),
+        End: DateTime.formatIso(current.antardasha.end),
+      },
+    ]);
   }
 });
 
@@ -233,14 +293,39 @@ npx tsx quickstart.ts
 You should see output like this:
 
 ```text
-D1 Lagna: Gemini (Ardra, pada 1)
-D9 Lagna: Sagittarius
-Moon: 199.55° in Swati
-Running dasha: Saturn-Sun, until 2027-07-15T11:54:00.000Z
+Placements (KrishnamurtiVP291, Placidus)
+┌───┬─────────┬───────────┬───────────────┬──────┬────────────┐
+│   │ Point   │ Longitude │ Star          │ Pada │ Retrograde │
+├───┼─────────┼───────────┼───────────────┼──────┼────────────┤
+│ 0 │ Lagna   │ 69.68     │ Ardra         │ 1    │ —          │
+│ 1 │ Sun     │ 256.59    │ Purva Ashadha │ 1    │ false      │
+│ 2 │ Moon    │ 199.55    │ Swati         │ 4    │ false      │
+│ 3 │ Mars    │ 304.19    │ Dhanishta     │ 4    │ false      │
+│ 4 │ Mercury │ 248.11    │ Mula          │ 3    │ false      │
+│ 5 │ Jupiter │ 1.48      │ Ashwini       │ 1    │ false      │
+│ 6 │ Venus   │ 217.79    │ Anuradha      │ 2    │ false      │
+│ 7 │ Saturn  │ 16.62     │ Bharani       │ 1    │ true       │
+│ 8 │ Rahu    │ 101.26    │ Pushya        │ 3    │ false      │
+│ 9 │ Ketu    │ 281.26    │ Shravana      │ 1    │ false      │
+└───┴─────────┴───────────┴───────────────┴──────┴────────────┘
+Charts
+┌───┬───────┬─────────────┐
+│   │ Chart │ Lagna Sign  │
+├───┼───────┼─────────────┤
+│ 0 │ D1    │ Gemini      │
+│ 1 │ D9    │ Sagittarius │
+└───┴───────┴─────────────┘
+Running dasha
+┌───┬───────────┬────────────┬──────────────────────────┬──────────────────────────┐
+│   │ Mahadasha │ Antardasha │ Start                    │ End                      │
+├───┼───────────┼────────────┼──────────────────────────┼──────────────────────────┤
+│ 0 │ Saturn    │ Sun        │ 2026-08-02T11:54:00.000Z │ 2027-07-15T11:54:00.000Z │
+└───┴───────────┴────────────┴──────────────────────────┴──────────────────────────┘
 ```
 
-The positions are fixed by the birth moment, so yours will match. The last
-line depends on the day you run it. This output is from 1 November 2026.
+The positions are fixed by the birth moment, so yours will match. The **Running
+dasha** table depends on the day you run it, and this output is from 1 November
+2026. The unnamed first column is the row number that `Console.table` adds.
 
 ## What you got back
 
