@@ -88,24 +88,118 @@ are the ones most products use:
 | `Yukteshwar` | Named for Sri Yukteshwar. |
 | `TrueCitra` | Keeps the star Chitra fixed at 180°. |
 
-The other names, including the `Lahiri` variants and the `Babyl*` and
-`GalacticCenter*` families, are listed on the
-[AstroParams reference](/docs/api-reference/astro-params). They are ordered by
-Swiss Ephemeris catalog number, not by how often they are used.
+### All 47 ayanamsas
+
+Pass any of these names exactly as written. They are listed in Swiss Ephemeris
+catalog order, not by how often they are used.
+
+<table>
+  <tbody>
+    <tr>
+      <td><code>FaganBradley</code></td>
+      <td><code>Lahiri</code></td>
+      <td><code>DeLuce</code></td>
+    </tr>
+    <tr>
+      <td><code>Raman</code></td>
+      <td><code>Ushashashi</code></td>
+      <td><code>Krishnamurti</code></td>
+    </tr>
+    <tr>
+      <td><code>DjwhalKhul</code></td>
+      <td><code>Yukteshwar</code></td>
+      <td><code>JNBhasin</code></td>
+    </tr>
+    <tr>
+      <td><code>BabylKugler1</code></td>
+      <td><code>BabylKugler2</code></td>
+      <td><code>BabylKugler3</code></td>
+    </tr>
+    <tr>
+      <td><code>BabylHuber</code></td>
+      <td><code>BabylEtPSC</code></td>
+      <td><code>Aldebaran15Tau</code></td>
+    </tr>
+    <tr>
+      <td><code>Hipparchos</code></td>
+      <td><code>Sassanian</code></td>
+      <td><code>GalacticCenter0Sag</code></td>
+    </tr>
+    <tr>
+      <td><code>J2000</code></td>
+      <td><code>J1900</code></td>
+      <td><code>B1950</code></td>
+    </tr>
+    <tr>
+      <td><code>SuryaSiddhanta</code></td>
+      <td><code>SuryaSiddhantaMeanSun</code></td>
+      <td><code>Aryabhata</code></td>
+    </tr>
+    <tr>
+      <td><code>AryabhataMeanSun</code></td>
+      <td><code>SSRevati</code></td>
+      <td><code>SSCitra</code></td>
+    </tr>
+    <tr>
+      <td><code>TrueCitra</code></td>
+      <td><code>TrueRevati</code></td>
+      <td><code>TruePushya</code></td>
+    </tr>
+    <tr>
+      <td><code>GalacticCenterGilBrand</code></td>
+      <td><code>GalacticEquatorIAU1958</code></td>
+      <td><code>GalacticEquator</code></td>
+    </tr>
+    <tr>
+      <td><code>GalacticEquatorMidMula</code></td>
+      <td><code>Skydram</code></td>
+      <td><code>TrueMula</code></td>
+    </tr>
+    <tr>
+      <td><code>DhruvaGalCenterMulaWilhelm</code></td>
+      <td><code>Aryabhata522</code></td>
+      <td><code>BabylBritton</code></td>
+    </tr>
+    <tr>
+      <td><code>TrueSheoran</code></td>
+      <td><code>GalacticCenterCochrane</code></td>
+      <td><code>GalacticEquatorFiorenza</code></td>
+    </tr>
+    <tr>
+      <td><code>ValensMoon</code></td>
+      <td><code>Lahiri1940</code></td>
+      <td><code>LahiriVP285</code></td>
+    </tr>
+    <tr>
+      <td><code>KrishnamurtiVP291</code></td>
+      <td><code>LahiriICRC</code></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+The [AstroParams reference](/docs/api-reference/astro-params) shows the same list
+as a type.
 
 ## Choose a house system
 
-Ascendant supports 13 house systems.
+Ascendant supports 13 house systems. `Placidus` is the default.
 
 | Name | How it divides the houses |
 | --- | --- |
-| `Placidus` | By time. Unequal houses, and the default. |
+| `Placidus` | By time. Unequal houses. The default. |
 | `WholeSign` | One sign per house. The Lagna's sign is house 1, and every house is 30°. |
 | `Koch` | By time, from the birthplace meridian. Unequal houses. |
 | `Equal` | Twelve 30° houses counted from the Lagna's exact degree. |
-
-The rest are `Porphyrius`, `Regiomontanus`, `Campanus`, `VehlowEqual`,
-`Meridian`, `Azimuthal`, `PolichPage`, `Alcabitus`, and `Morinus`.
+| `VehlowEqual` | Equal 30° houses with the Lagna in the middle of house 1. |
+| `Porphyrius` | Divides each quadrant between the angles into three equal parts. |
+| `Regiomontanus` | A medieval system based on divisions of the celestial equator. |
+| `Campanus` | Based on divisions of the prime vertical. |
+| `Meridian` | Axial rotation: equal in time, measured from the meridian. |
+| `Morinus` | Based on the celestial equator, with equal 30° houses. |
+| `Alcabitus` | A medieval Arabic system. |
+| `PolichPage` | Topocentric, a modern time-based system close to Placidus. |
+| `Azimuthal` | Based on the horizon. For specialized use. |
 
 <Callout type="warn" title="High latitudes">
   Time-based systems such as Placidus and Koch become unreliable near the polar
