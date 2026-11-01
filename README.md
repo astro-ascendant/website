@@ -31,10 +31,8 @@ not certainty, and not a substitute for medical, legal, or financial advice.
 
 - [Getting started](content/index.mdx) and [Quickstart](content/quickstart.mdx)
 - [Core concepts](content/concepts.mdx)
-- [Building with coding agents](content/agents.mdx)
-- For horoscope users: [Generate your horoscope](content/horoscope.mdx),
-  [Take it to an AI assistant](content/ask-ai.mdx),
-  [Skills and Plugins](content/skills.md)
+- [Build with Agent](content/agents.mdx)
+- [Skills and Plugins](content/skills.md)
 - Developer guides in [content/guides](content/guides)
 - API reference: [Chart](content/api-reference/chart.mdx),
   [Dasha](content/api-reference/dasha.mdx), [SAV](content/api-reference/sav.mdx),

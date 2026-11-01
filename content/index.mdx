@@ -3,7 +3,6 @@ title: Getting started
 description: Generate a horoscope, build with the Effect-first TypeScript library, or let an AI assistant read your chart. Choose your path.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
@@ -18,7 +17,7 @@ There are three ways to use it, depending on what you want to do.
 <Cards>
   <Card
     title="Generate a horoscope"
-    href="/docs/horoscope"
+    href="/chart"
     description="Enter a birth date, time, and place on the chart page and read your Rashi chart, KP chart, dashas, and more."
   />
   <Card
@@ -27,30 +26,11 @@ There are three ways to use it, depending on what you want to do.
     description="Install the astro-ascendant TypeScript library and calculate your first chart and dasha."
   />
   <Card
-    title="Ask an AI about my chart"
-    href="/docs/ask-ai"
-    description="Send your horoscope to ChatGPT, Claude, or Gemini, or install the skill for readings from a saved chart."
+    title="Ascendant AI Skill"
+    href="/docs/skills"
+    description="Install the skill so your AI assistant answers from a saved birth chart, with its evidence cited."
   />
 </Cards>
-
-<Callout
-  type="warn"
-  title="Python SDK is not recommended"
-  className="leading-7 [&_p]:leading-7 [&_strong]:leading-7 [&>svg]:mt-1"
->
-  The Python SDK ([`astro-ascendant`](https://pypi.org/project/astro-ascendant/)
-  on PyPI) shares its name with the TypeScript SDK but is **not at feature
-  parity** and is **not actively developed**. Use the TypeScript SDK instead. If
-  you need it maintained, [fork it on
-  GitHub](https://github.com/astro-ascendant/ascendant).
-</Callout>
-
-<Callout type="info" title="Building with a coding agent?">
-  Point your agent at [`/llms.txt`](/llms.txt) for an index of these docs, or
-  [`/llms-full.txt`](/llms-full.txt) for the full text in one file. Any page
-  is also available as Markdown by adding `.md` to its URL. See [Building with
-  coding agents](/docs/agents).
-</Callout>
 
 ## Start with a prompt
 
@@ -125,8 +105,8 @@ advice.
 
 | Section | Who it is for | Start with |
 | --- | --- | --- |
-| **For horoscope users** | Anyone who wants a horoscope and an assistant to help read it. | [Generate your horoscope](/docs/horoscope) |
+| **For horoscope users** | Anyone who wants a horoscope and an assistant to help read it. | [Create a horoscope](/chart), then [Skills and Plugins](/docs/skills) |
 | **Start here** | Developers new to the library. | [Quickstart](/docs/quickstart), then [Core concepts](/docs/concepts) |
 | **Developer guides** | Developers building a feature. | [Choose a school and settings](/docs/guides/settings) |
 | **API reference** | Exact names, types, and errors. | [Chart](/docs/api-reference/chart) |
-| **Agents** | Anyone building with a coding agent. | [Building with coding agents](/docs/agents) |
+| **Agents** | Anyone building with a coding agent. | [Build with Agent](/docs/agents) |
