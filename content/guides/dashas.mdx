@@ -67,15 +67,15 @@ For the birth above this prints:
 
 | Mahadasha | Start | End |
 | --- | --- | --- |
-| Rahu | 1982-08-12 | 2000-08-12 |
-| Jupiter | 2000-08-12 | 2016-08-12 |
-| Saturn | 2016-08-12 | 2035-08-12 |
-| Mercury | 2035-08-12 | 2052-08-12 |
-| Ketu | 2052-08-12 | 2059-08-12 |
-| Venus | 2059-08-12 | 2079-08-12 |
-| Sun | 2079-08-12 | 2085-08-12 |
-| Moon | 2085-08-12 | 2095-08-12 |
-| Mars | 2095-08-12 | 2102-08-12 |
+| Rahu | `1982-08-12` | `2000-08-12` |
+| Jupiter | `2000-08-12` | `2016-08-12` |
+| Saturn | `2016-08-12` | `2035-08-12` |
+| Mercury | `2035-08-12` | `2052-08-12` |
+| Ketu | `2052-08-12` | `2059-08-12` |
+| Venus | `2059-08-12` | `2079-08-12` |
+| Sun | `2079-08-12` | `2085-08-12` |
+| Moon | `2085-08-12` | `2095-08-12` |
+| Mars | `2095-08-12` | `2102-08-12` |
 
 <Callout type="info" title="The first period starts before birth">
   The first Mahadasha begins before the birth date, here in 1982, because the
@@ -85,7 +85,7 @@ For the birth above this prints:
 </Callout>
 
 Each Mahadasha holds its own Antardashas. The first three of the Rahu Mahadasha
-are Rahu to 1985-04-24, Jupiter to 1987-09-18, and Saturn to 1990-07-24.
+are Rahu to `1985-04-24`, Jupiter to `1987-09-18`, and Saturn to `1990-07-24`.
 
 ```ts
 const first = timeline[0];
@@ -133,8 +133,8 @@ For the birth above, both begin at the birth moment:
 
 | System | First four Mahadashas |
 | --- | --- |
-| Chara | Gemini 2000-01-01 to 2006-01-01, Taurus to 2012-01-01, Aries to 2022-01-01, Pisces to 2033-01-01 |
-| Sthira | Libra 2000-01-01 to 2007-01-01, Scorpio to 2015-01-01, Sagittarius to 2024-01-01, Capricorn to 2031-01-01 |
+| Chara | Gemini `2000-01-01` to `2006-01-01`, Taurus to `2012-01-01`, Aries to `2022-01-01`, Pisces to `2033-01-01` |
+| Sthira | Libra `2000-01-01` to `2007-01-01`, Scorpio to `2015-01-01`, Sagittarius to `2024-01-01`, Capricorn to `2031-01-01` |
 
 Because the result is tagged by `system`, you can tell the two apart in your own
 types:
@@ -162,8 +162,8 @@ if (running) {
 }
 ```
 
-For the same date, the Chara period is Pisces-Virgo, from 2026-08-01 to
-2027-07-01, and the Sthira period is Capricorn-Taurus.
+For the same date, the Chara period is Pisces-Virgo, from `2026-08-01` to
+`2027-07-01`, and the Sthira period is Capricorn-Taurus.
 
 <Callout type="warn" title="Use the matching query">
   `Dasha.at` takes a Vimshottari timeline and `Dasha.atRashi` takes a Chara or
@@ -177,9 +177,9 @@ The systems measure time differently, and you can see it in the boundaries:
 
 - **Vimshottari** periods are decimal years converted into calendar months, days,
   hours, and minutes. Their boundaries fall at any time of day. In the example,
-  Saturn begins at 11:55 UTC on 2016-08-12.
+  Saturn begins at `11:55 UTC` on `2016-08-12`.
 - **Chara and Sthira** periods are whole calendar months. Their boundaries fall
-  on the first of a month, such as 2026-08-01.
+  on the first of a month, such as `2026-08-01`.
 
 Treat the exact instants as part of the result. Do not round them to a day if
 you compare periods across systems.

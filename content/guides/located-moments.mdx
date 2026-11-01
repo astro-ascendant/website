@@ -75,8 +75,8 @@ Clock changes create two kinds of bad local times:
 
 | Case | Example in `America/New_York` | With `"reject"` |
 | --- | --- | --- |
-| A **gap**, when clocks jump forward, so the time never happened | 2021-03-14 02:30 | `Option.none()` |
-| An **overlap**, when clocks fall back, so the time happened twice | 2021-11-07 01:30 | `Option.none()` |
+| A **gap**, when clocks jump forward, so the time never happened | `2021-03-14 02:30` | `Option.none()` |
+| An **overlap**, when clocks fall back, so the time happened twice | `2021-11-07 01:30` | `Option.none()` |
 
 The other disambiguation modes (`"earlier"`, `"later"`, `"compatible"`) silently
 pick an answer. That can move a birth by an hour and change the Lagna. For

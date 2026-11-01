@@ -47,9 +47,9 @@ Each event reports where and when:
 
 | Moment (UTC) | Longitude | Sign | Retrograde |
 | --- | --- | --- | --- |
-| 2027-01-25 11:30 | 120° | Cancer | yes |
-| 2027-06-25 13:09 | 120° | Leo | no |
-| 2027-11-25 23:14 | 150° | Virgo | no |
+| `2027-01-25 11:30` | 120° | Cancer | yes |
+| `2027-06-25 13:09` | 120° | Leo | no |
+| `2027-11-25 23:14` | 150° | Virgo | no |
 
 The first event is Jupiter moving backward across the Cancer and Leo boundary
 while retrograde. The search counts **every** crossing in strict time order, so a
@@ -76,7 +76,7 @@ Leo, then Virgo.
 
 To search into the past, set `direction: "backward"`. The events then come back
 newest first. From 1 November 2026, Jupiter's previous two ingresses were into
-Cancer at 2026-10-30 15:40 UTC and into Gemini at 2026-06-01 10:36 UTC.
+Cancer at `2026-10-30 15:40 UTC` and into Gemini at `2026-06-01 10:36 UTC`.
 
 ## Event kinds
 
@@ -164,11 +164,11 @@ const events = await runtime.runPromise(
 
 The cusp comes from the house system in your settings, so a different house system
 gives a different cusp and different crossing times. For the birth location
-above, the tenth cusp is at 91.749°, so the real crossing is on 2027-07-18, in
+above, the tenth cusp is at 91.749°, so the real crossing is on `2027-07-18`, in
 Cancer.
 
 The opposite-point issue above applies here too. The same search also returns
-2027-01-16, at 271.749°, and the filter from the callout removes it:
+`2027-01-16`, at 271.749°, and the filter from the callout removes it:
 
 ```ts
 const { charts } = await runtime.runPromise(Chart.generate(from));
@@ -196,10 +196,10 @@ For Mercury from 1 November 2026:
 
 | Moment (UTC) | Longitude | Sign | What happens |
 | --- | --- | --- | --- |
-| 2026-11-13 15:54 | 190.876° | Libra | Turns direct |
-| 2027-02-09 17:35 | 311.819° | Aquarius | Turns retrograde |
-| 2027-03-03 12:32 | 296.760° | Capricorn | Turns direct |
-| 2027-06-10 18:15 | 72.194° | Gemini | Turns retrograde |
+| `2026-11-13 15:54` | 190.876° | Libra | Turns direct |
+| `2027-02-09 17:35` | 311.819° | Aquarius | Turns retrograde |
+| `2027-03-03 12:32` | 296.760° | Capricorn | Turns direct |
+| `2027-06-10 18:15` | 72.194° | Gemini | Turns retrograde |
 
 <Callout type="warn" title="Do not rely on is_retrograde at a station">
   At a station the speed is zero, so the event's `is_retrograde` flag, taken from
