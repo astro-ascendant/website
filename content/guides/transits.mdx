@@ -3,8 +3,6 @@ title: Transit searches
 description: Find the next or previous sign ingresses, longitude hits, house-cusp crossings, and stations of one graha, and attach charts to each event.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
-
 A **transit search** finds when one graha does something specific: enters a
 sign, reaches a longitude, crosses a house cusp, or turns around. You give a
 starting **Located Moment**, and the search returns the next or previous events in
@@ -12,8 +10,8 @@ time order. It reports exact moments and nothing else. There is no
 interpretation in the result.
 
 `Transit.findTransits` is the module's only function. This guide runs a first
-search, explains every request field and event kind, and covers the two things
-you must know about in version 6.0.0.
+search, explains every request field and event kind, and shows how to handle a
+search that cannot finish.
 
 ## Run a first search
 
@@ -74,6 +72,9 @@ Leo, then Virgo.
 | `precisionMinutes` | How precisely each moment is refined. The default is 1 minute. |
 | `includeCharts` | Divisions to attach to every event. See [Attach charts](#attach-charts). |
 
+The search includes `from` itself: a graha that sits exactly on a boundary, target,
+or cusp at that moment reports it there.
+
 To search into the past, set `direction: "backward"`. The events then come back
 newest first. From 1 November 2026, Jupiter's previous two ingresses were into
 Cancer at `2026-10-30 15:40 UTC` and into Gemini at `2026-06-01 10:36 UTC`.
@@ -113,36 +114,9 @@ const events = await runtime.runPromise(
 );
 ```
 
-<Callout type="warn" title="Known issue in 6.0.0: opposite-point results">
-  In version 6.0.0, `longitude-hit` and `cusp-crossing` also return the moments
-  when the graha reaches the point exactly **opposite** the target, 180° away.
-  Searching the Sun for 100° returns 100° in July and 280° in January, alternately.
-  `sign-ingress` and `station` are not affected.
-
-  Until this is fixed, keep only the events whose longitude is near your target,
-  and ask for twice as many as you need:
-
-  ```ts
-  const circularGap = (a: number, b: number) => {
-    const gap = Math.abs(a - b) % 360;
-    return Math.min(gap, 360 - gap);
-  };
-
-  const target = 100;
-  const events = await runtime.runPromise(
-    Transit.findTransits({
-      planet: "Sun",
-      from,
-      count: 8, // twice the 4 hits wanted
-      direction: "forward",
-      kinds: ["longitude-hit"],
-      targetLongitude: Chart.Longitude.make(target),
-    }),
-  );
-  const hits = events.filter((event) => circularGap(Number(event.longitude), target) < 1);
-  // 4 events: 2027-07-27, 2028-07-26, 2029-07-26, 2030-07-27
-  ```
-</Callout>
+Saturn crosses 350° at `2027-03-10 09:27` and again at `2056-04-17 20:34`, about
+a lap later. Searching the Sun for 100° returns one hit a year: `2027-07-27`,
+`2028-07-26`, `2029-07-26`, and `2030-07-27`.
 
 ### Cusp crossing
 
@@ -164,17 +138,8 @@ const events = await runtime.runPromise(
 
 The cusp comes from the house system in your settings, so a different house system
 gives a different cusp and different crossing times. For the birth location
-above, the tenth cusp is at 91.749°, so the real crossing is on `2027-07-18`, in
-Cancer.
-
-The opposite-point issue above applies here too. The same search also returns
-`2027-01-16`, at 271.749°, and the filter from the callout removes it:
-
-```ts
-const { charts } = await runtime.runPromise(Chart.generate(from));
-const cusp = Number(charts[0].houses[10].cusp); // 91.749
-const crossings = events.filter((event) => circularGap(Number(event.longitude), cusp) < 1);
-```
+above, the tenth cusp is at 91.747°, so the Sun crosses it on `2027-07-18 18:20`,
+in Cancer, and again on `2028-07-18 00:37`.
 
 ### Station
 
@@ -194,21 +159,15 @@ const events = await runtime.runPromise(
 
 For Mercury from 1 November 2026:
 
-| Moment (UTC) | Longitude | Sign | What happens |
-| --- | --- | --- | --- |
-| `2026-11-13 15:54` | 190.876° | Libra | Turns direct |
-| `2027-02-09 17:35` | 311.819° | Aquarius | Turns retrograde |
-| `2027-03-03 12:32` | 296.760° | Capricorn | Turns direct |
-| `2027-06-10 18:15` | 72.194° | Gemini | Turns retrograde |
+| Moment (UTC) | Longitude | Sign | What happens | `is_retrograde` |
+| --- | --- | --- | --- | --- |
+| `2026-11-13 15:54` | 190.876° | Libra | Turns direct | `false` |
+| `2027-02-09 17:36` | 311.819° | Aquarius | Turns retrograde | `true` |
+| `2027-03-03 12:32` | 296.760° | Capricorn | Turns direct | `false` |
+| `2027-06-10 18:14` | 72.194° | Gemini | Turns retrograde | `true` |
 
-<Callout type="warn" title="Do not rely on is_retrograde at a station">
-  At a station the speed is zero, so the event's `is_retrograde` flag, taken from
-  the sign of the speed at that instant, is not a reliable guide to which way the
-  graha turns. Version 6.0.0 reports `false` for the February 2027 station above,
-  even though Mercury turns retrograde there. Work out the turn from the order
-  instead. Stations alternate between turning retrograde and turning direct, and the
-  longitude falls after a station that turns retrograde.
-</Callout>
+At a station the speed is zero, so `is_retrograde` reports the motion just after
+it: `true` at a station that starts a retrograde, and `false` at one that ends it.
 
 ## Attach charts
 
@@ -258,19 +217,23 @@ const events = await runtime.runPromise(
 // 2 events: Aries and Pisces
 ```
 
-An invalid or incomplete request fails with `TransitValidationError`. See [Errors
-and typed failures](/docs/guides/errors).
+An invalid or incomplete request fails with `TransitValidationError`, and so does a
+search window that leaves the supported Julian Day range. See [Errors and typed
+failures](/docs/guides/errors).
 
 ## Speed
 
-A search samples the ephemeris thousands of times. `Runtime.MainLayer` already
-uses the cached Swiss Ephemeris layer, so repeated and overlapping searches reuse
-earlier positions. If you build your own layers, use `Swisseph.SwissephCachedLayer`
+A search leaps from the starting moment to the earliest time a graha could reach
+the next boundary, target, or station, and refines each crossing with a few more
+lookups. Per the 6.1.0 release notes, typical searches use 5 to 25 times fewer
+ephemeris calls than before. `Runtime.MainLayer` also uses the cached Swiss
+Ephemeris layer, so repeated and overlapping searches reuse earlier positions. If you build your own layers, use `Swisseph.SwissephCachedLayer`
 and not `Swisseph.SwissephLayer`. See [Ephemeris adapters and
 caching](/docs/guides/ephemeris-and-caching).
 
 ## Provenance
 
-Each event records its method: school `Ascendant`, method `transit-sample-bisect`,
-version 1. The search samples the graha's position at coarse steps and bisects each
-bracketed crossing down to `precisionMinutes`.
+Each event records its method: school `Parashari`, method `transit-sample-bisect`,
+version `2026-11-01`. The search leaps from the located moment by the time the graha
+needs to reach the nearest boundary, target, or station, then refines each crossing
+to `precisionMinutes`.

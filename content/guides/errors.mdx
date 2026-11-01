@@ -36,12 +36,9 @@ you can plan ahead.
 | `RashiDrishti.calculate` | None |
 | `Transit.findTransits` | `TransitValidationError`, `TransitSearchExhausted`, `ChartCalculationError`, `LocatedMomentValidationError`, `LongitudeError`, `EphemerisError` |
 
-The names above are the error **tags**, the strings you pass to `catchTag`. In
-the Jaimini modules the exported classes are called `EvidenceError` and
-`CalculationError`, but their tags carry the module name, as shown.
-
-The type of `Transit.findTransits` also includes a schema decoding `Issue`. Handle
-the errors you care about and let the rest propagate.
+The names above are the error **tags**, the strings you pass to `catchTag`. They are
+also the names of the exported classes. Older code may use the unprefixed Jaimini
+names `EvidenceError` and `CalculationError`, which remain as deprecated aliases.
 
 ## What an error looks like
 
@@ -56,7 +53,7 @@ its kind. Most also carry a `cause` with the underlying detail.
 | `EphemerisError` | `operation`, `cause` | The ephemeris failed. `operation` names the call that failed. |
 | `DashaEvidenceError` and the Jaimini `*EvidenceError`s | `placement`, `expected`, `actual` | The placements did not hold exactly one entry for a planet the calculation needs. |
 | `SAVCalculationError` | `cause` | An Ashtakavarga table broke a classical checksum. `cause` names the entity and the totals. |
-| `TransitValidationError` | `cause` | The request was incomplete or invalid. |
+| `TransitValidationError` | `cause` | The request was incomplete or invalid, or the search window left the supported Julian Day range. |
 | `TransitSearchExhausted` | `found`, `searchedUntil` | The search window ended before `count` events were found. `found` holds the events it did find. |
 
 A `ChartCalculationError` at the `"houses"` stage means the chosen house system's

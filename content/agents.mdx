@@ -93,10 +93,9 @@ are the mistakes this library invites:
 | One `ManagedRuntime`, created once | A new runtime per request gets an empty position cache. See [Ephemeris adapters and caching](/docs/guides/ephemeris-and-caching). |
 | Local time is converted to UTC with the zone for that **date** | Offsets change over time, and a daylight-saving gap or overlap can move a birth by an hour. See [From local time to a Located Moment](/docs/guides/located-moments). |
 | One school per judgment, and the settings are stated | KP and Parashari use different ayanamsas and house systems. See [Choose a school and settings](/docs/guides/settings). |
-| Functions and imports exist | Agents invent names. For example, `getDivisionalTarget` comes from `astro-ascendant/chart/divisional-mapping`, not from `astro-ascendant/chart`. |
+| Functions and imports exist | Agents invent names or reach for removed ones. For example, `Chart.project` was removed in 6.0, and `Chart.generate` replaces it. |
 | `Dasha.at` and `Dasha.atRashi` results are checked for `null` | They return `null` outside the timeline. See [Dashas](/docs/guides/dashas). |
 | Errors are handled by tag | `Chart.generate` fails typed for bad input. See [Errors and typed failures](/docs/guides/errors). |
-| Transit `longitude-hit` and `cusp-crossing` results are filtered in 6.0.0 | They also return the opposite point. See [Transit searches](/docs/guides/transits). |
 | Arudha Pada is described as the plain projection | The library does not apply the classical adjustment. See [Jaimini calculations](/docs/guides/jaimini). |
 | Nothing is presented as a prediction | A calculation is a position or a period, not a promise. |
 

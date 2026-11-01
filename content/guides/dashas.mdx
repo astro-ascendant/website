@@ -177,7 +177,7 @@ The systems measure time differently, and you can see it in the boundaries:
 
 - **Vimshottari** periods are decimal years converted into calendar months, days,
   hours, and minutes. Their boundaries fall at any time of day. In the example,
-  Saturn begins at `11:55 UTC` on `2016-08-12`.
+  Saturn begins at `12:48 UTC` on `2016-08-12`.
 - **Chara and Sthira** periods are whole calendar months. Their boundaries fall
   on the first of a month, such as `2026-08-01`.
 
@@ -186,10 +186,12 @@ you compare periods across systems.
 
 ## Which method was used
 
-Each Rashi dasha records its method in `provenance`. Chara reports
-`kn-rao-co-lord-strength` and Sthira reports `bv-raman-koch-brahma-strength`,
-both version 2 and school Jaimini. Store these with the timeline if you will
-show it later. See [Provenance and verification](/docs/guides/provenance).
+Every dasha records its method in `provenance`. Chara reports the Jaimini method
+`kn-rao-co-lord-strength` and Sthira reports `bv-raman-koch-brahma-strength`.
+Vimshottari returns a plain array, so its provenance sits on each Mahadasha, as the
+Parashari method `moon-nakshatra-balance`. The version of each is a date, currently
+`2026-11-01`. Store these with the timeline if you will show it later. See
+[Provenance and verification](/docs/guides/provenance).
 
 ## When it fails
 

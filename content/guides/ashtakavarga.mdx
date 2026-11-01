@@ -27,6 +27,7 @@ moment or location, because everything it uses is already in the placements.
 | `reduced` | The seven planetary BAVs after Trikona and then Ekadhipatya reduction. |
 | `shodhya_pinda` | For each planet, its Rashi Pinda, Graha Pinda, and their sum, the Shodhya Pinda. |
 | `totals` | The total of each BAV table, plus the SAV total. |
+| `provenance` | The method that made the result: Parashari `bphs-bav-trikona-ekadhipatya`. |
 
 ## Calculate
 
@@ -61,17 +62,17 @@ For the birth above, these are the scores by sign:
 | Sign | Sun BAV | Lagna BAV | SAV |
 | --- | --- | --- | --- |
 | Aries | 4 | 4 | 29 |
-| Taurus | 5 | 3 | 23 |
-| Gemini | 1 | 2 | 23 |
+| Taurus | 5 | 3 | 22 |
+| Gemini | 1 | 2 | 22 |
 | Cancer | 3 | 6 | 26 |
 | Leo | 6 | 3 | 34 |
 | Virgo | 5 | 5 | 33 |
-| Libra | 5 | 3 | 29 |
+| Libra | 5 | 3 | 30 |
 | Scorpio | 4 | 4 | 30 |
 | Sagittarius | 5 | 5 | 28 |
 | Capricorn | 2 | 4 | 21 |
 | Aquarius | 4 | 5 | 32 |
-| Pisces | 4 | 5 | 29 |
+| Pisces | 4 | 5 | 30 |
 
 The other six planets have their own BAV tables under `bhinna`, keyed the same
 way.
@@ -101,11 +102,14 @@ receive a table that breaks the rules.
 ## Reduced tables and Shodhya Pinda
 
 `reduced` applies two reductions to the seven planetary BAVs, Trikona first and
-then Ekadhipatya. Reduced scores are smaller, and many signs drop to zero:
+then Ekadhipatya. The Ekadhipatya step looks at each pair of signs one planet
+rules and reduces it by whether the seven planets occupy them. Reduced scores are
+smaller, and many signs drop to zero:
 
 ```ts
 ashtakavarga.reduced.Sun;
-// Leo: 2, Virgo: 3, Libra: 1, Scorpio: 1, Aquarius: 3, and 0 in every other sign
+// Leo: 2, Virgo: 3, Libra: 4, Scorpio: 1, Sagittarius: 1, Aquarius: 3,
+// and 0 in every other sign
 ```
 
 `shodhya_pinda` builds on the reduced tables. For each planet it holds a
@@ -114,13 +118,13 @@ seven planets occupy), and their sum, the **Shodhya Pinda**:
 
 | Planet | Rashi Pinda | Graha Pinda | Shodhya Pinda |
 | --- | --- | --- | --- |
-| Sun | 58 | 36 | 94 |
-| Moon | 78 | 38 | 116 |
-| Mars | 74 | 29 | 103 |
-| Mercury | 80 | 57 | 137 |
-| Jupiter | 44 | 8 | 52 |
-| Venus | 87 | 53 | 140 |
-| Saturn | 34 | 5 | 39 |
+| Sun | 113 | 61 | 174 |
+| Moon | 100 | 43 | 143 |
+| Mars | 123 | 78 | 201 |
+| Mercury | 96 | 62 | 158 |
+| Jupiter | 55 | 8 | 63 |
+| Venus | 130 | 69 | 199 |
+| Saturn | 59 | 5 | 64 |
 
 Use these as they are. A Shodhya Pinda is a weighted total for one planet, not a
 probability and not a prediction.
@@ -134,7 +138,7 @@ in D1 and look it up:
 const [d1] = charts;
 
 const tenth = d1.houses[10].sign; // "Pisces"
-ashtakavarga.sarva[tenth]; // 29
+ashtakavarga.sarva[tenth]; // 30
 ashtakavarga.bhinna.Sun[tenth]; // 4
 ```
 
@@ -148,18 +152,19 @@ const houseScores = Object.entries(d1.houses).map(([house, { sign }]) => ({
 }));
 ```
 
-For the birth above, with Gemini rising, the SAV scores of houses 1 to 12 are 23,
-26, 34, 33, 29, 30, 28, 21, 32, 29, 29, and 23. The highest is the third house,
+For the birth above, with Gemini rising, the SAV scores of houses 1 to 12 are 22,
+26, 34, 33, 30, 30, 28, 21, 32, 30, 29, and 22. The highest is the third house,
 Leo, at 34.
 
 <Callout type="info" title="Houses and house systems">
-  The sign scores do not depend on the house system. They did not change across
-  Placidus, Koch, Equal, and whole-sign houses for this birth. The ayanamsa can
-  change them, because it moves each planet's longitude and so can move it into a
-  different sign. Which sign a house maps to depends on the house system. With a cusp-based system such as Placidus, a house starts at a cusp and
-  `houses[n].sign` is the sign of that cusp. For Parashari work, where each house
-  is one whole sign, use the Lahiri and whole-sign settings from [Choose a school
-  and settings](/docs/guides/settings).
+  The sign scores do not depend on the house system. They were identical across
+  all 13 house systems for this birth. The ayanamsa can change them, because it
+  moves each planet's longitude and so can move it into a different sign. Which
+  sign a house maps to does depend on the house system. With a cusp-based system
+  such as Placidus, a house starts at a cusp and `houses[n].sign` is the sign of
+  that cusp. For Parashari work, where each house is one whole sign, use the
+  Lahiri and whole-sign settings from [Choose a school and
+  settings](/docs/guides/settings).
 </Callout>
 
 ## Terms in this guide

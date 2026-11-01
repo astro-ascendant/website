@@ -3,7 +3,6 @@ title: Divisional charts
 description: Generate D9 and the other divisional charts, read their whole-sign houses, and map a single longitude into a division.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 
 A **divisional chart** reworks the same planetary positions through a division
 of each sign. The D9, for example, splits every sign into nine parts. Ascendant
@@ -110,7 +109,7 @@ fields:
 | `lagna` | The mapped Lagna, in the house that holds it. Otherwise `null`. |
 
 A chart also records its `division` and its `provenance`, which for every
-divisional chart is `whole-sign-from-mapped-lagna`, version 1.
+divisional chart is the Parashari `whole-sign-from-mapped-lagna` method.
 
 To find where a planet sits, scan the houses. The data is one-directional on
 purpose: a house lists its planets, but a planet does not carry its house.
@@ -132,7 +131,7 @@ For the birth above, the Lagna and Sun land in these signs:
 | Division | Lagna | Sun |
 | --- | --- | --- |
 | D1 | Gemini | Sagittarius |
-| D2 | Leo | Virgo |
+| D2 | Leo | Cancer |
 | D3 | Gemini | Aries |
 | D4 | Virgo | Gemini |
 | D7 | Leo | Pisces |
@@ -155,10 +154,10 @@ cusps.
 ## Map one longitude
 
 If you need only the divisional position of a single longitude, skip the chart
-and use `getDivisionalTarget`. It lives in its own entry point:
+and use `getDivisionalTarget`:
 
 ```ts
-import { getDivisionalTarget } from "astro-ascendant/chart/divisional-mapping";
+import { getDivisionalTarget } from "astro-ascendant/chart";
 import { Effect } from "effect";
 
 const target = await runtime.runPromise(getDivisionalTarget(256.5924, 9));
@@ -171,13 +170,8 @@ const target = await runtime.runPromise(getDivisionalTarget(256.5924, 9));
 
 For the Sun at 256.59° in D1, the D9 target is Leo at 29.33°, which matches the
 Sun's D9 sign in the table above. For division `1`, the function returns the
-source position unchanged.
-
-<Callout type="info" title="API reference import path">
-  The generated Chart reference lists `getDivisionalTarget` among the functions
-  imported from `astro-ascendant/chart`. In version 6.0.0 it is exported from
-  `astro-ascendant/chart/divisional-mapping`, as shown here.
-</Callout>
+source position unchanged. The same function is also exported from
+`astro-ascendant/chart/divisional-mapping`.
 
 ## Where divisions are used
 

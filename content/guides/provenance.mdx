@@ -3,13 +3,11 @@ title: Provenance and verification
 description: Read the school, method, and version attached to results, look up the method specification behind them, and store what you need to repeat a calculation.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
-
 An astrology result is only useful if you can say how it was produced. Ascendant
-answers that in two ways. Most results carry a **provenance**, a short label
-naming the method that made them. And every method has a **method specification**
-in a registry, which lists its steps and the properties it guarantees. This guide
-shows how to read both, how to connect them, and what to store alongside a result.
+answers that in two ways. Every result carries a **provenance**, a short label
+naming the method that made it. And every method has a **method specification** in
+a registry, which lists its steps and the properties it guarantees. This guide shows
+how to read both, how to connect them, and what to store alongside a result.
 
 ## What provenance is
 
@@ -17,37 +15,44 @@ A provenance has three fields:
 
 | Field | Meaning | Example |
 | --- | --- | --- |
-| `school` | The tradition or origin of the method. | `Jaimini`, `Ascendant` |
+| `school` | The tradition the method belongs to: `Parashari`, `Jaimini`, or `Universal`. | `Jaimini` |
 | `method` | The name of the specific method. | `plain-projection` |
-| `version` | The version of that method's specification. | `1` |
+| `version` | The date the method last changed, as `YYYY-MM-DD`. | `2026-11-01` |
 
 Together they identify exactly one specification. Results that came from different
-versions came from different specifications.
+versions came from different specifications. Today every method has the version
+`2026-11-01`.
 
-## Which results carry it
+A D1 chart is `Universal`, because its houses follow whichever house system and
+ayanamsa you chose. Divisional charts, Placements, Vimshottari, Ashtakavarga, and
+transit events are `Parashari`. The Jaimini results and the Chara and Sthira dashas
+are `Jaimini`.
 
-Provenance sits on the result itself. This table shows where to find it, with the
-value for each:
+## Where to find it
 
-| Result | Where | School / method / version |
+Provenance sits on the result itself. This table shows where to find it and which
+method each result reports:
+
+| Result | Where | School / method |
 | --- | --- | --- |
-| D1 chart | `charts[0].provenance` | Ascendant / `house-system-cusps` / 1 |
-| Divisional chart | `charts[n].provenance` | Ascendant / `whole-sign-from-mapped-lagna` / 1 |
-| Chara Karakas | `result.provenance` | Jaimini / `exact-degree-shared-roles` / 1 |
-| Rashi Drishti | `result.provenance` | Jaimini / `movable-fixed-dual` / 1 |
-| Karakamsha | `result.provenance` | Jaimini / `atmakaraka-d9-sign` / 1 |
-| Arudha Pada | `result.provenance` | Jaimini / `plain-projection` / 1 |
-| Upapada | `result.provenance` | Jaimini / `twelfth-house-plain-projection` / 1 |
-| Argala | `result.provenance` | Jaimini / `structural-positions` / 1 |
-| Chara dasha | `timeline.provenance` | Jaimini / `kn-rao-co-lord-strength` / 2 |
-| Sthira dasha | `timeline.provenance` | Jaimini / `bv-raman-koch-brahma-strength` / 2 |
-| Transit event | `event.provenance` | Ascendant / `transit-sample-bisect` / 1 |
+| Placements | `placements.provenance` | Parashari / `sidereal-ephemeris-placements` |
+| D1 chart | `charts[0].provenance` | Universal / `house-system-cusps` |
+| Divisional chart | `charts[n].provenance` | Parashari / `whole-sign-from-mapped-lagna` |
+| Vimshottari dasha | `timeline[n].provenance`, on each Mahadasha | Parashari / `moon-nakshatra-balance` |
+| Ashtakavarga | `result.provenance` | Parashari / `bphs-bav-trikona-ekadhipatya` |
+| Chara Karakas | `result.provenance` | Jaimini / `exact-degree-shared-roles` |
+| Rashi Drishti | `result.provenance` | Jaimini / `movable-fixed-dual` |
+| Karakamsha | `result.provenance` | Jaimini / `atmakaraka-d9-sign` |
+| Arudha Pada | `result.provenance` | Jaimini / `plain-projection` |
+| Upapada | `result.provenance` | Jaimini / `twelfth-house-plain-projection` |
+| Argala | `result.provenance` | Jaimini / `structural-positions` |
+| Chara dasha | `timeline.provenance` | Jaimini / `kn-rao-co-lord-strength` |
+| Sthira dasha | `timeline.provenance` | Jaimini / `bv-raman-koch-brahma-strength` |
+| Transit event | `event.provenance` | Parashari / `transit-sample-bisect` |
 
-<Callout type="info" title="Not every result has provenance">
-  Placements, Vimshottari dashas, and Ashtakavarga results do not carry a
-  provenance field. For those, record the library version you used, together with
-  the settings, as described [below](#store-what-you-need-to-repeat-a-result).
-</Callout>
+Two details: Vimshottari returns a plain array, so its provenance is on each
+Mahadasha and not on the array. And `placements.provenance` is optional in the
+type, because you can build Placements yourself. `Chart.generate` always fills it.
 
 Reading one is ordinary property access:
 
@@ -66,8 +71,8 @@ const located = Chart.LocatedMoment.make({
 const { placements, charts } = await runtime.runPromise(Chart.generate(located, [9]));
 const karakas = await runtime.runPromise(CharaKarakas.calculate(placements));
 
-charts[0].provenance; // { school: "Ascendant", method: "house-system-cusps", version: 1 }
-karakas.provenance; // { school: "Jaimini", method: "exact-degree-shared-roles", version: 1 }
+charts[0].provenance; // { school: "Universal", method: "house-system-cusps", version: "2026-11-01" }
+karakas.provenance; // { school: "Jaimini", method: "exact-degree-shared-roles", version: "2026-11-01" }
 ```
 
 ## The method registry
@@ -77,8 +82,11 @@ in the table above:
 
 | Key | Method |
 | --- | --- |
+| `placements` | Placements from the ephemeris |
 | `d1ChartProjection` | D1 chart from house-system cusps |
 | `divisionalChartProjection` | Divisional chart from the mapped Lagna |
+| `vimshottariDasha` | Vimshottari dasha from the Moon's nakshatra balance |
+| `ashtakavarga` | Ashtakavarga with Trikona and Ekadhipatya reduction |
 | `jaiminiCharaKarakas` | Chara Karakas |
 | `jaiminiRashiDrishti` | Rashi Drishti |
 | `jaiminiKarakamsha` | Karakamsha |
@@ -98,7 +106,7 @@ import { Provenance } from "astro-ascendant";
 
 Provenance.methods.jaiminiArudhaPada;
 // {
-//   provenance: { school: "Jaimini", method: "plain-projection", version: 1 },
+//   provenance: { school: "Jaimini", method: "plain-projection", version: "2026-11-01" },
 //   steps: [
 //     { id: "derive-source", description: "Find the source sign and its lord for the requested house." },
 //     { id: "project", description: "Project the lord's distance from the source sign." },
@@ -109,8 +117,10 @@ Provenance.methods.jaiminiArudhaPada;
 
 The Chara dasha runs three steps, `derive-direction`, `resolve-co-lords`, and
 `build-periods`. The transit search guarantees that every zero-crossing counts in
-strict time order and that an exhausted search fails with a typed error instead of
-returning a short list.
+strict time order, that an exhausted search fails with a typed error instead of
+returning a short list, and that it finds the events an hourly scan of the ephemeris
+finds. The Ashtakavarga checks that each planetary table totals its classical
+bindu count and that the Sarvashtakavarga totals 337.
 
 `Provenance.MethodId` is the union of the registry keys, so you can write a lookup
 that TypeScript checks:
@@ -177,9 +187,8 @@ const methods = restored.methods.map((method) =>
 ```
 
 A value with a missing field fails with a schema error, so a damaged record does
-not slip through. Also store the version of `astro-ascendant` you ran, because
-results without provenance, such as Vimshottari and Ashtakavarga, are identified
-only by it.
+not slip through. Also store the version of `astro-ascendant` you ran. It is the
+simplest way to reproduce a result exactly.
 
 ## What to show readers
 
@@ -188,4 +197,4 @@ For any reading you present, state:
 - The **settings**: ayanamsa and house system, from `calculation.astroParams`.
 - The **school** of each judgment, and that the two schools were not mixed. See
   [Choose a school and settings](/docs/guides/settings).
-- The **method** and **version** of each result that carries a provenance.
+- The **method** and **version** of each result.

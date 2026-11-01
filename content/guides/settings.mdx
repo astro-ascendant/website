@@ -64,9 +64,9 @@ matter. The birth is `2000-01-01 12:00 UTC` at `12.9716° N`, `77.5946° E`.
 
 | Result | `KrishnamurtiVP291` + `Placidus` | `Lahiri` + `WholeSign` |
 | --- | --- | --- |
-| Lagna longitude | 69.680° | 69.603° |
+| Lagna longitude | 69.684° | 69.607° |
 | Lagna sign | Gemini | Gemini |
-| House 2 cusp in D1 | 95.388° | 90.000° |
+| House 2 cusp in D1 | 95.392° | 90.000° |
 
 The ayanamsa moves the Lagna by a fraction of a degree. That is small here, but
 it is enough to change a star, a sub lord, or a sign at a boundary. The house
@@ -202,9 +202,12 @@ Ascendant supports 13 house systems. `Placidus` is the default.
 | `Azimuthal` | Based on the horizon. For specialized use. |
 
 <Callout type="warn" title="High latitudes">
-  Time-based systems such as Placidus and Koch become unreliable near the polar
-  circles, because the houses can grow very large or very small there. If your
-  users may be born far north or south, prefer `WholeSign` or `Equal`.
+  Placidus and Koch are undefined inside the polar circles, where some degrees
+  never rise or set. There, `Chart.generate` fails with a `ChartCalculationError`
+  instead of returning bad cusps. In a test, 66° N worked and 68° N failed. Other
+  systems, such as `Equal`, `WholeSign`, and `Campanus`, still return cusps, but
+  they are not meaningful near the poles. If your users may be born far north or
+  south, choose the house system deliberately.
 </Callout>
 
 ## Use both schools in one app
