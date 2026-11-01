@@ -3,7 +3,7 @@ title: Dasha
 description: Vimshottari, Chara, and Sthira dasha calculations and queries.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/dasha`:
 
@@ -190,7 +190,7 @@ const CharaDasha: Schema.Struct<{
   readonly provenance: Schema.Struct<{
     readonly school: Schema.Literal<"Jaimini">;
     readonly method: Schema.Literal<"kn-rao-co-lord-strength">;
-    readonly version: Schema.Literal<2>;
+    readonly version: Schema.Literal<"2026-11-01">;
   }>;
   readonly mahadashas: Schema.$Array<
     Schema.Struct<{
@@ -261,7 +261,7 @@ const CharaDasha: Schema.Struct<{
 const CharaDashaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"kn-rao-co-lord-strength">;
-  readonly version: Schema.Literal<2>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -283,6 +283,11 @@ const CurrentDasha: Schema.Struct<{
         "Ketu",
       ]
     >;
+    readonly provenance: Schema.Struct<{
+      readonly school: Schema.Literal<"Parashari">;
+      readonly method: Schema.Literal<"moon-nakshatra-balance">;
+      readonly version: Schema.Literal<"2026-11-01">;
+    }>;
     readonly start: Schema.DateTimeUtc;
     readonly end: Schema.DateTimeUtc;
     readonly antardashas: Schema.$Array<
@@ -478,6 +483,11 @@ const MahaDasha: Schema.Struct<{
       "Ketu",
     ]
   >;
+  readonly provenance: Schema.Struct<{
+    readonly school: Schema.Literal<"Parashari">;
+    readonly method: Schema.Literal<"moon-nakshatra-balance">;
+    readonly version: Schema.Literal<"2026-11-01">;
+  }>;
   readonly start: Schema.DateTimeUtc;
   readonly end: Schema.DateTimeUtc;
   readonly antardashas: Schema.$Array<
@@ -607,7 +617,7 @@ const RashiDasha: Schema.toTaggedUnion<"system", readonly [Schema.Struct<{
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Jaimini">;
         readonly method: Schema.Literal<"kn-rao-co-lord-strength">;
-        readonly version: Schema.Literal<2>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly mahadashas: Schema.$Array<Schema.Struct<{
         readonly mahadasha: Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>;
@@ -625,9 +635,7 @@ const RashiDasha: Schema.toTaggedUnion<"system", readonly [Schema.Struct<{
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Jaimini">;
         readonly method: Schema.Literal<"bv-raman-koch-brahma-strength">;
-        readonly version: Schema.Literal<2>;
-    }>;
-    reado
+        readonly version: Schema.Literal<"2026-11-0
 // … truncated
 ```
 
@@ -702,7 +710,7 @@ const SthiraDasha: Schema.Struct<{
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Jaimini">;
         readonly method: Schema.Literal<"bv-raman-koch-brahma-strength">;
-        readonly version: Schema.Literal<2>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly brahma: Schema.Struct<{
         readonly planet: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus"]>;
@@ -718,7 +726,7 @@ const SthiraDasha: Schema.Struct<{
                 readonly aspectingPlanets: Schema.$Array<Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>>;
                 readonly total: Schema.Finite;
             }>, Schema.Struct<{
-                readonly sign: Schema.Literals<readonly ["Aries", "Taurus"
+                readonly sign: Schema.Literals<readonly ["Aries
 // … truncated
 ```
 
@@ -728,7 +736,7 @@ const SthiraDasha: Schema.Struct<{
 const SthiraDashaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"bv-raman-koch-brahma-strength">;
-  readonly version: Schema.Literal<2>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -750,6 +758,11 @@ const VimshottariDasha: Schema.$Array<
         "Ketu",
       ]
     >;
+    readonly provenance: Schema.Struct<{
+      readonly school: Schema.Literal<"Parashari">;
+      readonly method: Schema.Literal<"moon-nakshatra-balance">;
+      readonly version: Schema.Literal<"2026-11-01">;
+    }>;
     readonly start: Schema.DateTimeUtc;
     readonly end: Schema.DateTimeUtc;
     readonly antardashas: Schema.$Array<
@@ -786,4 +799,14 @@ const VimshottariDasha: Schema.$Array<
     >;
   }>
 >;
+```
+
+### `VimshottariDashaProvenance`
+
+```ts
+const VimshottariDashaProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Parashari">;
+  readonly method: Schema.Literal<"moon-nakshatra-balance">;
+  readonly version: Schema.Literal<"2026-11-01">;
+}>;
 ```

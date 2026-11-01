@@ -3,7 +3,7 @@ title: SAV
 description: Ashtakavarga and Shodhya Pinda calculations for shared chart placements.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/sav`:
 
@@ -17,6 +17,11 @@ import * as SAV from "astro-ascendant/sav";
 
 ```ts
 const calculate: (placements: Placements) => Effect.Effect<{
+    provenance: {
+        readonly school: "Parashari";
+        readonly method: "bphs-bav-trikona-ekadhipatya";
+        readonly version: "2026-11-01";
+    };
     bhinna: {
         readonly Jupiter: {
             readonly Aquarius: number;
@@ -54,11 +59,6 @@ const calculate: (placements: Placements) => Effect.Effect<{
             readonly Gemini: number;
             readonly Leo: number;
             readonly Libra: number;
-            readonly Pisces: number;
-            readonly Sagittarius: number;
-            readonly Scorpio: number;
-            readonly Taurus: number;
-            r
 // … truncated
 ```
 
@@ -97,6 +97,11 @@ const AshtakavargaPlanets: Schema.Literals<
 
 ```ts
 const AshtakavargaResult: Schema.Struct<{
+    readonly provenance: Schema.Struct<{
+        readonly school: Schema.Literal<"Parashari">;
+        readonly method: Schema.Literal<"bphs-bav-trikona-ekadhipatya">;
+        readonly version: Schema.Literal<"2026-11-01">;
+    }>;
     readonly bhinna: Schema.$Record<Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]>, Schema.Literal<"Lagna">]>, Schema.$Record<Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>, Schema.Int>>;
     readonly sarva: Schema.$Record<Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>, Schema.Int>;
     readonly reduced: Schema.$Record<Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]>, Schema.$Record<Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>, Schema.Int>>;
@@ -106,13 +111,7 @@ const AshtakavargaResult: Schema.Struct<{
         readonly shodhya_pinda: Schema.Int;
     }>>;
     readonly totals: Schema.Struct<{
-        readonly Sun: Schema.Int;
-        readonly Moon: Schema.Int;
-        readonly Mars: Schema.Int;
-        readonly Mercury: Schema.Int;
-        readonly Jupiter: Schema.Int;
-        readonly Venus: Schema.Int;
-        readonly Saturn: Schema.Int;
+        readonly Sun: Schema.
 // … truncated
 ```
 

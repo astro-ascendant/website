@@ -3,7 +3,7 @@ title: Transit
 description: Mechanics-only search for the next or previous transit events of one graha.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/transit`:
 
@@ -25,8 +25,7 @@ const findTransits: (
   | import("../chart/error.js").LocatedMomentValidationError
   | import("../utils/position.js").LongitudeError
   | TransitSearchExhausted
-  | TransitValidationError
-  | import("effect/SchemaIssue").Issue,
+  | TransitValidationError,
   AstroParams | Ephemeris
 >;
 ```
@@ -64,23 +63,27 @@ const TransitEvent: Schema.Struct<{
         inSign(signIndex: number, degree: number): Longitude;
     };
     readonly kind: Schema.Literals<readonly ["sign-ingress", "cusp-crossing", "longitude-hit", "station"]>;
+    
+/**
+     * For `sign-ingress`, the sign entered at that instant in the direction of the search
+     * (a backward search reports the earlier sign); otherwise the sign at the event.
+     */
+
     readonly sign: Schema.optionalKey<Schema.Literals<readonly ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]>>;
+    
+/** Whether the graha moves backwards at the event; just after it, at a `station`. */
+
     readonly is_retrograde: Schema.Boolean;
     readonly direction: Schema.Literals<readonly ["forward", "backward"]>;
     readonly provenance: Schema.Struct<{
-        readonly school: Schema.Literal<"Ascendant">;
+        readonly school: Schema.Literal<"Parashari">;
         readonly method: Schema.Literal<"transit-sample-bisect">;
-        readonly version: Schema.Literal<1>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly calculation: Schema.optionalKey<Schema.Struct<{
         readonly placements: Schema.Struct<{
             readonly lagna: Schema.Struct<{
-                readonly name: Schema.Literal<"Lagna">;
-                readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
-                    normalize(degrees: number): Longitude;
-                    inSign(signIndex: number, degree: number): Longitude;
-                };
-                readonly star: Schema
+                readonly nam
 // … truncated
 ```
 

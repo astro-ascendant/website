@@ -3,7 +3,7 @@ title: Provenance
 description: Method specification and provenance records attached to calculations.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/provenance`:
 
@@ -20,6 +20,50 @@ type MethodId = keyof typeof methods;
 ```
 
 ## Constants
+
+### `ashtakavarga`
+
+```ts
+const ashtakavarga: {
+  readonly provenance: {
+    readonly school: "Parashari";
+    readonly method: "bphs-bav-trikona-ekadhipatya";
+    readonly version: "2026-11-01";
+  };
+  readonly steps: readonly [
+    {
+      readonly id: "score-bhinna";
+      readonly description: "Give each planet and the Lagna a bindu per contributor whose classical houses include the sign.";
+    },
+    {
+      readonly id: "sum-sarva";
+      readonly description: "Add the seven planetary tables into the Sarvashtakavarga.";
+    },
+    {
+      readonly id: "reduce";
+      readonly description: "Apply Trikona then Ekadhipatya reduction, the latter by planet occupancy of each pair of signs.";
+    },
+    {
+      readonly id: "weigh-pinda";
+      readonly description: "Weigh the reduced scores by the Rashi and Graha multipliers into Shodhya Pinda.";
+    },
+  ];
+  readonly verification: readonly [
+    "Each planetary table totals its classical bindu count and the Sarvashtakavarga totals 337.",
+    "Reduction never leaves a negative score.",
+  ];
+};
+```
+
+### `AshtakavargaProvenance`
+
+```ts
+const AshtakavargaProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Parashari">;
+  readonly method: Schema.Literal<"bphs-bav-trikona-ekadhipatya">;
+  readonly version: Schema.Literal<"2026-11-01">;
+}>;
+```
 
 ### `CalculationProvenance`
 
@@ -38,7 +82,7 @@ const charaDasha: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "kn-rao-co-lord-strength";
-    readonly version: 2;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -67,7 +111,7 @@ const charaDasha: {
 const CharaDashaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"kn-rao-co-lord-strength">;
-  readonly version: Schema.Literal<2>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -76,9 +120,9 @@ const CharaDashaProvenance: Schema.Struct<{
 ```ts
 const d1ChartProjection: {
   readonly provenance: {
-    readonly school: "Ascendant";
+    readonly school: "Universal";
     readonly method: "house-system-cusps";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -106,9 +150,9 @@ const d1ChartProjection: {
 
 ```ts
 const D1ChartProvenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
+  readonly school: Schema.Literal<"Universal">;
   readonly method: Schema.Literal<"house-system-cusps">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -117,9 +161,9 @@ const D1ChartProvenance: Schema.Struct<{
 ```ts
 const divisionalChartProjection: {
   readonly provenance: {
-    readonly school: "Ascendant";
+    readonly school: "Parashari";
     readonly method: "whole-sign-from-mapped-lagna";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -142,9 +186,9 @@ const divisionalChartProjection: {
 
 ```ts
 const DivisionalChartProvenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
+  readonly school: Schema.Literal<"Parashari">;
   readonly method: Schema.Literal<"whole-sign-from-mapped-lagna">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -155,7 +199,7 @@ const jaiminiArgala: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "structural-positions";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -180,7 +224,7 @@ const jaiminiArgala: {
 const JaiminiArgalaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"structural-positions">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -191,7 +235,7 @@ const jaiminiArudhaPada: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "plain-projection";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -215,7 +259,7 @@ const jaiminiArudhaPada: {
 const JaiminiArudhaPadaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"plain-projection">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -226,7 +270,7 @@ const jaiminiCharaKarakas: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "exact-degree-shared-roles";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -251,7 +295,7 @@ const jaiminiCharaKarakas: {
 const JaiminiCharaKarakasProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"exact-degree-shared-roles">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -262,7 +306,7 @@ const jaiminiKarakamsha: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "atmakaraka-d9-sign";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -284,7 +328,7 @@ const jaiminiKarakamsha: {
 const JaiminiKarakamshaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"atmakaraka-d9-sign">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -295,7 +339,7 @@ const jaiminiRashiDrishti: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "movable-fixed-dual";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -319,7 +363,7 @@ const jaiminiRashiDrishti: {
 const JaiminiRashiDrishtiProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"movable-fixed-dual">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -330,7 +374,7 @@ const jaiminiUpapada: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "twelfth-house-plain-projection";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -352,7 +396,7 @@ const jaiminiUpapada: {
 const JaiminiUpapadaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"twelfth-house-plain-projection">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -362,9 +406,9 @@ const JaiminiUpapadaProvenance: Schema.Struct<{
 const methods: {
     readonly d1ChartProjection: {
         readonly provenance: {
-            readonly school: "Ascendant";
+            readonly school: "Universal";
             readonly method: "house-system-cusps";
-            readonly version: 1;
+            readonly version: "2026-11-01";
         };
         readonly steps: readonly [{
             readonly id: "place-points";
@@ -380,9 +424,9 @@ const methods: {
     };
     readonly divisionalChartProjection: {
         readonly provenance: {
-            readonly school: "Ascendant";
+            readonly school: "Parashari";
             readonly method: "whole-sign-from-mapped-lagna";
-            readonly version: 1;
+            readonly version: "2026-11-01";
         };
         readonly steps: readonly [{
             readonly id: "map-longitudes";
@@ -391,7 +435,7 @@ const methods: {
             readonly id: "build-whole-sign-houses";
             readonly description: "Count twelve whole-sign houses from the mapped Lagna's Sign.";
         }];
-        readonly verification: rea
+        read
 // … truncated
 ```
 
@@ -423,6 +467,46 @@ const MethodStep: Schema.Struct<{
 }>;
 ```
 
+### `placements`
+
+```ts
+const placements: {
+  readonly provenance: {
+    readonly school: "Parashari";
+    readonly method: "sidereal-ephemeris-placements";
+    readonly version: "2026-11-01";
+  };
+  readonly steps: readonly [
+    {
+      readonly id: "sample-positions";
+      readonly description: "Read each graha's sidereal longitude at the moment for the selected ayanamsa; Ketu is opposite Rahu, the mean node.";
+    },
+    {
+      readonly id: "place-lagna";
+      readonly description: "Take the Lagna from the ascendant of the selected house system.";
+    },
+    {
+      readonly id: "assign-stars";
+      readonly description: "Assign each point its nakshatra, pada and star lord.";
+    },
+  ];
+  readonly verification: readonly [
+    "Every longitude lies in [0, 360).",
+    "Rahu and Ketu are opposite and never flagged retrograde.",
+  ];
+};
+```
+
+### `PlacementsProvenance`
+
+```ts
+const PlacementsProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Parashari">;
+  readonly method: Schema.Literal<"sidereal-ephemeris-placements">;
+  readonly version: Schema.Literal<"2026-11-01">;
+}>;
+```
+
 ### `sthiraDasha`
 
 ```ts
@@ -430,7 +514,7 @@ const sthiraDasha: {
   readonly provenance: {
     readonly school: "Jaimini";
     readonly method: "bv-raman-koch-brahma-strength";
-    readonly version: 2;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
@@ -459,7 +543,7 @@ const sthiraDasha: {
 const SthiraDashaProvenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"bv-raman-koch-brahma-strength">;
-  readonly version: Schema.Literal<2>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -468,23 +552,24 @@ const SthiraDashaProvenance: Schema.Struct<{
 ```ts
 const transitSearch: {
   readonly provenance: {
-    readonly school: "Ascendant";
+    readonly school: "Parashari";
     readonly method: "transit-sample-bisect";
-    readonly version: 1;
+    readonly version: "2026-11-01";
   };
   readonly steps: readonly [
     {
       readonly id: "sample-coarse";
-      readonly description: "Step per-planet coarse intervals from the located moment.";
+      readonly description: "Leap from the located moment by the time the graha needs to reach the nearest boundary, target or station, from per-planet speed and acceleration limits.";
     },
     {
       readonly id: "bisect-brackets";
-      readonly description: "Bisect each bracketed crossing to one-minute precision.";
+      readonly description: "Refine each bracketed crossing to the requested precision with Newton and secant steps kept inside the bracket.";
     },
   ];
   readonly verification: readonly [
     "Every zero-crossing counts in strict time order.",
     "Exhausted searches fail typed instead of returning short lists.",
+    "Searches find the events an hourly scan of the ephemeris finds.",
   ];
 };
 ```
@@ -493,8 +578,48 @@ const transitSearch: {
 
 ```ts
 const TransitSearchProvenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
+  readonly school: Schema.Literal<"Parashari">;
   readonly method: Schema.Literal<"transit-sample-bisect">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
+}>;
+```
+
+### `vimshottariDasha`
+
+```ts
+const vimshottariDasha: {
+  readonly provenance: {
+    readonly school: "Parashari";
+    readonly method: "moon-nakshatra-balance";
+    readonly version: "2026-11-01";
+  };
+  readonly steps: readonly [
+    {
+      readonly id: "derive-balance";
+      readonly description: "Find the Moon's nakshatra lord and the exact arc travelled to get the period elapsed at birth.";
+    },
+    {
+      readonly id: "build-mahadashas";
+      readonly description: "Order the nine lords from the star lord and start the first period before birth by the elapsed part.";
+    },
+    {
+      readonly id: "build-antardashas";
+      readonly description: "Split each Mahadasha by the lords' shares of the 120-year cycle.";
+    },
+  ];
+  readonly verification: readonly [
+    "The nine Mahadashas are contiguous and span 120 years.",
+    "Antardashas tile their Mahadasha and end on its end.",
+  ];
+};
+```
+
+### `VimshottariDashaProvenance`
+
+```ts
+const VimshottariDashaProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Parashari">;
+  readonly method: Schema.Literal<"moon-nakshatra-balance">;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```

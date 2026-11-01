@@ -3,7 +3,7 @@ title: Jaimini
 description: Jaimini calculations for Chara Karakas, Rashi Drishti, Karakamsha, Arudha Pada, Upapada, and Argala.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/argala`:
 
@@ -21,7 +21,7 @@ const calculate: (placements: Placements) => Effect.Effect<
     provenance: {
       readonly school: "Jaimini";
       readonly method: "exact-degree-shared-roles";
-      readonly version: 1;
+      readonly version: "2026-11-01";
     };
     assignments: {
       Atmakaraka: readonly [Holder, ...Holder[]];
@@ -33,29 +33,59 @@ const calculate: (placements: Placements) => Effect.Effect<
       Darakaraka: readonly [Holder, ...Holder[]];
     };
   },
-  EvidenceError | ParseError,
+  CharaKarakasEvidenceError | CharaKarakasParseError,
   never
 >;
 ```
 
 ## Classes
 
-### `CalculationError`
+### `ArgalaCalculationError`
 
 ```ts
-class CalculationError extends CalculationError_base {}
+class ArgalaCalculationError extends ArgalaCalculationError_base {}
 ```
 
-### `EvidenceError`
+### `ArgalaEvidenceError`
 
 ```ts
-class EvidenceError extends EvidenceError_base {}
+class ArgalaEvidenceError extends ArgalaEvidenceError_base {}
 ```
 
-### `ParseError`
+### `ArudhaPadaEvidenceError`
 
 ```ts
-class ParseError extends ParseError_base {}
+class ArudhaPadaEvidenceError extends ArudhaPadaEvidenceError_base {}
+```
+
+### `CharaKarakasEvidenceError`
+
+```ts
+class CharaKarakasEvidenceError extends CharaKarakasEvidenceError_base {}
+```
+
+### `CharaKarakasParseError`
+
+```ts
+class CharaKarakasParseError extends CharaKarakasParseError_base {}
+```
+
+### `KarakamshaCalculationError`
+
+```ts
+class KarakamshaCalculationError extends KarakamshaCalculationError_base {}
+```
+
+### `KarakamshaEvidenceError`
+
+```ts
+class KarakamshaEvidenceError extends KarakamshaEvidenceError_base {}
+```
+
+### `UpapadaEvidenceError`
+
+```ts
+class UpapadaEvidenceError extends UpapadaEvidenceError_base {}
 ```
 
 ## Interfaces
@@ -69,6 +99,24 @@ interface RankedHolder extends Holder {
 ```
 
 ## Types
+
+### `CalculationError`
+
+```ts
+type CalculationError = ArgalaCalculationError;
+```
+
+### `EvidenceError`
+
+```ts
+type EvidenceError = ArgalaEvidenceError;
+```
+
+### `ParseError`
+
+```ts
+type ParseError = CharaKarakasParseError;
+```
 
 ### `Role`
 
@@ -181,7 +229,7 @@ const Positions: Schema.Literals<readonly [2, 4, 11, 12, 10, 3, 5, 9]>;
 const Provenance: Schema.Struct<{
   readonly school: Schema.Literal<"Jaimini">;
   readonly method: Schema.Literal<"structural-positions">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -262,7 +310,7 @@ const Result: Schema.Struct<{
     readonly provenance: Schema.Struct<{
         readonly school: Schema.Literal<"Jaimini">;
         readonly method: Schema.Literal<"structural-positions">;
-        readonly version: Schema.Literal<1>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly reference: Schema.Union<readonly [Schema.Struct<{
         readonly kind: Schema.Literal<"Sign">;
@@ -278,7 +326,7 @@ const Result: Schema.Struct<{
         readonly planets: Schema.$Array<Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>>;
     }>, Schema.Struct<{
         readonly position: Schema.Literals<readonly [2, 4, 11, 12, 10, 3, 5, 9]>;
-        readonly sign: Schema.Literals<readonly ["Aries", "T
+        readonly sign: Schema.Literals<readonly [
 // … truncated
 ```
 

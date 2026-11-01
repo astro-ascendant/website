@@ -3,7 +3,7 @@ title: Chart
 description: Chart generation and placement models for D1 and divisional charts.
 ---
 
-{/* Generated from astro-ascendant@6.0.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/chart`:
 
@@ -72,6 +72,12 @@ class LocatedMomentValidationError extends LocatedMomentValidationError_base {}
 
 ## Interfaces
 
+### `ChartParams`
+
+```ts
+interface ChartParams extends Schema.Schema.Type<typeof ChartParams> {}
+```
+
 ### `D1Chart`
 
 ```ts
@@ -104,6 +110,18 @@ interface DivisionalTarget {
   readonly degree: Degree;
   readonly longitude: Longitude;
 }
+```
+
+### `LocatedMoment`
+
+```ts
+interface LocatedMoment extends Schema.Schema.Type<typeof LocatedMoment> {}
+```
+
+### `Placements`
+
+```ts
+interface Placements extends Schema.Schema.Type<typeof Placements> {}
 ```
 
 ### `SourcePosition`
@@ -159,9 +177,9 @@ type Longitude = typeof LongitudeSchema.Type;
 const CalculationCharts: Schema.TupleWithRest<Schema.Tuple<readonly [Schema.Struct<{
     readonly sex: Schema.optionalKey<Schema.Literals<readonly ["Male", "Female"]>>;
     readonly provenance: Schema.Struct<{
-        readonly school: Schema.Literal<"Ascendant">;
+        readonly school: Schema.Literal<"Universal">;
         readonly method: Schema.Literal<"house-system-cusps">;
-        readonly version: Schema.Literal<1>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly division: Schema.Literal<1>;
     readonly houses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
@@ -179,7 +197,7 @@ const CalculationCharts: Schema.TupleWithRest<Schema.Tuple<readonly [Schema.Stru
         readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
         readonly significations: Schema.$Array<Schema.String>;
         readonly planets: Schema.$Array<Schema.Struct<{
-            readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars",
+            readonly name: Schema.Literals<readonly ["Sun", "Moo
 // … truncated
 ```
 
@@ -189,9 +207,9 @@ const CalculationCharts: Schema.TupleWithRest<Schema.Tuple<readonly [Schema.Stru
 const Chart: Schema.Union<readonly [Schema.Struct<{
     readonly sex: Schema.optionalKey<Schema.Literals<readonly ["Male", "Female"]>>;
     readonly provenance: Schema.Struct<{
-        readonly school: Schema.Literal<"Ascendant">;
+        readonly school: Schema.Literal<"Universal">;
         readonly method: Schema.Literal<"house-system-cusps">;
-        readonly version: Schema.Literal<1>;
+        readonly version: Schema.Literal<"2026-11-01">;
     }>;
     readonly division: Schema.Literal<1>;
     readonly houses: Schema.$Record<Schema.Literals<readonly [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]>, Schema.Struct<{
@@ -209,7 +227,7 @@ const Chart: Schema.Union<readonly [Schema.Struct<{
         readonly signLord: Schema.Union<readonly [Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>, Schema.Literal<"Lagna">]>;
         readonly significations: Schema.$Array<Schema.String>;
         readonly planets: Schema.$Array<Schema.Struct<{
-            readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "
+            readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter",
 // … truncated
 ```
 
@@ -296,28 +314,13 @@ const ChartCalculation: Schema.Struct<{
 // … truncated
 ```
 
-### `ChartParams`
-
-```ts
-const ChartParams: Schema.Struct<{
-  readonly moment: Schema.Struct<{
-    readonly date: Schema.DateTimeUtc;
-  }>;
-  readonly latitude: Schema.Finite;
-  readonly longitude: Schema.Finite;
-  readonly sex: Schema.optionalKey<
-    Schema.Literals<readonly ["Male", "Female"]>
-  >;
-}>;
-```
-
 ### `D1ChartProvenance`
 
 ```ts
 const D1ChartProvenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
+  readonly school: Schema.Literal<"Universal">;
   readonly method: Schema.Literal<"house-system-cusps">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -365,9 +368,9 @@ const Division: Schema.Literals<
 
 ```ts
 const DivisionalChartProvenance: Schema.Struct<{
-  readonly school: Schema.Literal<"Ascendant">;
+  readonly school: Schema.Literal<"Parashari">;
   readonly method: Schema.Literal<"whole-sign-from-mapped-lagna">;
-  readonly version: Schema.Literal<1>;
+  readonly version: Schema.Literal<"2026-11-01">;
 }>;
 ```
 
@@ -640,18 +643,6 @@ const Lagna: Schema.Struct<{
 const LagnaName: Schema.Literal<"Lagna">;
 ```
 
-### `LocatedMoment`
-
-```ts
-const LocatedMoment: Schema.Struct<{
-  readonly moment: Schema.Struct<{
-    readonly date: Schema.DateTimeUtc;
-  }>;
-  readonly latitude: Schema.Finite;
-  readonly longitude: Schema.Finite;
-}>;
-```
-
 ### `Moment`
 
 ```ts
@@ -666,34 +657,14 @@ const Moment: Schema.Struct<{
 const Pada: Schema.Literals<readonly [1, 2, 3, 4]>;
 ```
 
-### `Placements`
+### `PlacementsProvenance`
 
 ```ts
-const Placements: Schema.Struct<{
-    readonly lagna: Schema.Struct<{
-        readonly name: Schema.Literal<"Lagna">;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
-            
-/** Wraps any finite angle onto the circle; use `Position.normalizeLongitude` for unchecked input. */
-
-            normalize(degrees: number): Longitude;
-            
-/** The Longitude at a Degree within the Sign at a 0-based wheel position. */
-
-            inSign(signIndex: number, degree: number): Longitude;
-        };
-        readonly star: Schema.Struct<{
-            readonly name: Schema.Literals<readonly ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"]>;
-            readonly lord: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-            readonly pada: Schema.Literals<readonly [1, 2, 3, 4]>;
-        }>;
-    }>;
-    readonly planets: Schema.$Array<Schema.Struct<{
-        readonly name: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
-        readonly longitude: Schema.brand<Schema.Finite, "Longitude"> & {
-            
-/** Wraps any finite angle onto the circle
-// … truncated
+const PlacementsProvenance: Schema.Struct<{
+  readonly school: Schema.Literal<"Parashari">;
+  readonly method: Schema.Literal<"sidereal-ephemeris-placements">;
+  readonly version: Schema.Literal<"2026-11-01">;
+}>;
 ```
 
 ### `Planet`
