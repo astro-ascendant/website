@@ -1,0 +1,197 @@
+---
+title: Errors and typed failures
+description: Know which errors each Ascendant function can fail with, handle them by tag, and tell expected failures from defects.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+Ascendant functions return an `Effect`, and an Effect has three outcomes: it
+succeeds, it fails with a **typed error**, or it dies with a **defect**. This guide
+covers the first two, which are the failures your program should expect, and how to
+tell them from the third.
+
+The idea is simple. Anything that can go wrong because of the input or the data,
+such as an invalid latitude, a search window that ends too early, or placements
+missing a planet, is a typed error. TypeScript knows the exact list for each
+function, so you handle failures by name and the compiler tells you what you missed.
+
+## What each function can fail with
+
+TypeScript infers these from the function's return type. The table lists them so
+you can plan ahead.
+
+| Function | Typed errors |
+| --- | --- |
+| `Chart.generate` | `LocatedMomentValidationError`, `ChartCalculationError`, `LongitudeError` |
+| `getDivisionalTarget` | `DivisionalMappingError` |
+| `Dasha.calculate`, `Dasha.calculateChara` | `DashaEvidenceError` |
+| `Dasha.calculateSthira` | `DashaEvidenceError`, `DashaCalculationError` |
+| `Dasha.at`, `Dasha.atRashi` | None. They return `null` outside the timeline. |
+| `SAV.calculate` | `SAVCalculationError` |
+| `CharaKarakas.calculate` | `CharaKarakasEvidenceError`, `CharaKarakasParseError` |
+| `Karakamsha.calculate` | `KarakamshaEvidenceError`, `KarakamshaCalculationError` |
+| `ArudhaPada.calculate` | `ArudhaPadaEvidenceError` |
+| `Upapada.calculate` | `UpapadaEvidenceError` |
+| `Argala.calculate` | `ArgalaEvidenceError`, `ArgalaCalculationError` |
+| `RashiDrishti.calculate` | None |
+| `Transit.findTransits` | `TransitValidationError`, `TransitSearchExhausted`, `ChartCalculationError`, `LocatedMomentValidationError`, `LongitudeError`, `EphemerisError` |
+
+The names above are the error **tags**, the strings you pass to `catchTag`. In
+the Jaimini modules the exported classes are called `EvidenceError` and
+`CalculationError`, but their tags carry the module name, as shown.
+
+The type of `Transit.findTransits` also includes a schema decoding `Issue`. Handle
+the errors you care about and let the rest propagate.
+
+## What an error looks like
+
+Every error is an `Error` with a `_tag` and a `message`, plus fields specific to
+its kind. Most also carry a `cause` with the underlying detail.
+
+| Error | Extra fields | Meaning |
+| --- | --- | --- |
+| `LocatedMomentValidationError` | `cause` | The moment or coordinates are invalid, for example a latitude outside -90 to 90. |
+| `ChartCalculationError` | `stage`, `cause` | A chart could not be built. `stage` is `"validation"`, `"placements"`, `"houses"`, or `"mapping"`. |
+| `LongitudeError` | `cause` | An angle could not be converted to a valid longitude. |
+| `EphemerisError` | `operation`, `cause` | The ephemeris failed. `operation` names the call that failed. |
+| `DashaEvidenceError` and the Jaimini `*EvidenceError`s | `placement`, `expected`, `actual` | The placements did not hold exactly one entry for a planet the calculation needs. |
+| `SAVCalculationError` | `cause` | An Ashtakavarga table broke a classical checksum. `cause` names the entity and the totals. |
+| `TransitValidationError` | `cause` | The request was incomplete or invalid. |
+| `TransitSearchExhausted` | `found`, `searchedUntil` | The search window ended before `count` events were found. `found` holds the events it did find. |
+
+A `ChartCalculationError` at the `"houses"` stage means the chosen house system's
+D1 cusps did not divide the circle into twelve houses. See [Choose a school and
+settings](/docs/guides/settings).
+
+## Handle an error by tag
+
+Use `Effect.catchTag` to recover from one error:
+
+```ts
+import { Chart, Runtime } from "astro-ascendant";
+import { DateTime, Effect, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(Runtime.MainLayer);
+
+const input = {
+  moment: Chart.Moment.make({ date: DateTime.makeUnsafe("2000-01-01T12:00:00Z") }),
+  latitude: 120, // out of range
+  longitude: 77,
+} satisfies Chart.LocatedMoment;
+
+const message = await runtime.runPromise(
+  Chart.generate(input).pipe(
+    Effect.catchTag("LocatedMomentValidationError", (error) =>
+      Effect.succeed(`Invalid input: ${error.message}`),
+    ),
+  ),
+);
+// "Invalid input: Moment and geographic coordinates must be valid"
+```
+
+The message is short and fixed. The detail is in `error.cause`, which for this
+error says `Expected a value between -90 and 90` at `latitude`. Show the message to
+users and log the cause.
+
+To handle several errors in one place, use `Effect.catchTags`. This maps each one
+to an HTTP-style response:
+
+```ts
+const response = await runtime.runPromise(
+  Chart.generate(input).pipe(
+    Effect.map((calculation) => ({ status: 200, body: calculation })),
+    Effect.catchTags({
+      LocatedMomentValidationError: (error) =>
+        Effect.succeed({ status: 400, body: error.message }),
+      ChartCalculationError: (error) =>
+        Effect.succeed({ status: 500, body: `${error.stage}: ${error.message}` }),
+      LongitudeError: (error) => Effect.succeed({ status: 500, body: error.message }),
+    }),
+  ),
+);
+```
+
+Because `catchTags` lists every tag in the function's error type, the result no
+longer has an error channel, and TypeScript will flag the call if a future version
+adds a new error.
+
+## Handle errors at the promise boundary
+
+`runtime.runPromise` rejects with the error itself. The rejection is a real
+`Error` instance with its `_tag`, so you can branch on the tag in an ordinary
+`catch`:
+
+```ts
+try {
+  await runtime.runPromise(Chart.generate(input));
+} catch (error) {
+  if (error instanceof Error && "_tag" in error) {
+    console.error(error._tag, error.message);
+  } else {
+    throw error;
+  }
+}
+```
+
+To inspect the outcome without throwing, use `runPromiseExit` and the `Cause`
+helpers:
+
+```ts
+import { Cause, Exit } from "effect";
+
+const exit = await runtime.runPromiseExit(Chart.generate(input));
+
+if (Exit.isFailure(exit)) {
+  const failure = Cause.findErrorOption(exit.cause);
+  // failure is Some(error), with error._tag === "LocatedMomentValidationError"
+}
+```
+
+Prefer `catchTag` and `catchTags` inside your Effect programs, and keep
+`runPromiseExit` for the edge of your application.
+
+## Partial results
+
+`TransitSearchExhausted` carries the events it did find, so you can keep a partial
+answer instead of discarding it:
+
+```ts
+import { Transit } from "astro-ascendant";
+
+const events = await runtime.runPromise(
+  Transit.findTransits(request).pipe(
+    Effect.catchTag("TransitSearchExhausted", (error) => Effect.succeed(error.found)),
+  ),
+);
+```
+
+See [Transit searches](/docs/guides/transits).
+
+## Defects are not for catching
+
+A defect is a bug in the calling code, not an expected failure. An Effect that dies
+does not appear in the typed error channel. A division number outside the supported
+list is one example. TypeScript rejects it at compile time, but if a cast gets a
+value like `5` through, `Chart.generate` dies:
+
+```ts
+const exit = await runtime.runPromiseExit(
+  Chart.generate({ ...input, latitude: 1 }, [5] as never),
+);
+Exit.isFailure(exit) && Cause.hasDies(exit.cause); // true
+```
+
+<Callout type="warn" title="Validate untrusted input first">
+  Do not catch defects to hide them. Validate numbers that come from outside your
+  program, such as a division from a query string, before you pass them in, and
+  fix the code that produced a value the types rule out.
+</Callout>
+
+## A checklist
+
+- Handle `LocatedMomentValidationError` where you accept user input.
+- Treat `ChartCalculationError` and `EphemerisError` as server-side failures, and
+  log their `cause`.
+- Expect `null` from `Dasha.at` and `Dasha.atRashi`, not an error.
+- Use `TransitSearchExhausted.found` when a partial list is acceptable.
+- Do not catch defects. Fix the code instead.

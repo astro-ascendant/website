@@ -40,6 +40,7 @@
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.17.9",
     "geo-tz": "^8.1.10",
     "motion": "^14.7.1",
+    "pele": "1.12.0",
     "react": "^19.3.1",
     "react-day-picker": "^10.0.2",
     "react-dom": "^19.3.1",

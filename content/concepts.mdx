@@ -1,0 +1,103 @@
+---
+title: Core concepts
+description: The vocabulary Ascendant shares across its API and guides, from Located Moments and Placements to schools and provenance.
+---
+
+Ascendant calculates positions once, then derives everything else from them.
+The same few terms appear in every function name, type, and guide, so they are
+worth learning first.
+
+<Mermaid
+  chart={`flowchart TD
+  A["Located Moment<br/>moment + latitude + longitude"] --> B["Chart.generate"]
+  S["AstroParams<br/>ayanamsa + house system"] --> B
+  B --> P["Placements"]
+  B --> D1["D1 chart<br/>cusp houses + KP"]
+  B --> DV["Divisional charts<br/>whole-sign houses"]
+  P --> DA["Dasha"]
+  P --> SAV["Ashtakavarga"]
+  P --> J["Jaimini"]
+  P --> T["Transit search"]`}
+/>
+
+## Input
+
+| Term | Meaning |
+| --- | --- |
+| **Moment** | The instant at which positions are calculated. It can be a birth, a transit, or any other event. It is always UTC and is separate from settings. |
+| **Located Moment** | A Moment paired with a latitude and longitude. It is the input to every chart calculation. |
+| **AstroParams** | The two settings of a calculation: the **ayanamsa** and the **house system**. They live outside the Moment, and every result records them. |
+
+The **ayanamsa** aligns tropical longitudes to the fixed zodiac, and Ascendant
+ships 47 predefined ones. The **house system** decides the cusps of D1, and
+Ascendant supports 13. The default is KrishnamurtiVP291 with Placidus. See
+[Choose a school and settings](/docs/guides/settings).
+
+## Positions and charts
+
+| Term | Meaning |
+| --- | --- |
+| **Placements** | The exact sidereal longitudes and motion states of the Lagna and the grahas at a Located Moment, with each star and pada. Every chart and every other calculation is derived from them. |
+| **Chart calculation** | The Placements plus the requested charts, derived together under one set of AstroParams. It always contains D1. |
+| **Division** | A chart's identity in the divisional system: D1, D2, D3, and so on up to D60. |
+| **D1 chart** | The chart whose houses start at the house system's cusps. Only D1 carries the chart angles, the KP star, sub and sub-sub lords, significations, and ruling planets. |
+| **Divisional chart** | A chart made by mapping the Lagna and grahas through a Division. Its houses are whole signs counted from the mapped Lagna, whatever the house system. It has no angles or KP data. |
+| **Planet** | A graha as placed in one chart: its longitude, degree, sign, dignity, and retrograde state. Its star and pada stay on the Placements. |
+| **Sign** | One of the twelve zodiac signs, with its lord. |
+| **Degree** | A position within a sign, from 0 up to but not including 30. In a divisional chart it is the degree the mapping produces. |
+
+Rahu and Ketu are grahas that behave like planets in every way except that
+they do not rule a sign.
+
+Relationships run one way. A house lists its planets, but a planet does not
+carry its house. To find a planet's house, scan the chart's houses for it.
+
+Because you may know these ideas by other names: a **kundali**, a
+**horoscope**, or a **natal chart** is a Chart calculation. "Natal" is a meaning
+you give a calculation made for a birth moment, not a kind of chart.
+
+## Schools
+
+Ascendant implements more than one tradition, and a single judgment never
+mixes them.
+
+| School | Typical settings | Notes |
+| --- | --- | --- |
+| **KP** | KrishnamurtiVP291 ayanamsa, Placidus houses | The default. It uses D1's cusps, star lords, sub lords, and significators. |
+| **Parashari** | Lahiri ayanamsa, whole-sign houses | Used for promise, quality, and divisional charts. |
+
+Always state the school and settings alongside a result.
+
+## Timing and scoring
+
+| Term | Meaning |
+| --- | --- |
+| **Dasha** | A timeline of periods. Vimshottari gives planetary Mahadashas and Antardashas. Chara and Sthira give Jaimini sign periods. You can ask which period is active at any date. |
+| **Ashtakavarga** | A Parashari scoring system built from the sign positions of the Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, and Lagna. |
+| **Bhinnashtakavarga (BAV)** | The twelve sign scores for one of those eight entities, counted in **bindus** (benefic points). |
+| **Sarvashtakavarga (SAV)** | The twelve sign scores formed by adding the seven planetary BAV tables. It totals 337 under the classical table. |
+| **Shodhya Pinda** | A weighted total for one planet, from its reduced BAV after Trikona and Ekadhipatya reduction. |
+| **Transit search** | A time-ordered search for the next or previous events of one graha. The events are sign ingresses, longitude hits, house-cusp crossings, and retrograde stations. |
+
+## Jaimini
+
+Jaimini is a school, not a single calculation. You request each result by
+name.
+
+| Term | Meaning |
+| --- | --- |
+| **Chara Karakas** | Seven planetary roles assigned in descending order of degree within a sign. Planets at the same degree share the roles they tie for. |
+| **Rashi Drishti** | The signs a reference sign influences under Jaimini's sign aspects. |
+| **Karakamsha** | The D9 sign occupied by each planet holding the Atmakaraka role. |
+| **Arudha Pada** | The sign reached by repeating the distance from a house's sign to its lord. |
+| **Upapada** | The Arudha Pada of the twelfth house. |
+| **Argala** | The supporting and obstructing relationships around a reference sign, or around Ketu in the reverse direction. |
+
+## Provenance
+
+Charts, the Jaimini results, the Chara and Sthira dashas, and transit events
+carry their **provenance**: a `school`, a `method`, and a `version`. Each one
+points to a **method specification** in the library's registry, which lists the
+calculation steps and the criteria used to verify it. That is how a result can
+be checked and repeated. Placements, Vimshottari dashas, and Ashtakavarga
+results do not carry provenance. See [Provenance and verification](/docs/guides/provenance).

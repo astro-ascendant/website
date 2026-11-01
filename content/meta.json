@@ -1,4 +1,16 @@
 {
   "title": "Ascendant",
-  "pages": ["index", "skills", "api-reference"]
+  "pages": [
+    "index",
+    "quickstart",
+    "concepts",
+    "agents",
+    "---For horoscope users---",
+    "horoscope",
+    "ask-ai",
+    "skills",
+    "---For developers---",
+    "guides",
+    "api-reference"
+  ]
 }

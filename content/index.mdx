@@ -1,16 +1,37 @@
 ---
 title: Getting started
-description: Install Ascendant and run your first Effect-based chart calculation.
+description: Generate a horoscope, build with the Effect-first TypeScript library, or let an AI assistant read your chart. Choose your path.
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
-import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Card, Cards } from "fumadocs-ui/components/card";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-Ascendant is an Effect-first TypeScript library for sidereal astrology.
-Start by calculating D1 and D9 for a UTC moment and location. The result
-contains shared **Placements** and the **Charts**: a cusp-aware D1 that
-carries the KP evidence, then whole-sign divisional charts. Reuse the
-placements with the other calculation modules.
+Ascendant calculates sidereal (Vedic) astrology. It works out planetary
+**Placements** once for a moment and place, then derives everything else from them:
+charts, dasha timelines, Ashtakavarga, Jaimini results, and transit searches.
+
+There are three ways to use it, depending on what you want to do.
+
+## Choose your path
+
+<Cards>
+  <Card
+    title="Generate a horoscope"
+    href="/docs/horoscope"
+    description="Enter a birth date, time, and place on the chart page and read your Rashi chart, KP chart, dashas, and more."
+  />
+  <Card
+    title="Build with the library"
+    href="/docs/quickstart"
+    description="Install the astro-ascendant TypeScript library and calculate your first chart and dasha."
+  />
+  <Card
+    title="Ask an AI about my chart"
+    href="/docs/ask-ai"
+    description="Send your horoscope to ChatGPT, Claude, or Gemini, or install the skill for readings from a saved chart."
+  />
+</Cards>
 
 <Callout
   type="warn"
@@ -24,129 +45,88 @@ placements with the other calculation modules.
   GitHub](https://github.com/astro-ascendant/ascendant).
 </Callout>
 
-## Install
+<Callout type="info" title="Building with a coding agent?">
+  Point your agent at [`/llms.txt`](/llms.txt) for an index of these docs, or
+  [`/llms-full.txt`](/llms-full.txt) for the full text in one file. Any page
+  is also available as Markdown by adding `.md` to its URL. See [Building with
+  coding agents](/docs/agents).
+</Callout>
+
+## Start with a prompt
+
+Copy this prompt into your coding agent (Claude Code, Codex, Cursor, Copilot,
+Gemini CLI, or any other) and replace the last line with what you want to
+build. It points the agent at these docs and sets the rules that keep
+Ascendant code correct.
+
+```text
+I want to build an astrology feature in TypeScript with the astro-ascendant library (https://www.npmjs.com/package/astro-ascendant).
+
+Before writing code:
+1. Read https://astro-ascendant.vercel.app/llms.txt and open the pages relevant to my task. Use https://astro-ascendant.vercel.app/llms-full.txt if you need everything. Add .md to any docs page URL to get it as Markdown.
+2. Take names and signatures from the API reference. Do not invent functions, options, or ayanamsa and house system names.
+
+Rules:
+- Install with `astro-ascendant` and `effect`. The library is Effect-based and every calculation returns an Effect.
+- Create one ManagedRuntime from `Runtime.MainLayer`, reuse it for every call, and dispose it only at shutdown.
+- All moments are UTC. Convert the birth's local date and time with its IANA time zone, which depends on the place and the date. If I haven't given a birth time, place, or time zone, ask me. Never guess them.
+- Calculate Placements once with `Chart.generate` and reuse them for dashas, Ashtakavarga, Jaimini results, and transits.
+- Defaults are the KrishnamurtiVP291 ayanamsa with Placidus houses (KP). Use Lahiri with WholeSign houses only for Parashari work, and never mix the two schools in one judgment. State the settings used.
+- Only D1 has cusp-based houses and KP data. Divisional charts use whole-sign houses from their mapped Lagna.
+- Handle failures through Effect's typed errors. Do not swallow them.
+- The library calculates mechanics, not predictions. Do not present interpretations as certainty or as medical, legal, or financial advice.
+
+Start with a short plan, then implement it. Verify the code compiles and runs.
+
+My task: [describe what you want to build]
+```
+
+## Install the library
+
+Ascendant is published on npm as `astro-ascendant`. It needs `effect` alongside it.
+
+<Tabs items={["Bun", "Node"]} groupId="runtime" persist>
+<Tab value="Bun">
 
 ```bash
 bun add astro-ascendant effect
 ```
 
-<Steps>
-<Step>
+</Tab>
+<Tab value="Node">
 
-### Import the packages
-
-This example uses Bun, KrishnamurtiVP291 ayanamsa, and Placidus houses
-(`AstroParams.DefaultAstroParams`).
-
-```ts
-import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { AstroParams, Chart, Swisseph } from "astro-ascendant";
-import { Console, DateTime, Effect, Layer } from "effect";
+```bash
+npm install astro-ascendant effect
 ```
 
-</Step>
-<Step>
+</Tab>
+</Tabs>
 
-### Create the runtime layer
+Then follow the [Quickstart](/docs/quickstart) to calculate your first chart and the
+Vimshottari dasha running today.
 
-```ts
-const runtimeLayer = Layer.mergeAll(
-  BunServices.layer,
-  Swisseph.SwissephLayer,
-  AstroParams.DefaultAstroParams,
-);
-```
+## What the library calculates
 
-`runtimeLayer` provides the Bun services, Swiss Ephemeris implementation, and
-default astrological parameters at the root of the program.
+| Calculation | What you get | Guide |
+| --- | --- | --- |
+| **Charts** | A cusp-aware D1 with KP evidence, and 15 whole-sign divisional charts. | [Divisional charts](/docs/guides/divisional-charts) |
+| **Dashas** | Vimshottari planetary periods, and Jaimini Chara and Sthira sign periods, with date queries. | [Dashas](/docs/guides/dashas) |
+| **Ashtakavarga** | Bhinnashtakavarga, Sarvashtakavarga, reduced tables, and Shodhya Pinda. | [Ashtakavarga](/docs/guides/ashtakavarga) |
+| **Jaimini** | Chara Karakas, Rashi Drishti, Karakamsha, Arudha Pada, Upapada, and Argala. | [Jaimini calculations](/docs/guides/jaimini) |
+| **Transits** | The next or previous sign ingresses, longitude hits, cusp crossings, and stations of a graha. | [Transit searches](/docs/guides/transits) |
+| **Settings** | 47 ayanamsas and 13 house systems, recorded on every result. | [Choose a school and settings](/docs/guides/settings) |
 
-</Step>
-<Step>
+By default Ascendant uses the sidereal zodiac, the KrishnamurtiVP291 ayanamsa, and
+Placidus houses. Methods are named so you can check and repeat a result. A reading
+is guidance, not certainty, and not a substitute for medical, legal, or financial
+advice.
 
-### Create the chart input
+## How these docs are organized
 
-```ts
-const input = Chart.ChartParams.make({
-  moment: Chart.Moment.make({
-    date: DateTime.makeUnsafe("2000-01-01T12:00:00.000Z"),
-  }),
-  latitude: 12.9716,
-  longitude: 77.5946,
-  sex: "Male",
-});
-```
-
-`ChartParams` combines a UTC `Moment` with latitude, longitude, and optional
-birth sex.
-
-</Step>
-<Step>
-
-### Generate D1 and D9
-
-`Chart.generate` always returns D1 first, as a `D1Chart`. Passing `[9]` adds
-the D9 divisional chart, as a `DivisionalChart`.
-
-```ts
-const examples = Chart.generate(input, [9]).pipe(Effect.provide(runtimeLayer));
-```
-
-</Step>
-<Step>
-
-### Print the results
-
-Use `Console.table` to inspect the shared placements and generated charts:
-
-```ts
-const examplesWithOutput = examples.pipe(
-  Effect.tap((calculation) =>
-    Effect.gen(function* () {
-      yield* Console.log("Placements");
-      yield* Console.table([
-        {
-          Point: calculation.placements.lagna.name,
-          Longitude: calculation.placements.lagna.longitude,
-          Retrograde: "—",
-        },
-        ...calculation.placements.planets.map((planet) => ({
-          Point: planet.name,
-          Longitude: planet.longitude,
-          Retrograde: planet.is_retrograde,
-        })),
-      ]);
-      yield* Console.log("Charts");
-      yield* Console.table(
-        calculation.charts.map((chart) => ({
-          Division: `D${chart.division}`,
-          HouseSystem: calculation.astroParams.houseSystem,
-          Ayanamsa: calculation.astroParams.ayanamsa,
-        })),
-      );
-    }),
-  ),
-);
-```
-
-</Step>
-<Step>
-
-### Run the program
-
-```ts
-BunRuntime.runMain(examplesWithOutput);
-```
-
-</Step>
-</Steps>
-
-`calculation.charts` is D1 followed by the requested divisions in numeric
-order, so `calculation.charts[0]` is always the D1. Its houses begin at the
-selected house system's cusps, and only D1 carries the chart angles, the KP
-star, sub and sub-sub lords, planet significations, house significators and
-ruling planets. Each divisional chart's houses are whole signs counted from
-its mapped Lagna. See [Chart](/docs/api-reference/chart) for the full models.
-
-`calculation.placements` contains the shared sidereal positions. Reuse it with
-the [Dasha](/docs/api-reference/dasha), [Ashtakavarga](/docs/api-reference/sav), and
-[Jaimini](/docs/api-reference/jaimini) calculators.
+| Section | Who it is for | Start with |
+| --- | --- | --- |
+| **For horoscope users** | Anyone who wants a horoscope and an assistant to help read it. | [Generate your horoscope](/docs/horoscope) |
+| **Start here** | Developers new to the library. | [Quickstart](/docs/quickstart), then [Core concepts](/docs/concepts) |
+| **Developer guides** | Developers building a feature. | [Choose a school and settings](/docs/guides/settings) |
+| **API reference** | Exact names, types, and errors. | [Chart](/docs/api-reference/chart) |
+| **Agents** | Anyone building with a coding agent. | [Building with coding agents](/docs/agents) |

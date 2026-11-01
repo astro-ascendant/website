@@ -1,0 +1,15 @@
+{
+  "title": "Developer guides",
+  "pages": [
+    "settings",
+    "located-moments",
+    "divisional-charts",
+    "dashas",
+    "ashtakavarga",
+    "jaimini",
+    "transits",
+    "errors",
+    "ephemeris-and-caching",
+    "provenance"
+  ]
+}

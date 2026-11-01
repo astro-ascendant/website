@@ -1,0 +1,184 @@
+---
+title: Choose a school and settings
+description: Pick an ayanamsa and house system, set them once, and keep KP and Parashari results apart.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+Every calculation in Ascendant depends on two settings, the **ayanamsa** and
+the **house system**. Together they are called **AstroParams**. This guide
+shows how to choose them for your use case, set them in code or from the
+environment, and confirm which ones a result used.
+
+## Pick settings quickly
+
+| You want | Ayanamsa | House system | School |
+| --- | --- | --- | --- |
+| KP readings, using cusps, star lords, sub lords, and significators | `KrishnamurtiVP291` | `Placidus` | KP |
+| Parashari readings, using signs and divisional charts | `Lahiri` | `WholeSign` | Parashari |
+| No preference | Leave the defaults | | KP |
+
+The library defaults are `KrishnamurtiVP291` with `Placidus`, so if you set
+nothing, you are working in the KP school. A single judgment should never mix
+the two schools. If your product offers both, run each one with its own
+settings, as shown in [Use both schools in one app](#use-both-schools-in-one-app).
+
+## What the two settings do
+
+The **ayanamsa** is the offset that aligns tropical longitudes with the fixed
+sidereal zodiac. It changes every longitude Ascendant reports, for the Lagna and
+for each graha.
+
+The **house system** decides where the twelve house cusps of the **D1** chart
+fall. It affects D1 only. Divisional charts always use whole-sign houses, counted
+from their mapped Lagna, whichever house system you choose.
+
+AstroParams are not part of the birth moment. They are settings of the
+calculation, and every chart calculation records the ones it used.
+
+## Set them in code
+
+Provide the settings with `AstroParams.layer` when you build your runtime:
+
+```ts
+import { AstroParams, Swisseph } from "astro-ascendant";
+import { Layer, ManagedRuntime } from "effect";
+
+const runtime = ManagedRuntime.make(
+  Layer.mergeAll(
+    AstroParams.layer({ ayanamsa: "Lahiri", houseSystem: "WholeSign" }),
+    Swisseph.SwissephCachedLayer,
+  ),
+);
+```
+
+`AstroParams.layer` takes an `Options` value, so TypeScript rejects any
+ayanamsa or house-system name the library does not know. Use
+`AstroParams.DefaultAstroParams` for the defaults, which is what
+`Runtime.MainLayer` uses.
+
+## See what changes
+
+The same birth, calculated under both presets, shows how much the settings
+matter. The birth is 2000-01-01 12:00 UTC at 12.9716° N, 77.5946° E.
+
+| Result | `KrishnamurtiVP291` + `Placidus` | `Lahiri` + `WholeSign` |
+| --- | --- | --- |
+| Lagna longitude | 69.680° | 69.603° |
+| Lagna sign | Gemini | Gemini |
+| House 2 cusp in D1 | 95.388° | 90.000° |
+
+The ayanamsa moves the Lagna by a fraction of a degree. That is small here, but
+it is enough to change a star, a sub lord, or a sign at a boundary. The house
+system moves the cusps. Whole-sign houses always begin at a multiple of 30°,
+and Placidus cusps do not.
+
+## Choose an ayanamsa
+
+Ascendant supports 47 ayanamsas, taken from the Swiss Ephemeris catalog. These
+are the ones most products use:
+
+| Name | Notes |
+| --- | --- |
+| `KrishnamurtiVP291` | A variant of the Krishnamurti ayanamsa. The library default, and the KP choice. |
+| `Krishnamurti` | The original Krishnamurti ayanamsa. |
+| `Lahiri` | The Chitrapaksha ayanamsa, widely used for Parashari work. |
+| `Raman` | Named for B. V. Raman. |
+| `FaganBradley` | The standard for Western sidereal astrology. |
+| `Yukteshwar` | Named for Sri Yukteshwar. |
+| `TrueCitra` | Keeps the star Chitra fixed at 180°. |
+
+The other names, including the `Lahiri` variants and the `Babyl*` and
+`GalacticCenter*` families, are listed on the
+[AstroParams reference](/docs/api-reference/astro-params). They are ordered by
+Swiss Ephemeris catalog number, not by how often they are used.
+
+## Choose a house system
+
+Ascendant supports 13 house systems.
+
+| Name | How it divides the houses |
+| --- | --- |
+| `Placidus` | By time. Unequal houses, and the default. |
+| `WholeSign` | One sign per house. The Lagna's sign is house 1, and every house is 30°. |
+| `Koch` | By time, from the birthplace meridian. Unequal houses. |
+| `Equal` | Twelve 30° houses counted from the Lagna's exact degree. |
+
+The rest are `Porphyrius`, `Regiomontanus`, `Campanus`, `VehlowEqual`,
+`Meridian`, `Azimuthal`, `PolichPage`, `Alcabitus`, and `Morinus`.
+
+<Callout type="warn" title="High latitudes">
+  Time-based systems such as Placidus and Koch become unreliable near the polar
+  circles, because the houses can grow very large or very small there. If your
+  users may be born far north or south, prefer `WholeSign` or `Equal`.
+</Callout>
+
+## Use both schools in one app
+
+Build one runtime per school and send each judgment to the right one. This keeps
+KP and Parashari results from mixing:
+
+```ts
+import { AstroParams, Swisseph } from "astro-ascendant";
+import { Layer, ManagedRuntime } from "effect";
+
+export const kp = ManagedRuntime.make(
+  Layer.mergeAll(
+    AstroParams.layer({ ayanamsa: "KrishnamurtiVP291", houseSystem: "Placidus" }),
+    Swisseph.SwissephCachedLayer,
+  ),
+);
+
+export const parashari = ManagedRuntime.make(
+  Layer.mergeAll(
+    AstroParams.layer({ ayanamsa: "Lahiri", houseSystem: "WholeSign" }),
+    Swisseph.SwissephCachedLayer,
+  ),
+);
+```
+
+Then run a calculation with the runtime that matches the question, for example
+`kp.runPromise(Chart.generate(located))`. Dispose both at shutdown.
+
+## Read the settings from the environment
+
+`AstroParams.layerConfig` reads the settings from Effect `Config`, so you can
+choose them per deployment without code changes:
+
+```ts
+import { AstroParams, Swisseph } from "astro-ascendant";
+import { Config, Layer, ManagedRuntime } from "effect";
+
+const settings = AstroParams.layerConfig({
+  ayanamsa: Config.schema(AstroParams.Ayanamsa, "AYANAMSA"),
+  houseSystem: Config.schema(AstroParams.HouseSystem, "HOUSE_SYSTEM"),
+});
+
+const runtime = ManagedRuntime.make(
+  Layer.mergeAll(settings, Swisseph.SwissephCachedLayer),
+);
+```
+
+Run it with the variables set:
+
+```bash
+AYANAMSA=Raman HOUSE_SYSTEM=Equal bun run app.ts
+```
+
+A name the library does not know, such as `AYANAMSA=Nope`, fails the program
+with a `ConfigError` whose message lists the accepted values. Your app stops at
+startup instead of producing a chart with the wrong settings.
+
+## Confirm which settings a result used
+
+Each chart calculation carries the settings it was made with:
+
+```ts
+const calculation = yield* Chart.generate(located);
+
+console.log(calculation.astroParams);
+// { ayanamsa: "Lahiri", houseSystem: "WholeSign" }
+```
+
+Store or display this next to every result. A reading is only repeatable if you
+can say which ayanamsa and house system produced it.

@@ -1,0 +1,123 @@
+---
+title: Take your horoscope to an AI assistant
+description: Send your chart to ChatGPT, Claude, or Gemini with one click, see exactly what is shared, or save it as a PDF.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+A horoscope is a set of tables. An AI assistant can help you read them, answer
+questions about your career, relationships, and timing, and explain the terms. The
+[chart page](/chart) gives you two ways to hand your horoscope over: a button that
+opens an assistant with your chart already in the message, and a PDF you can keep or
+attach yourself.
+
+You need to [create a horoscope](/docs/horoscope) first. The buttons appear under
+your results.
+
+## Ask an assistant with one click
+
+Under your results, **Ask ChatGPT** is the main button. Its menu also offers **Ask
+Claude** and **Ask Gemini**. Choosing one opens a new browser tab with your chart
+already written into the message.
+
+| Button | Opens |
+| --- | --- |
+| **Ask ChatGPT** | ChatGPT at `chatgpt.com` |
+| **Ask Claude** | Claude at `claude.ai` |
+| **Ask Gemini** | Google AI Studio at `aistudio.google.com` |
+
+<Callout type="info" title="Gemini opens AI Studio">
+  The Gemini app cannot be given a message through a link, but Google AI Studio can.
+  So **Ask Gemini** opens AI Studio, not the Gemini app. You may need to sign in with
+  a Google account.
+</Callout>
+
+You may also need to sign in to ChatGPT or Claude. Each assistant decides whether it
+waits for you to press send or sends the message as soon as the page opens, so read
+the message before you leave the tab.
+
+## What the message contains
+
+The message is built from your horoscope. It starts with instructions and then your
+chart.
+
+| Included | Details |
+| --- | --- |
+| **Instructions** | A request to read the Ascendant astrology skill from GitHub, with a link to its reference files. The skill tells the assistant how to give a reading. |
+| **Your name** | Only if you entered one. |
+| **D1** | Your Rashi chart: each planet's sign, degree, and house. |
+| **D9** | Your Navamsha chart. |
+| **KP planets** | Each body's house, sign lord, star lord, sub lord, and signifying houses. |
+| **KP cusps** | Each house's sign, cusp, and its lords. |
+| **Vimshottari** | Your Mahadasha periods with their start and end dates. |
+| **Current Antardasha** | The sub-periods of the Mahadasha you are in today. |
+
+It does **not** include your birth date, birth time, or birth place. Those are not
+written into the message.
+
+<Callout type="warn" title="Your chart is in the link">
+  The whole message travels in the address of the tab that opens, so it is sent to
+  the assistant's website and can be saved in your browser history. It contains your
+  name, if you gave one, and the full chart. Planet positions can also point to an
+  approximate birth moment. Use a name you are comfortable sharing, and do not use the
+  buttons on a shared computer if that is a concern.
+</Callout>
+
+## Make the most of it
+
+The assistant starts from your chart, so you can ask in plain words. A few places to
+begin:
+
+- "What does my current Vimshottari period emphasize?"
+- "Explain my Rashi chart to me as if I knew nothing about astrology."
+- "What do the sub lords in my KP chart say about my career?"
+- "When does my next Mahadasha begin, and what changes?"
+
+How the readings work, from the Ascendant skill:
+
+- **One school per answer.** KP is the default. Ask for **Parashari** by name if you
+  want promise, quality, yogas, or divisional charts. The assistant states which it
+  used, and the two are never mixed.
+- **Evidence is cited.** The reply gives its judgment first, then shows the method
+  underneath.
+- **No claims about death, serious accidents, or severe illness.** The skill
+  declines to time or assert them.
+- **It says when evidence is missing.** Expect "Insufficient evidence" rather than a
+  guess.
+
+An assistant's reading is guidance to reflect on. It is not certainty, and it is not
+medical, legal, or financial advice.
+
+## Save as PDF
+
+**Save as PDF**, beside the Ask button, downloads your horoscope as a file called
+`birth-chart.pdf`. Your browser builds it on your device when you click, so the PDF
+is not generated on a server.
+
+The PDF holds:
+
+- Your **name, birth date and time, place, UTC time, and coordinates**, with the
+  ayanamsa and house system used, and your Lagna.
+- Your **placements** and the **divisional charts** that were calculated.
+- The **Vimshottari, Chara, and Sthira dasha** tables.
+- The **Jaimini** results: Chara Karakas, Karakamsha, Upapada, and Arudha Pada.
+- The **KP chart** table.
+
+Keep it, print it, or attach it to a conversation with any assistant that accepts
+files. Unlike the Ask buttons, the PDF includes your birth details, so share it with
+care.
+
+## If something does not work
+
+| Problem | What to try |
+| --- | --- |
+| Nothing opens when you click Ask | Allow pop-ups for the site, then click again. |
+| The assistant opens with an empty box or a cut-off message | The message is long and travels in a link, and a service may shorten it. Save the PDF and attach it to a new conversation instead. |
+| The assistant cannot open the skill link | Some assistants cannot browse. Ask it to give a general reading from the tables, and say which school you want. |
+| You are asked to sign in | ChatGPT, Claude, and AI Studio need an account. Sign in, then use the button again. |
+
+## Keep your chart for next time
+
+The buttons start a fresh conversation each time. If you would rather save your chart
+once and ask questions whenever you like, from your own coding assistant, install the
+Ascendant skill. See [Skills and Plugins](/docs/skills).
