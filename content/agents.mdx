@@ -3,68 +3,57 @@ title: Build with Agent
 description: Give your coding agent the Ascendant docs, a prompt that sets the rules, and a checklist for reviewing what it writes.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
+These docs are written to be read by a coding agent. An agent can do two separate
+things with Ascendant:
 
-Most people now build with a coding agent, and these docs are written to be read by
-one. This page covers two separate things an agent can do with Ascendant:
-
-| You want the agent to | Use | Where |
+| The agent should | Use | Where |
 | --- | --- | --- |
-| **Write code** that calculates charts, dashas, and transits | The docs, plus a prompt | This page |
+| **Write code** that calculates charts, dashas, and transits | The docs and a prompt | This page |
 | **Answer astrology questions** from a saved birth chart | The Ascendant skill | [Skills and Plugins](/docs/skills) |
 
 ## Start with the prompt
 
-[Getting started](/docs#start-with-a-prompt) has a prompt you can paste into any
-coding agent. It tells the agent where the docs are, how to build the runtime, how to
-handle time zones and schools, and what not to claim. Copy it, replace the last line
-with your task, and send it.
-
-The rest of this page explains how to give an agent the docs in other ways and how to
-check its work.
+[Getting started](/docs#start-with-a-prompt) has a prompt for any coding agent. Paste
+it, replace the last line with your task, and send it. It carries the docs location,
+runtime pattern, time-zone handling, and school rules.
 
 ## Give the agent the docs
 
-The docs are available in several forms. Pick the one that fits the agent and the
-size of the job.
+Pick the form that fits the job:
 
 | Form | Address | Use it for |
 | --- | --- | --- |
-| Index | [`/llms.txt`](/llms.txt) | A list of every page with a one-line description and an absolute link. Start here. |
-| Everything | [`/llms-full.txt`](/llms-full.txt) | The full text of every page in one file, roughly 200 KB. Use it only when the agent has room for it. |
-| One page | `/docs/<page>.md` | A single page as Markdown, for example `/docs/quickstart.md` or `/docs/guides/transits.md`. The Getting started page is `/docs/index.md`. |
-| Copy button | **Copy Markdown** on each page | Pasting one page into a chat. |
-| Open menu | **Open** on each page | Sending a page to ChatGPT, Claude, Cursor, or Scira AI, or opening its source on GitHub. |
-| Types | `node_modules/astro-ascendant` | The package ships TypeScript declarations, so an agent can read exact signatures once it is installed. |
+| Index | [`/llms.txt`](/llms.txt) | Every page with a one-line description. Start here. |
+| Everything | [`/llms-full.txt`](/llms-full.txt) | All pages in one file, about 200 KB. Send it when the agent has the room. |
+| One page | `/docs/<page>.md` | A single page as Markdown, such as `/docs/quickstart.md` or `/docs/guides/transits.md`. Getting started is `/docs/index.md`. |
+| Copy button | **Copy Markdown** on each page | One page pasted into a chat. |
+| Open menu | **Open** on each page | A page sent to ChatGPT, Claude, Cursor, or Scira AI, or its source on GitHub. |
+| Types | `node_modules/astro-ascendant` | Exact signatures from the shipped TypeScript declarations, once installed. |
 
 The [API reference](/docs/api-reference/chart) is generated from the published
-package, so its names and types are exact. The guides explain how the pieces fit
-together. An agent needs both.
+package, so its names and types are exact. The guides explain how the pieces fit.
 
-### A reading order that works
+### Reading order
+
+Done means the agent can name the guide and API page its task uses.
 
 1. Read `/llms.txt` to see what exists.
 2. Read the [Quickstart](/docs/quickstart.md) and [Core concepts](/docs/concepts.md)
-   once, to learn the vocabulary and the runtime pattern.
-3. Read the one guide for the task: [settings](/docs/guides/settings.md),
-   [dashas](/docs/guides/dashas.md), [transits](/docs/guides/transits.md), and so on.
-4. Look up exact names in the matching API reference page before using them.
+   for the vocabulary and the runtime pattern.
+3. Read the one guide for the task, such as [settings](/docs/guides/settings.md),
+   [dashas](/docs/guides/dashas.md), or [transits](/docs/guides/transits.md).
+4. Look up each name in its API reference page before using it.
 
-## Tell the agent about Effect
+### Effect
 
-Ascendant is built on Effect 4. Agents trained mostly on older Effect releases tend
-to write code that does not compile, because some names changed between releases.
-Point the agent at the current Effect documentation too. Effect publishes a guide for
-exactly this at
-[`LLMS.md`](https://raw.githubusercontent.com/Effect-TS/effect/refs/heads/main/LLMS.md).
-The Quickstart also links to [effect.website](https://effect.website),
-[effect.institute](https://effect.institute), and
-[effect.kitlangton.com](https://effect.kitlangton.com).
+Ascendant is built on Effect 4, and names changed between releases. Add Effect's own
+guide for current code: [`LLMS.md`](https://raw.githubusercontent.com/Effect-TS/effect/refs/heads/main/LLMS.md).
+The Quickstart lists more Effect resources.
 
 ## Keep the rules in your project
 
-If you work with an agent in the same repository every day, put the rules in the
-file it reads on every session, such as `AGENTS.md` or `CLAUDE.md`:
+Put the rules in the file your agent reads every session, such as `AGENTS.md` or
+`CLAUDE.md`:
 
 ```markdown
 ## Astrology (astro-ascendant)
@@ -72,40 +61,39 @@ file it reads on every session, such as `AGENTS.md` or `CLAUDE.md`:
 - Docs index: https://astro-ascendant.vercel.app/llms.txt. Read the relevant page
   before writing code, and take names from the API reference.
 - Effect docs: https://raw.githubusercontent.com/Effect-TS/effect/refs/heads/main/LLMS.md
-- Build one `ManagedRuntime` from `Runtime.MainLayer` and reuse it. Dispose it only at shutdown.
-- All moments are UTC. Convert local time with its IANA zone and the birth date, using
-  `DateTime.makeZoned` with `disambiguation: "reject"`. Ask for missing birth data.
+- Build one `ManagedRuntime` from `Runtime.MainLayer`, reuse it, and dispose it at shutdown.
+- Keep all moments in UTC. Convert local time with its IANA zone and the birth date,
+  using `DateTime.makeZoned` with `disambiguation: "reject"`. Ask for missing birth data.
 - Calculate Placements once with `Chart.generate` and reuse them.
 - Default is KrishnamurtiVP291 + Placidus (KP). Use Lahiri + WholeSign for Parashari.
-  Never mix schools in one judgment, and always report the settings used.
-- Handle typed errors with `Effect.catchTag`. Do not catch defects.
-- Results are mechanics, not predictions. Never present them as certainty or as
+  Judge each question in one school, and report the settings used.
+- Handle typed errors with `Effect.catchTag`, and let defects propagate.
+- Describe results as mechanics: positions and periods, never predictions or
   medical, legal, or financial advice.
 ```
 
 ## Review what the agent wrote
 
-Agents are fast and confident, so check the parts that are easy to get wrong. These
-are the mistakes this library invites:
+Each row is a mistake this library invites. Done means every row holds.
 
 | Check | Why it matters |
 | --- | --- |
-| One `ManagedRuntime`, created once | A new runtime per request gets an empty position cache. See [Ephemeris adapters and caching](/docs/guides/ephemeris-and-caching). |
-| Local time is converted to UTC with the zone for that **date** | Offsets change over time, and a daylight-saving gap or overlap can move a birth by an hour. See [From local time to a Located Moment](/docs/guides/located-moments). |
-| One school per judgment, and the settings are stated | KP and Parashari use different ayanamsas and house systems. See [Choose a school and settings](/docs/guides/settings). |
-| Functions and imports exist | Agents invent names or reach for removed ones. For example, `Chart.project` was removed in 6.0, and `Chart.generate` replaces it. |
-| `Dasha.at` and `Dasha.atRashi` results are checked for `null` | They return `null` outside the timeline. See [Dashas](/docs/guides/dashas). |
-| Errors are handled by tag | `Chart.generate` fails typed for bad input. See [Errors and typed failures](/docs/guides/errors). |
-| Arudha Pada is described as the plain projection | The library does not apply the classical adjustment. See [Jaimini calculations](/docs/guides/jaimini). |
-| Nothing is presented as a prediction | A calculation is a position or a period, not a promise. |
+| One `ManagedRuntime`, created once | A runtime per request starts with an empty position cache. See [Ephemeris adapters and caching](/docs/guides/ephemeris-and-caching). |
+| Local time converted with the zone for that **date** | Offsets change over time, and a daylight-saving gap or overlap can shift a birth by an hour. See [From local time to a Located Moment](/docs/guides/located-moments). |
+| One school per judgment, settings stated | KP and Parashari use different ayanamsas and house systems. See [Choose a school and settings](/docs/guides/settings). |
+| Every function and import exists | Agents invent names or reach for removed ones. `Chart.generate` replaces `Chart.project`, removed in 6.0. |
+| `Dasha.at` and `Dasha.atRashi` results checked for `null` | They return `null` outside the timeline. See [Dashas](/docs/guides/dashas). |
+| Errors handled by tag | `Chart.generate` fails typed on bad input. See [Errors and typed failures](/docs/guides/errors). |
+| Arudha Pada described as the plain projection | The library skips the classical adjustment. See [Jaimini calculations](/docs/guides/jaimini). |
+| Results framed as positions and periods | A calculation is not a promise. |
 
-### A known-good result to test against
+### A known-good result
 
-Ask the agent to calculate the birth below and compare. If its output matches, its
-runtime, time conversion, and chart code are almost certainly right.
+Have the agent calculate this birth and compare. A match means its runtime, time
+conversion, and chart code are almost certainly right.
 
 - **Birth:** `2000-01-01 17:30` local time, `Asia/Kolkata`, latitude `12.9716`, longitude `77.5946`
-- **Settings:** the defaults, KrishnamurtiVP291 with Placidus
+- **Settings:** defaults, KrishnamurtiVP291 with Placidus
 
 | Point | Expected |
 | --- | --- |
@@ -114,18 +102,18 @@ runtime, time conversion, and chart code are almost certainly right.
 | Moon | 199.55°, Swati pada 4, not retrograde |
 | Saturn | 16.62°, Bharani pada 1, retrograde |
 
-The Quickstart builds exactly this program with `Console.table` and shows its full
-output. Provenance and the settings recorded on each result give the agent, and you,
-something to cite. See [Provenance and verification](/docs/guides/provenance).
+The Quickstart builds this program and shows its full output. The settings recorded
+on each result give the agent, and you, something to cite. See
+[Provenance and verification](/docs/guides/provenance).
 
 ## Agents that answer questions
 
-To have an agent read a chart instead of writing code, install the Ascendant skill.
-It saves birth data once and answers from that record, with its evidence cited.
+The Ascendant skill saves birth data once and answers from that record with cited
+evidence:
 
 ```bash
 npx ascendant-skills install
 ```
 
-Works with Claude Code, Codex, OpenCode, Cursor, Gemini CLI, Copilot, and other
+It works with Claude Code, Codex, OpenCode, Cursor, Gemini CLI, Copilot, and other
 skill-compatible agents. See [Skills and Plugins](/docs/skills) for per-tool steps.

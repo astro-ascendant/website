@@ -9,7 +9,9 @@ export const Route = createFileRoute("/llms.txt")({
       GET: async () => {
         // Serve canonical absolute URLs so LLM crawlers never guess the origin.
         const text = await llms(source).index();
-        return new Response(text.replaceAll("](/", `](${siteUrl}/`));
+        return new Response(text.replaceAll("](/", `](${siteUrl}/`), {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        });
       },
     },
   },

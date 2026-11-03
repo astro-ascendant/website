@@ -11,6 +11,7 @@ export const Route = createFileRoute("/llms-full.txt")({
         // Serve canonical absolute URLs so LLM crawlers never guess the origin.
         return new Response(
           scanned.join("\n\n").replaceAll("](/", `](${siteUrl}/`),
+          { headers: { "Content-Type": "text/plain; charset=utf-8" } },
         );
       },
     },
