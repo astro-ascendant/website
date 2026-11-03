@@ -1,5 +1,5 @@
 ---
-title: Skills and Plugins
+title: Skills and plugins
 description: Install the Ascendant plugins for OpenCode, Claude Code, and Codex, or the skill for any other agent.
 ---
 

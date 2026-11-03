@@ -211,7 +211,7 @@ function LandingPage() {
               page="guides/settings"
             />
             <DocsRow
-              title="Skills and Plugins"
+              title="Skills and plugins"
               description="Analyse saved charts from OpenCode, Claude Code, Codex, and more"
               page="skills"
             />
