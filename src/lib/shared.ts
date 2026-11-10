@@ -30,3 +30,8 @@ export const skillsGitConfig = {
   repo: "skills",
   branch: "main",
 };
+
+/** The astro-ascendant release shown in the site header. */
+export const libraryVersion = "6.1";
+
+export const changelogUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/CHANGELOG.md`;

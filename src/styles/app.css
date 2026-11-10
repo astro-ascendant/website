@@ -92,6 +92,7 @@
   --spacing: 0.25rem;
   --tracking-normal: 0em;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-swift: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* UI Arc component tokens (action button, tabs and friends). */
@@ -100,7 +101,7 @@
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.25rem;
-  --radius-control: 1.125rem;
+  --radius-control: var(--radius);
   --radius-pill: 9999px;
   --control-height-sm: 2.25rem;
   --control-height-md: 2.25rem;
@@ -115,7 +116,7 @@
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
   --shadow-resting: 0 1px 2px oklch(0% 0 0 / 0.035);
   --shadow-floating: 0 12px 32px oklch(0% 0 0 / 0.12);
-  --radius-panel: 1rem;
+  --radius-panel: calc(var(--radius) + var(--spacing));
   --surface: var(--card);
   --surface-raised: var(--popover);
   --surface-muted: var(--muted);
@@ -250,21 +251,37 @@ body {
   inset: 0;
 }
 
-.section-tag-ruled {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-  flex: 1;
-  font-weight: 500;
-  color: var(--foreground);
+/*
+ * A full-width band whose top rule ends in two small inward-pointing
+ * triangles, one at each edge of the page. The triangles are zero-size boxes
+ * drawn with one coloured border, centred on the rule.
+ */
+.section-ticks {
+  --tick-size: 5px;
+  --tick-color: color-mix(in oklab, var(--border), var(--foreground) 40%);
+  position: relative;
+  border-top: 1px solid var(--border);
 }
 
-.section-tag-rule {
-  flex: 1;
-  min-width: 0;
-  height: var(--border-hairline);
-  background: var(--border);
+.section-ticks::before,
+.section-ticks::after {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--tick-size) - 0.5px);
+  border: var(--tick-size) solid transparent;
+  pointer-events: none;
+}
+
+.section-ticks::before {
+  left: 0;
+  border-left-color: var(--tick-color);
+  border-right-width: 0;
+}
+
+.section-ticks::after {
+  right: 0;
+  border-right-color: var(--tick-color);
+  border-left-width: 0;
 }
 
 @theme inline {
@@ -322,9 +339,10 @@ body {
   --radius-md: calc(var(--radius) - (var(--spacing) * 0.5));
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + var(--spacing));
-  --radius-2xl: calc(var(--radius) + (var(--spacing) * 2));
-  --radius-3xl: calc(var(--radius) + (var(--spacing) * 3));
-  --radius-4xl: calc(var(--radius) + (var(--spacing) * 4));
+  /* Capped at xl: the landing page tops out at 14px, so nothing grows past it. */
+  --radius-2xl: var(--radius-xl);
+  --radius-3xl: var(--radius-xl);
+  --radius-4xl: var(--radius-xl);
   --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
   --tracking-tight: calc(var(--tracking-normal) - 0.025em);
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
@@ -354,39 +372,6 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-.banner-arrow {
-  transition: transform 150ms var(--ease-out);
-}
-
-.banner-line {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.9),
-    transparent
-  );
-  opacity: 0;
-  transform: scaleX(0);
-  transition:
-    transform 250ms var(--ease-out),
-    opacity 250ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .banner:hover .banner-line {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-  .banner:hover .banner-arrow {
-    transform: translateX(2px);
   }
 }
 
@@ -579,18 +564,5 @@ body {
   .kp-chart-house-number,
   .kp-chart-asc-label {
     font-size: 14px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .banner-arrow {
-    transition: none;
-  }
-  .banner:hover .banner-arrow {
-    transform: none;
-  }
-  .banner-line {
-    transform: none;
-    transition: opacity 250ms var(--ease-out);
   }
 }

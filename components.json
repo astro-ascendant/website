@@ -24,6 +24,7 @@
   "registries": {
     "@uiarc": "https://uiarc.dev/r/{name}.json",
     "@svgl": "https://svgl.app/r/{name}.json",
-    "@pdfcn": "https://pdfcn.dev/r/{name}.json"
+    "@pdfcn": "https://pdfcn.dev/r/{name}.json",
+    "@react-bits": "https://reactbits.dev/r/{name}.json"
   }
 }

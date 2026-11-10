@@ -1,13 +1,21 @@
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
-import wordmark from "../../assets/wordmark.webp";
+import { ArrowRightIcon } from "@phosphor-icons/react";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { OrreryHero } from "../components/orrery-hero";
+import { SpecularLink } from "../components/specular-link";
+import {
+  gutterClassName,
+  SiteFrame,
+  SiteHeader,
+} from "../components/site-frame";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: "Free Horoscope Calculator - Ascendant" },
+      { title: "Ascendant - Free Horoscope Calculator" },
       {
         name: "description",
         content:
@@ -15,7 +23,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "Free Horoscope Calculator - Ascendant",
+        content: "Ascendant - Free Horoscope Calculator",
       },
       {
         property: "og:description",
@@ -26,233 +34,298 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const rowClassName = "group flex flex-wrap items-center gap-2 py-3.5";
+const INSTALL_COMMANDS = [
+  { runtime: "Bun", command: "bun add astro-ascendant effect" },
+  { runtime: "Node", command: "npm install astro-ascendant effect" },
+] as const;
 
-function RowText({
+const secondaryButtonClassName =
+  "border-border bg-background text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-[background-color,transform] duration-150 ease-out active:scale-[0.96]";
+
+const cardClassName =
+  "bg-background flex h-full flex-col gap-2 p-5 sm:p-6";
+
+function CardText({
   title,
   description,
+  linked = false,
 }: {
   title: string;
   description: string;
+  linked?: boolean;
 }) {
   return (
     <>
-      <span className="min-w-0 text-sm font-medium text-foreground sm:text-base">
+      <h3 className="text-foreground flex items-center gap-2 text-sm font-medium sm:text-base">
         {title}
-      </span>
-      <span
-        aria-hidden="true"
-        className="hidden shrink-0 text-sm text-muted-foreground sm:inline"
-      >
-        /
-      </span>
-      <span className="min-w-0 basis-full text-sm text-muted-foreground transition-colors duration-150 ease-out group-hover:text-foreground sm:basis-auto sm:flex-1">
+        {linked ? (
+          <ArrowRightIcon
+            aria-hidden="true"
+            className="text-muted-foreground size-4 transition-[translate] duration-(--duration-fast) ease-(--ease-out) motion-safe:group-hover:translate-x-0.5 motion-safe:group-focus-visible:translate-x-0.5"
+          />
+        ) : null}
+      </h3>
+      <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
         {description}
-      </span>
+      </p>
     </>
   );
 }
 
-/** A row that describes something without linking anywhere. */
-function PlainRow({
+/** A card that describes something without linking anywhere. */
+function PlainCard({
   title,
   description,
+  className,
 }: {
   title: string;
   description: string;
+  className?: string;
 }) {
   return (
-    <li className={rowClassName}>
-      <RowText title={title} description={description} />
+    <li className={className}>
+      <div className={cardClassName}>
+        <CardText title={title} description={description} />
+      </div>
     </li>
   );
 }
 
-/** A row that links to a docs page by its path under /docs. */
-function DocsRow({
+/** A card that links to a docs page by its path under /docs. */
+function DocsCard({
   title,
   description,
   page,
+  className,
+  arrow = false,
 }: {
   title: string;
   description: string;
   page: string;
+  className?: string;
+  arrow?: boolean;
 }) {
   return (
-    <li>
+    <li className={className}>
       <Link
         to="/docs/$"
         params={{ _splat: page }}
-        className={rowClassName}
+        className={`group hover:bg-card transition-colors duration-150 ease-out ${cardClassName}`}
       >
-        <RowText title={title} description={description} />
+        <CardText title={title} description={description} linked={arrow} />
       </Link>
     </li>
   );
 }
 
-function SectionTitle({ children }: { children: string }) {
+/** Hairline-divided grid: the gap shows the border colour between cards. */
+function CardGrid({
+  className,
+  children,
+}: {
+  className: string;
+  children: ReactNode;
+}) {
   return (
-    <h2 className="section-tag-ruled text-sm font-medium sm:text-base">
-      <span>{children}</span>
-      <span className="section-tag-rule" aria-hidden="true" />
-    </h2>
+    <ul
+      className={`border-border/70 bg-border/70 mt-10 grid gap-px overflow-hidden rounded-xl border ${className}`}
+    >
+      {children}
+    </ul>
   );
 }
 
-const headerLinkClassName =
-  "text-sm text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground";
+function SectionHeading({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: ReactNode;
+}) {
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+      <h2 className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl">
+        {title}
+      </h2>
+      <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty sm:text-base">
+        {subtitle}
+      </p>
+    </div>
+  );
+}
 
 function LandingPage() {
   return (
     <main className="bg-background text-foreground flex min-h-screen flex-col antialiased">
       <div aria-hidden="true" className="paper-grain" />
-      <div className="mx-auto w-full max-w-173 flex-1 px-4 pt-14 lg:max-w-4xl">
-        <header className="flex items-center justify-between gap-4">
-          <a href="/" aria-label="Ascendant home" className="inline-block">
-            <img
-              src={wordmark}
-              alt="Ascendant"
-              width={973}
-              height={200}
-              className="h-8 w-auto"
-            />
-          </a>
-          <nav aria-label="Primary" className="flex items-center gap-5">
-            <Link to="/docs/$" params={{ _splat: "" }} className={headerLinkClassName}>
-              Docs
-            </Link>
-            <a
-              href="https://github.com/astro-ascendant"
-              target="_blank"
-              rel="noreferrer"
-              className={headerLinkClassName}
-            >
-              GitHub
-            </a>
-          </nav>
-        </header>
 
-        <section aria-label="Ascendant horoscope calculator" className="mt-10">
-          <div className="grid w-full items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
-            <div className="flex flex-col items-start">
-              <h1 className="font-sans text-lg font-medium tracking-tight text-foreground sm:text-xl">
-                Understand your horoscope.
-              </h1>
-              <p className="mt-4 max-w-prose text-sm leading-relaxed text-pretty text-muted-foreground sm:text-base">
-                Unlike the broad and vague magazine horoscopes that only use
-                your <span className="font-serif italic">sun sign</span>, we use
-                a complete picture of the sky when and where you were born to
-                generate your full horoscope.
-              </p>
-              <div className="mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                <Link
-                  to="/chart"
-                  className="bg-primary text-primary-foreground w-fit rounded-lg px-5 py-2 text-sm font-medium transition-transform duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
-                >
-                  Create Horoscope
-                </Link>
-              </div>
-            </div>
+      <SiteFrame>
+        <SiteHeader />
 
-            <div>
-              <OrreryHero />
+        <section
+          aria-label="Ascendant horoscope calculator"
+          className="section-ticks divide-border grid md:min-h-[38rem] md:grid-cols-2 md:divide-x"
+        >
+          <div
+            className={`flex flex-col items-center justify-center py-14 text-center sm:py-20 md:items-start md:text-left ${gutterClassName}`}
+          >
+            <h1 className="text-foreground max-w-xl text-4xl font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
+              Understand your horoscope.
+            </h1>
+            <p className="text-muted-foreground mt-5 max-w-lg text-base leading-relaxed text-pretty sm:text-lg">
+              Unlike the broad and vague magazine horoscopes that only use your{" "}
+              <span className="font-serif italic">sun sign</span>, we use a
+              complete picture of the sky when and where you were born to
+              generate your full horoscope.
+            </p>
+            <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+              <SpecularLink to="/chart">Create horoscope</SpecularLink>
+              <Link
+                to="/docs/$"
+                params={{ _splat: "" }}
+                className={secondaryButtonClassName}
+              >
+                Read the docs
+              </Link>
             </div>
+          </div>
+          <div
+            className={`border-border flex items-center justify-center py-14 max-md:border-t sm:py-20 ${gutterClassName}`}
+          >
+            <OrreryHero />
           </div>
         </section>
 
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle>What you get</SectionTitle>
-          <ul className="mt-2 flex flex-col">
-            <PlainRow
-              title="Rashi and Varga Charts"
+        <section
+          className={`section-ticks py-16 sm:py-24 ${gutterClassName}`}
+        >
+          <SectionHeading
+            title="What you get"
+            subtitle="The charts, timelines, and scores astrologers read, calculated from your birth date, time, and place."
+          />
+          <CardGrid className="sm:grid-cols-2 lg:grid-cols-3">
+            <PlainCard
+              title="Rashi and Varga charts"
               description="Your main birth chart, plus fifteen divisional charts from Hora to Shashtiamsa, Navamsha included"
             />
-            <PlainRow
-              title="KP Chart"
+            <PlainCard
+              title="Krishnamurthi Paddhati"
               description="Star lords, sub lords, and the houses each planet signifies"
             />
-            <PlainRow
+            <PlainCard
               title="Dashas"
               description="Vimshottari, Chara, and Sthira timelines, with the period you are in now"
             />
-            <PlainRow
+            <PlainCard
               title="Jaimini and Sarvashtakavarga"
               description="Karakas, Arudha Pada, and a score for every sign"
             />
-            <DocsRow
+            <DocsCard
               title="Ascendant AI Skill"
-              description="Send your chart to ChatGPT, Claude, or Gemini, or install the skill"
+              description="Send your horoscope to ChatGPT, Claude, or Gemini, or install the skill"
               page="skills"
+              className="sm:col-span-2"
+              arrow
             />
-          </ul>
+          </CardGrid>
         </section>
 
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle>For developers</SectionTitle>
-          <p className="mt-3 max-w-prose text-sm leading-relaxed text-pretty text-muted-foreground sm:text-base">
-            Ascendant is also an open-source, Effect-first TypeScript library for
-            sidereal astrology.
-          </p>
-          <CodeBlock className="mt-4 mb-2">
-            <Pre className="px-4">
-              <code>bun add astro-ascendant effect</code>
-            </Pre>
-          </CodeBlock>
-          <ul className="mt-2 flex flex-col">
-            <DocsRow
+        <section
+          className={`section-ticks py-16 sm:py-24 ${gutterClassName}`}
+        >
+          <SectionHeading
+            title="For developers"
+            subtitle="Ascendant is also an open-source, Effect-first TypeScript library for sidereal astrology."
+          />
+          {/* Same groupId as the docs, so the runtime choice carries over. */}
+          <Tabs
+            items={["Bun", "Node"]}
+            groupId="runtime"
+            persist
+            className="mx-auto mt-8 mb-0 w-full max-w-md"
+          >
+            {INSTALL_COMMANDS.map(({ runtime, command }) => (
+              <Tab key={runtime} value={runtime} keepMounted>
+                <DynamicCodeBlock
+                  lang="bash"
+                  code={command}
+                  codeblock={{ className: "my-0" }}
+                />
+              </Tab>
+            ))}
+          </Tabs>
+          <CardGrid className="sm:grid-cols-2 lg:grid-cols-4">
+            <DocsCard
               title="Quickstart"
               description="Calculate your first chart and the dasha running today"
               page="quickstart"
             />
-            <DocsRow
+            <DocsCard
               title="Guides"
               description="Settings, divisional charts, dashas, transits, errors, and more"
               page="guides/settings"
             />
-            <DocsRow
+            <DocsCard
               title="Skills and plugins"
               description="Analyse saved charts from OpenCode, Claude Code, Codex, and more"
               page="skills"
             />
-            <DocsRow
+            <DocsCard
               title="API reference"
               description="Effect services for charts, dashas, and transits"
               page="api-reference/chart"
             />
-          </ul>
+          </CardGrid>
         </section>
-      </div>
-      <footer className="mx-auto mt-12 flex w-full max-w-173 justify-center px-4 pb-8 lg:max-w-4xl">
-        <nav
-          aria-label="Footer"
-          className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
+
+        <section
+          className={`section-ticks bg-card/40 flex flex-col items-center py-16 text-center sm:py-24 ${gutterClassName}`}
         >
-          <span className="text-xs text-muted-foreground">
-            © 2026 Laxman K R
-          </span>
-          <span aria-hidden="true" className="text-xs text-muted-foreground/60">
-            •
-          </span>
-          <a
-            href="https://www.gnu.org/licenses/agpl-3.0.html"
-            target="_blank"
-            rel="noreferrer"
-            className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
+          <h2 className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl">
+            Create your horoscope today
+          </h2>
+          <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed text-pretty sm:text-base">
+            Enter a birth date, time, and place. It is free, with nothing
+            to install.
+          </p>
+          <SpecularLink to="/chart" className="mt-8">
+            Create horoscope
+          </SpecularLink>
+        </section>
+
+        <footer
+          className={`section-ticks flex w-full justify-center py-8 ${gutterClassName}`}
+        >
+          <nav
+            aria-label="Footer"
+            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
           >
-            GNU AGPL v3
-          </a>
-          <span aria-hidden="true" className="text-xs text-muted-foreground/60">
-            •
-          </span>
-          <Link
-            to="/about"
-            className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
-          >
-            About
-          </Link>
-        </nav>
-      </footer>
+            <span className="text-xs text-muted-foreground">
+              © 2026 Laxman K R
+            </span>
+            <span aria-hidden="true" className="text-xs text-muted-foreground/60">
+              •
+            </span>
+            <a
+              href="https://www.gnu.org/licenses/agpl-3.0.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
+            >
+              GNU AGPL v3
+            </a>
+            <span aria-hidden="true" className="text-xs text-muted-foreground/60">
+              •
+            </span>
+            <Link
+              to="/about"
+              className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
+            >
+              About
+            </Link>
+          </nav>
+        </footer>
+      </SiteFrame>
     </main>
   );
 }
