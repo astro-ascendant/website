@@ -18,13 +18,13 @@ export interface DataTableColumn<T = Record<string, unknown>> {
   width?: string | number;
   /**
    * Custom cell renderer. Must return @formepdf/react elements (Text, View,
-   * Image, etc.) — NOT HTML DOM elements. TypeScript accepts ReactNode but DOM
+   * Image, etc.), not HTML DOM elements. TypeScript accepts ReactNode but DOM
    * nodes will crash at runtime in the PDF renderer.
    */
   render?: (value: unknown, row: T) => React.ReactNode;
   /**
    * Custom footer cell renderer. Same constraint: return @formepdf/react
-   * elements only — no HTML/DOM nodes.
+   * elements only, no HTML/DOM nodes.
    */
   renderFooter?: (value: unknown) => React.ReactNode;
 }

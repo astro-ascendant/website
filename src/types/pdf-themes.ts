@@ -1,17 +1,17 @@
 export interface TypographyScale {
-  /** 10pt — Captions, footnotes */
+  /** 10pt: Captions, footnotes */
   xs: number;
-  /** 12pt — Body text (PDF standard) */
+  /** 12pt: Body text (PDF standard) */
   sm: number;
-  /** 15pt — Large body, small headings */
+  /** 15pt: Large body, small headings */
   base: number;
-  /** 18pt — H4 equivalent */
+  /** 18pt: H4 equivalent */
   lg: number;
-  /** 22pt — H3 equivalent */
+  /** 22pt: H3 equivalent */
   xl: number;
-  /** 28pt — H2 equivalent */
+  /** 28pt: H2 equivalent */
   "2xl": number;
-  /** 36pt — H1 equivalent */
+  /** 36pt: H1 equivalent */
   "3xl": number;
 }
 
@@ -53,37 +53,37 @@ export interface FontWeights {
 
 /** Line height scale */
 export interface LineHeights {
-  /** 1.2 — Tight, for headings */
+  /** 1.2: Tight, for headings */
   tight: number;
-  /** 1.4 — Normal, for body text */
+  /** 1.4: Normal, for body text */
   normal: number;
-  /** 1.6 — Relaxed, for reading-heavy content */
+  /** 1.6: Relaxed, for reading-heavy content */
   relaxed: number;
 }
 
 /** Border radius scale for rounded corners */
 export interface BorderRadiusScale {
-  /** 0pt — Sharp corners */
+  /** 0pt: Sharp corners */
   none: number;
-  /** 2pt — Subtle rounding */
+  /** 2pt: Subtle rounding */
   sm: number;
-  /** 4pt — Standard rounding */
+  /** 4pt: Standard rounding */
   md: number;
-  /** 8pt — Pronounced rounding */
+  /** 8pt: Pronounced rounding */
   lg: number;
-  /** 9999pt — Pill/circle shape */
+  /** 9999pt: Pill/circle shape */
   full: number;
 }
 
 /** Letter spacing scale for typography adjustments */
 export interface LetterSpacingScale {
-  /** -0.025em — Tighter spacing */
+  /** -0.025em: Tighter spacing */
   tight: number;
-  /** 0em — Normal spacing */
+  /** 0em: Normal spacing */
   normal: number;
-  /** 0.025em — Slightly wider spacing */
+  /** 0.025em: Slightly wider spacing */
   wide: number;
-  /** 0.05em — Much wider spacing (for uppercase) */
+  /** 0.05em: Much wider spacing (for uppercase) */
   wider: number;
 }
 
@@ -103,7 +103,7 @@ export interface PrimitiveTokens {
 /**
  * Semantic color tokens using the foreground/background pair convention.
  * All values must be hex strings (e.g., '#1a1a1a').
- * react-pdf supports hex, rgb(), and hsl() — but NOT oklch.
+ * react-pdf supports hex, rgb(), and hsl(), but NOT oklch.
  */
 export interface ColorTokens {
   /** Primary text and content color */
@@ -132,7 +132,7 @@ export interface ColorTokens {
   info: string;
 }
 
-/** Typography semantic tokens — what fonts and sizes to use where */
+/** Typography semantic tokens: what fonts and sizes to use where */
 export interface TypographyTokens {
   /** Body text settings */
   body: {
@@ -163,7 +163,7 @@ export interface TypographyTokens {
   };
 }
 
-/** Spacing semantic tokens — consistent spacing across the document */
+/** Spacing semantic tokens: consistent spacing across the document */
 export interface SpacingTokens {
   /** Page margin settings in points */
   page: {

@@ -3,7 +3,7 @@ import type { PrimitiveTokens } from "@/types/pdf-themes";
 /**
  * Default primitive tokens shared by all theme presets.
  *
- * These define the raw design scales — the "palette" of values available.
+ * These define the raw design scales: the "palette" of values available.
  * Themes select from these scales when assigning semantic tokens.
  *
  * - Typography: Major Third (1.25) ratio, 12pt base

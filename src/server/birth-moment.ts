@@ -5,7 +5,7 @@ import type { ChartErrorCode } from "@/lib/chart-errors";
 /**
  * Moment handling follows the same discipline as the astro-ascendant skills:
  * a birth is one instant plus a verbatim offset string. Nothing downstream
- * needs an IANA zone, and a bare wall-clock time is never accepted — the
+ * needs an IANA zone, and a bare wall-clock time is never accepted: the
  * offset is the only timezone information the record carries.
  */
 

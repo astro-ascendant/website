@@ -21,7 +21,7 @@ export type PageNumberSize = "xs" | "sm" | "md";
  */
 export interface PageNumberProps extends Omit<PDFComponentProps, "children"> {
   /**
-   * Format string — use `{page}` for current page and `{total}` for total page count.
+   * Format string: use `{page}` for current page and `{total}` for total page count.
    * @default 'Page {page} of {total}'
    */
   format?: string;
