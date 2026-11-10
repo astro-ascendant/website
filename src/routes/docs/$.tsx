@@ -35,10 +35,10 @@ export const Route = createFileRoute("/docs/$")({
 
     return {
       meta: [
-        title ? { title: `${title} - Ascendant` } : undefined,
+        title ? { title: `Ascendant - ${title}` } : undefined,
         description ? { name: "description", content: description } : undefined,
         title
-          ? { property: "og:title", content: `${title} - Ascendant` }
+          ? { property: "og:title", content: `Ascendant - ${title}` }
           : undefined,
         description
           ? { property: "og:description", content: description }

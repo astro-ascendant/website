@@ -6,7 +6,7 @@ export const Route = createFileRoute("/chart")({
   component: ChartRoute,
   head: () => ({
     meta: [
-      { title: "Calculate Horoscope - Ascendant" },
+      { title: "Ascendant - Calculate Horoscope" },
       {
         name: "description",
         content:
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/chart")({
       },
       {
         property: "og:title",
-        content: "Calculate Horoscope - Ascendant",
+        content: "Ascendant - Calculate Horoscope",
       },
       {
         property: "og:description",

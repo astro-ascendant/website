@@ -64,7 +64,7 @@ export function ChartDetailsEditor({
       return;
     }
     const previous = document.title;
-    document.title = `${TITLE} - Ascendant`;
+    document.title = `Ascendant - ${TITLE}`;
     return () => {
       document.title = previous;
     };
