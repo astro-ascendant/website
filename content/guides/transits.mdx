@@ -55,7 +55,8 @@ retrograde sweep produces extra events and a boundary can appear three times.
 
 An event's `sign` is the sign the graha moves into at that instant, in the
 direction of the search. Here Jupiter moves back into Cancer, then forward into
-Leo, then Virgo.
+Leo, then Virgo. For every other kind, `sign` is the sign the graha is in at the
+event.
 
 ## The request
 
@@ -68,16 +69,25 @@ Leo, then Virgo.
 | `kinds` | One or more event kinds, listed below. At least one is required. |
 | `targetLongitude` | Required with `longitude-hit`. |
 | `house` | Required with `cusp-crossing`, from 1 to 12. |
-| `maxYears` | How far to search, up to 200. The default is 30. |
-| `precisionMinutes` | How precisely each moment is refined. The default is 1 minute. |
+| `maxYears` | How far to search, more than 0 and up to 200. The default is 30. |
+| `precisionMinutes` | How precisely each moment is refined, more than 0 and up to 1440 (one day). The default is 1 minute. |
 | `includeCharts` | Divisions to attach to every event. See [Attach charts](#attach-charts). |
 
 The search includes `from` itself: a graha that sits exactly on a boundary, target,
 or cusp at that moment reports it there.
 
 To search into the past, set `direction: "backward"`. The events then come back
-newest first. From 1 November 2026, Jupiter's previous two ingresses were into
-Cancer at `2026-10-30 15:40 UTC` and into Gemini at `2026-06-01 10:36 UTC`.
+newest first, and `sign` follows the search backward through time, so it names
+the sign the graha was in **before** the crossing. From 1 November 2026, the
+previous two ingresses of Jupiter report:
+
+| Moment (UTC) | Longitude | `sign` | What happened, forward in time |
+| --- | --- | --- | --- |
+| `2026-10-30 15:40` | 120° | Cancer | Jupiter left Cancer for Leo |
+| `2026-06-01 10:36` | 90° | Gemini | Jupiter left Gemini for Cancer |
+
+To name the sign entered in ordinary time order, take the next sign for a direct
+crossing and the previous sign for a retrograde one.
 
 ## Event kinds
 
@@ -169,6 +179,12 @@ For Mercury from 1 November 2026:
 At a station the speed is zero, so `is_retrograde` reports the motion just after
 it: `true` at a station that starts a retrograde, and `false` at one that ends it.
 
+Only Mars, Mercury, Venus, Jupiter, and Saturn station. The Sun and Moon never
+turn back, and Rahu and Ketu are the mean nodes, which always move backward, so a
+`station` search for any of them finds nothing and fails with
+`TransitSearchExhausted`. For the same reason, every Rahu and Ketu event reports
+`is_retrograde: true`.
+
 ## Attach charts
 
 Add `includeCharts` to receive a full chart calculation for each event's moment,
@@ -224,8 +240,8 @@ failures](/docs/guides/errors).
 ## Speed
 
 A search leaps from the starting moment to the earliest time a graha could reach
-the next boundary, target, or station, and refines each crossing with a few more
-lookups. Per the 6.1.0 release notes, typical searches use 5 to 25 times fewer
+the next boundary, target, or station, and refines each crossing with about four
+more lookups. Per the 6.1.0 release notes, typical searches use 5 to 25 times fewer
 ephemeris calls than before. `Runtime.MainLayer` also uses the cached Swiss
 Ephemeris layer, so repeated and overlapping searches reuse earlier positions. If you build your own layers, use `Swisseph.SwissephCachedLayer`
 and not `Swisseph.SwissephLayer`. See [Ephemeris adapters and
@@ -236,4 +252,6 @@ caching](/docs/guides/ephemeris-and-caching).
 Each event records its method: school `Parashari`, method `transit-sample-bisect`,
 version `2026-11-01`. The search leaps from the located moment by the time the graha
 needs to reach the nearest boundary, target, or station, then refines each crossing
-to `precisionMinutes`.
+to `precisionMinutes`. Despite the method's name, refinement takes Newton steps
+(the graha's speed is the slope of its longitude) or secant steps for stations, and
+falls back to bisection only when a step would leave the bracket.
