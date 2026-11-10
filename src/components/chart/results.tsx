@@ -37,7 +37,7 @@ import {
 } from "@/components/chart/kp-table";
 import { ChartKpCircularChart } from "@/components/chart/kp-circular-chart";
 
-function ChartCalculating() {
+export function ChartCalculating() {
   return (
     <Card className="shadow-none">
       <CardHeader>
@@ -52,7 +52,11 @@ function ChartCalculating() {
   );
 }
 
-function ChartFailure({ onEditDetails }: { onEditDetails?: () => void }) {
+export function ChartFailure({
+  onEditDetails,
+}: {
+  onEditDetails?: () => void;
+}) {
   const {
     state: { failure },
     actions: { calculate },
@@ -142,14 +146,14 @@ function ChartJaiminiTables() {
                 <TableHead>Karakamsha</TableHead>
                 <TableCell>
                   {result.jaimini.karakamsha === ""
-                    ? "—"
+                    ? "-"
                     : result.jaimini.karakamsha}
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableHead>Upapada</TableHead>
                 <TableCell>
-                  {result.jaimini.upapada === "" ? "—" : result.jaimini.upapada}
+                  {result.jaimini.upapada === "" ? "-" : result.jaimini.upapada}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -174,7 +178,7 @@ function ChartJaiminiTables() {
               {result.jaimini.arudha.map((entry) => (
                 <TableRow key={entry.house}>
                   <TableCell>{entry.house}</TableCell>
-                  <TableCell>{entry.pada === "" ? "—" : entry.pada}</TableCell>
+                  <TableCell>{entry.pada === "" ? "-" : entry.pada}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -196,7 +200,7 @@ function ChartJaiminiTables() {
                 <TableCell>
                   {result.jaimini.drishti.length > 0
                     ? result.jaimini.drishti.join(", ")
-                    : "—"}
+                    : "-"}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -204,7 +208,7 @@ function ChartJaiminiTables() {
                 <TableCell>
                   {result.jaimini.argala.supporting.length > 0
                     ? result.jaimini.argala.supporting.join(", ")
-                    : "—"}
+                    : "-"}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -212,7 +216,7 @@ function ChartJaiminiTables() {
                 <TableCell>
                   {result.jaimini.argala.obstructing.length > 0
                     ? result.jaimini.argala.obstructing.join(", ")
-                    : "—"}
+                    : "-"}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -223,7 +227,8 @@ function ChartJaiminiTables() {
   );
 }
 
-function ChartKpTabs() {
+/** The KP views. `showDasha` is off where no birth is involved, as for the sky now. */
+export function ChartKpTabs({ showDasha = true }: { showDasha?: boolean } = {}) {
   const {
     state: { result },
   } = useChartSession();
@@ -232,11 +237,11 @@ function ChartKpTabs() {
   }
   return (
     <Tabs defaultValue="wheel">
-      <TabsList containerClassName="max-w-full self-start">
+      <TabsList variant="line" containerClassName="max-w-full self-start">
         <TabsTrigger value="wheel">Chart</TabsTrigger>
         <TabsTrigger value="planets">Planets</TabsTrigger>
         <TabsTrigger value="cusps">Cusps</TabsTrigger>
-        <TabsTrigger value="dasha">Dasha</TabsTrigger>
+        {showDasha ? <TabsTrigger value="dasha">Dasha</TabsTrigger> : null}
       </TabsList>
       <TabsContent value="wheel">
         <ChartKpCircularChart />
@@ -247,9 +252,11 @@ function ChartKpTabs() {
       <TabsContent value="cusps">
         <ChartKpCuspTable />
       </TabsContent>
-      <TabsContent value="dasha">
-        <ChartKpDashaTimeline />
-      </TabsContent>
+      {showDasha ? (
+        <TabsContent value="dasha">
+          <ChartKpDashaTimeline />
+        </TabsContent>
+      ) : null}
     </Tabs>
   );
 }
@@ -324,12 +331,10 @@ function ChartSavTable() {
 }
 
 function ChartSuccess({
-  tabListClassName,
   tabListContainerClassName,
   tabListFill,
   onTabChange,
 }: {
-  tabListClassName?: string;
   tabListContainerClassName?: string;
   tabListFill?: boolean;
   onTabChange?: () => void;
@@ -345,11 +350,11 @@ function ChartSuccess({
       <Tabs defaultValue="chart" onValueChange={onTabChange}>
         <TabsList
           fill={tabListFill}
+          variant={tabListFill ? "segmented" : "line"}
           containerClassName={cn(
             "max-w-full self-start",
             tabListContainerClassName,
           )}
-          className={tabListClassName}
         >
           <TabsTrigger value="chart">Chart</TabsTrigger>
           <TabsTrigger value="kp">KP</TabsTrigger>
@@ -396,12 +401,10 @@ function ChartSuccess({
 }
 
 export function ChartResultSwitch({
-  tabListClassName,
   tabListContainerClassName,
   tabListFill,
   onEditDetails,
 }: {
-  tabListClassName?: string;
   tabListContainerClassName?: string;
   tabListFill?: boolean;
   onEditDetails?: () => void;
@@ -429,7 +432,6 @@ export function ChartResultSwitch({
       ) : null}
       {result !== null ? (
         <ChartSuccess
-          tabListClassName={tabListClassName}
           tabListContainerClassName={tabListContainerClassName}
           tabListFill={tabListFill}
           onTabChange={handleTabChange}

@@ -1,5 +1,4 @@
 import * as React from "react";
-import type { ReactNode } from "react";
 import { CalendarBlankIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,7 +10,12 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { CityPicker } from "@/components/chart/city-picker";
 import { ActionButton } from "@/components/arc/action-button/action-button";
 import {
@@ -20,10 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useChartSession } from "@/components/chart/session";
-
-export function ChartFormFrame({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-6">{children}</div>;
-}
 
 function FieldError({
   id,
@@ -65,7 +65,6 @@ export function ChartNameField() {
           updateBirth({ name: value });
           applyProfile(value);
         }}
-        className="rounded-md"
       />
       <datalist id="chart-saved-names">
         {savedProfiles.map((profile) => (
@@ -164,7 +163,7 @@ export function ChartDateField() {
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor="chart-date">Birth date</Label>
-      <InputGroup className="rounded-md">
+      <InputGroup>
         <InputGroupInput
           id="chart-date"
           value={text}
@@ -246,7 +245,7 @@ export function ChartTimeField() {
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? "chart-time-error" : undefined}
         onChange={(event) => updateBirth({ time: event.target.value })}
-        className="appearance-none rounded-md [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none [&::-webkit-calendar-picker-indicator]:[display:none]"
+        className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none [&::-webkit-calendar-picker-indicator]:[display:none]"
       />
       <FieldError id="chart-time-error" message={error} />
     </div>
@@ -278,24 +277,30 @@ export function ChartSexField() {
       >
         <TabsList
           aria-label="Gender"
-          className="w-full items-stretch group-data-horizontal/tabs:h-auto"
+          className="relative isolate w-full items-stretch rounded-lg group-data-horizontal/tabs:h-auto"
         >
           {SEX_OPTIONS.map((option) => (
             <TabsTrigger
               key={option.label}
               value={option.value}
-              className="h-auto min-w-0 flex-1 px-2 py-1.5 text-center text-xs leading-tight whitespace-normal"
+              className="h-auto min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs leading-tight whitespace-normal transition-colors duration-(--duration-fast) ease-(--ease-out) data-active:bg-transparent dark:data-active:bg-transparent"
             >
               {option.label}
             </TabsTrigger>
           ))}
+          {/* One pill that slides between tabs instead of each tab swapping its own background. */}
+          <TabsIndicator className="bg-background absolute top-0 left-0 -z-10 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) translate-y-(--active-tab-top) rounded-md transition-[translate] duration-(--duration-standard) ease-(--ease-in-out)" />
         </TabsList>
       </Tabs>
     </fieldset>
   );
 }
 
-export function ChartPlaceField() {
+export function ChartPlaceField({
+  label = "Birth place",
+}: {
+  label?: string;
+} = {}) {
   const {
     state: { selectedPlace, fieldErrors, placeOptions, searchError },
     actions: { selectPlace, queryPlaces },
@@ -310,7 +315,7 @@ export function ChartPlaceField() {
   }, [selectedPlace]);
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor="chart-place">Birth place</Label>
+      <Label htmlFor="chart-place">{label}</Label>
       <CityPicker
         value={selectedPlace}
         options={placeOptions}
@@ -346,7 +351,7 @@ export function ChartCalculateButton() {
   } = useChartSession();
   return (
     <ActionButton
-      label="Create Horoscope"
+      label="Create horoscope"
       pendingLabel="Creating Horoscope"
       successLabel="Chart ready"
       onAction={calculate}

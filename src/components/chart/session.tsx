@@ -41,6 +41,8 @@ interface ChartSessionActions {
   queryPlaces: (text: string) => void;
   /** Validates, then casts. Rejects when the chart could not be cast. */
   calculate: () => Promise<void>;
+  /** Replaces the details with `birth`, then casts them as `calculate` does. */
+  calculateFor: (birth: ChartBirthInput) => Promise<void>;
   savePdf: () => void;
   askAI: (provider: ChartPromptProvider) => void;
 }
@@ -192,8 +194,7 @@ function useChartSessionController(
     }, deps.debounceMs);
   };
 
-  const calculate = async () => {
-    const birth = state.birth;
+  const calculateFor = async (birth: ChartBirthInput) => {
     const validation = validateChartInput(birth);
     if (!validation.ok) {
       dispatch({ type: "invalid", fields: validation.fields });
@@ -206,6 +207,7 @@ function useChartSessionController(
       throw new Error("Chart details are incomplete.");
     }
     const request = chart.begin();
+    dispatch({ type: "edit", patch: birth });
     dispatch({ type: "start", birth });
     try {
       const result = await deps.requestChart(birth, request.signal);
@@ -221,6 +223,8 @@ function useChartSessionController(
       throw error;
     }
   };
+
+  const calculate = () => calculateFor(state.birth);
 
   const savePdf = () => {
     if (state.result !== null) {
@@ -242,6 +246,7 @@ function useChartSessionController(
       applyProfile: (name) => dispatch({ type: "applyProfile", name }),
       queryPlaces,
       calculate,
+      calculateFor,
       savePdf,
       askAI,
     },

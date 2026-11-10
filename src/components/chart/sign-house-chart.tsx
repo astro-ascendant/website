@@ -12,7 +12,16 @@ import {
   type DivisionOccupant,
 } from "@/lib/chart-view";
 import { useChartSession } from "@/components/chart/session";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { formatLongitude } from "@/lib/zodiac";
 
 function Root({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -186,30 +195,140 @@ function SignHouseChart({ division }: { division: number }) {
   );
 }
 
-export function ChartSignHouseCharts() {
+/** Traditional graha order; anything else follows in the order given. */
+const BODY_ORDER = [
+  "Sun",
+  "Moon",
+  "Mars",
+  "Mercury",
+  "Jupiter",
+  "Venus",
+  "Saturn",
+  "Rahu",
+  "Ketu",
+];
+
+function bodyRank(body: string): number {
+  const index = BODY_ORDER.indexOf(body);
+  return index === -1 ? BODY_ORDER.length : index;
+}
+
+/**
+ * The same division as a table: Lagna, then each planet's sign, degree and
+ * house. Nakshatra shows on D1 only, where the star is the planet's own.
+ */
+function DivisionPlanetsTable({ division }: { division: number }) {
+  const {
+    state: { result },
+  } = useChartSession();
+  if (!result) {
+    return null;
+  }
+  const divisionData = result.divisions.find(
+    (entry) => entry.division === division,
+  );
+  if (!divisionData) {
+    return null;
+  }
+  const isD1 = division === 1;
+  const lagnaHouse = divisionData.houses.find((house) => house.number === 1);
+  const lagna = {
+    sign: isD1 ? result.lagna.sign : (lagnaHouse?.sign ?? result.lagna.sign),
+    longitude: isD1 ? result.lagna.longitude : (lagnaHouse?.cusp ?? null),
+  };
+  const placements = [...divisionData.placements].sort(
+    (a, b) => bodyRank(a.body) - bodyRank(b.body),
+  );
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Planet</TableHead>
+          <TableHead>Sign</TableHead>
+          <TableHead>Degree</TableHead>
+          {isD1 ? <TableHead>Nakshatra</TableHead> : null}
+          <TableHead>House</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody tone="muted">
+        <TableRow>
+          <TableCell tone="default">Lagna</TableCell>
+          <TableCell>{lagna.sign}</TableCell>
+          <TableCell className="tabular-nums">
+            {formatLongitude(lagna.longitude) || "-"}
+          </TableCell>
+          {isD1 ? <TableCell>-</TableCell> : null}
+          <TableCell className="tabular-nums">1</TableCell>
+        </TableRow>
+        {placements.map((placement) => (
+          <TableRow key={placement.body}>
+            <TableCell tone="default">
+              {placement.body}
+              {placement.state === "Retrograde" ? (
+                <span className="text-muted-foreground ms-1" title="Retrograde">
+                  (R)
+                </span>
+              ) : null}
+            </TableCell>
+            <TableCell>{placement.sign}</TableCell>
+            <TableCell className="tabular-nums">
+              {formatLongitude(placement.longitude) || "-"}
+            </TableCell>
+            {isD1 ? (
+              <TableCell>
+                {placement.star === "" ? "-" : placement.star}
+                {placement.pada ? (
+                  <span className="text-muted-foreground">
+                    {" "}
+                    · {placement.pada}
+                  </span>
+                ) : null}
+              </TableCell>
+            ) : null}
+            <TableCell className="tabular-nums">
+              {placement.house > 0 ? placement.house : "-"}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+/** Chart and its table side by side on wide screens, stacked below. */
+function DivisionPanel({ division }: { division: number }) {
+  return (
+    <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+      <SignHouseChart division={division} />
+      <DivisionPlanetsTable division={division} />
+    </div>
+  );
+}
+
+const BIRTH_CAPTIONS = {
+  d1: "D1 is your chart as the sky was at the moment of birth. Every other division in this report zooms into it, so start here for the whole picture: where each planet sat, and the sign that was rising on your eastern horizon.",
+  d9: "D9 is the chart of what ripens underneath the surface. Astrologers read it for marriage and for the true strength of a planet, since a planet that looks powerful in D1 but sits poorly here delivers less in real life.",
+};
+
+/** Rashi and Navamsha tabs. `captions` swaps the birth-chart copy for another context. */
+export function ChartSignHouseCharts({
+  captions = BIRTH_CAPTIONS,
+}: {
+  captions?: { d1: string; d9: string };
+} = {}) {
   return (
     <Tabs defaultValue="D1">
-      <TabsList containerClassName="max-w-full self-start">
+      <TabsList variant="line" containerClassName="max-w-full self-start">
         <TabsTrigger value="D1">D1 · Rashi</TabsTrigger>
         <TabsTrigger value="D9">D9 · Navamsha</TabsTrigger>
       </TabsList>
       <TabsContent value="D1" className="flex flex-col gap-4">
-        <ChartQuote>
-          D1 is your chart as the sky was at the moment of birth. Every other
-          division in this report zooms into it, so start here for the whole
-          picture: where each planet sat, and the sign that was rising on your
-          eastern horizon.
-        </ChartQuote>
-        <SignHouseChart division={1} />
+        <ChartQuote>{captions.d1}</ChartQuote>
+        <DivisionPanel division={1} />
       </TabsContent>
       <TabsContent value="D9" className="flex flex-col gap-4">
-        <ChartQuote>
-          D9 is the chart of what ripens underneath the surface. Astrologers
-          read it for marriage and for the true strength of a planet, since a
-          planet that looks powerful in D1 but sits poorly here delivers less in
-          real life.
-        </ChartQuote>
-        <SignHouseChart division={9} />
+        <ChartQuote>{captions.d9}</ChartQuote>
+        <DivisionPanel division={9} />
       </TabsContent>
     </Tabs>
   );

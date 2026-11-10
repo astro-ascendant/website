@@ -102,10 +102,13 @@ export function TabsList({
   className,
   containerClassName,
   fill,
+  variant = "segmented",
   ...props
 }: ComponentPropsWithoutRef<typeof TabsPrimitive.List> & {
   containerClassName?: string;
   fill?: boolean;
+  /** `line`: bare labels on a hairline rule, with a gliding underline. */
+  variant?: "segmented" | "line";
 }) {
   const { active } = useContext(TabsContext);
   const reduced = useReducedMotion();
@@ -193,6 +196,7 @@ export function TabsList({
         .filter(Boolean)
         .join(" ")}
       data-fill={fill ? "true" : undefined}
+      data-variant={variant}
       data-overflow={edges.overflow}
       data-left={edges.left}
       data-right={edges.right}

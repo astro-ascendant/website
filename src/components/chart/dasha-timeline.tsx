@@ -151,7 +151,7 @@ export function ChartDashaTimelines() {
   ];
   return (
     <Tabs defaultValue="Vimshottari">
-      <TabsList containerClassName="max-w-full self-start">
+      <TabsList variant="line" containerClassName="max-w-full self-start">
         {systems.map((system) => (
           <TabsTrigger key={system.name} value={system.name}>
             {system.name}

@@ -192,11 +192,11 @@ export function buildHeadlineView(
 
   return {
     ascendant: `${lagna.sign} ${formatLongitude(lagna.longitude)}`,
-    moon: moon ? `${moon.sign} ${formatLongitude(moon.longitude)}` : "—",
+    moon: moon ? `${moon.sign} ${formatLongitude(moon.longitude)}` : "-",
     star:
       moon && moon.star !== ""
         ? `${moon.star}${moon.pada ? ` · Pada ${moon.pada}` : ""}`
-        : "—",
-    mahadasha: currentDasha ? currentDasha.mahadasha : "—",
+        : "-",
+    mahadasha: currentDasha ? currentDasha.mahadasha : "-",
   };
 }

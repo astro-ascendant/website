@@ -1,7 +1,6 @@
 import {
   ChartCalculateButton,
   ChartDateField,
-  ChartFormFrame,
   ChartNameField,
   ChartPlaceField,
   ChartSexField,
@@ -13,7 +12,6 @@ import { ChartProvider } from "@/components/chart/session";
 /** The chart's parts as one namespace: `<Chart.Provider>`, `<Chart.NameField>`, … */
 export const Chart = {
   Provider: ChartProvider,
-  FormFrame: ChartFormFrame,
   DateField: ChartDateField,
   NameField: ChartNameField,
   TimeField: ChartTimeField,
