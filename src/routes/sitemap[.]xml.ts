@@ -6,7 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
  * Generated so the sitemap cannot drift from the content tree. Every entry is
  * a canonical, indexable URL on the origin that actually serves this site.
  */
-const staticPaths = ["/", "/chart", "/docs"] as const;
+const staticPaths = ["/", "/chart", "/sky", "/docs"] as const;
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {

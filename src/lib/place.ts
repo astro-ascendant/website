@@ -70,3 +70,43 @@ export async function searchPlaces(
         Number.isFinite(entry.latitude) && Number.isFinite(entry.longitude),
     );
 }
+
+interface NominatimReverse {
+  display_name?: string;
+  address?: NominatimAddress;
+}
+
+/**
+ * The place name for a point, e.g. "Chennai, Tamil Nadu, India", or null when
+ * the lookup finds nothing. Callers pass coordinates already rounded to the
+ * precision they are willing to share.
+ */
+export async function reversePlace(
+  latitude: number,
+  longitude: number,
+  signal?: AbortSignal,
+): Promise<string | null> {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&addressdetails=1&lat=${latitude}&lon=${longitude}`,
+    { headers: { Accept: "application/json" }, signal },
+  );
+  if (!response.ok) {
+    throw new Error("Place lookup failed.");
+  }
+  const data = (await response.json()) as NominatimReverse;
+  const address = data.address;
+  const name =
+    address?.city ??
+    address?.town ??
+    address?.village ??
+    address?.hamlet ??
+    address?.suburb ??
+    address?.name;
+  const parts = [name, address?.state, address?.country].filter(
+    (part): part is string => typeof part === "string" && part !== "",
+  );
+  if (parts.length > 0) {
+    return parts.join(", ");
+  }
+  return data.display_name ?? null;
+}
