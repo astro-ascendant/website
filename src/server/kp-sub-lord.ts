@@ -1,11 +1,12 @@
 import { normalizeLongitude } from "@/lib/zodiac";
 
 /**
- * KP sub-lord of a sidereal longitude. astro-ascendant computes this for
- * house cusps (`house.subLord`) but does not export it for planets, so the
- * same division runs here: each nakshatra is split into nine subs in
+ * KP sub and sub-sub lords of a sidereal longitude. astro-ascendant computes
+ * these for house cusps (`house.subLord`, `house.subSubLord`) but does not
+ * export them for planets, so the same division runs here: each nakshatra is split into nine subs in
  * Vimshottari order, starting from the star lord, sized by dasha years.
- * The tests hold this to the library's cusp sub-lords.
+ * Each sub splits the same way again for the sub-sub lord. The tests hold
+ * both to the library's cusp values.
  */
 const NAKSHATRA_SPAN = 360 / 27;
 
@@ -21,18 +22,45 @@ const VIMSHOTTARI_CYCLE = [
   ["Mercury", 17],
 ] as const;
 
-export function kpSubLordOf(longitude: number): string {
-  const position = normalizeLongitude(longitude);
-  const star = Math.floor(position / NAKSHATRA_SPAN);
-  const elapsed = (position % NAKSHATRA_SPAN) / NAKSHATRA_SPAN;
+/**
+ * Splits a span into nine parts in Vimshottari order, starting from the lord
+ * at `first`, each sized by its dasha years. Returns the lord whose part holds
+ * `elapsed` (0..1 through the span) and how far through that part it sits.
+ */
+function divide(
+  first: number,
+  elapsed: number,
+): { index: number; elapsed: number } {
   let edge = 0;
   for (let offset = 0; offset < VIMSHOTTARI_CYCLE.length; offset += 1) {
-    const [lord, years] =
-      VIMSHOTTARI_CYCLE[(star + offset) % VIMSHOTTARI_CYCLE.length];
-    edge += years / 120;
-    if (elapsed < edge) {
-      return lord;
+    const index = (first + offset) % VIMSHOTTARI_CYCLE.length;
+    const share = VIMSHOTTARI_CYCLE[index][1] / 120;
+    if (elapsed < edge + share) {
+      return { index, elapsed: (elapsed - edge) / share };
     }
+    edge += share;
   }
-  return VIMSHOTTARI_CYCLE[(star + 8) % VIMSHOTTARI_CYCLE.length][0];
+  return { index: (first + 8) % VIMSHOTTARI_CYCLE.length, elapsed: 1 };
+}
+
+/** Sub and sub-sub lords of a sidereal longitude, as KP divides a nakshatra. */
+export function kpLordsOf(longitude: number): {
+  subLord: string;
+  subSubLord: string;
+} {
+  const position = normalizeLongitude(longitude);
+  const star = Math.floor(position / NAKSHATRA_SPAN);
+  const sub = divide(
+    star % VIMSHOTTARI_CYCLE.length,
+    (position % NAKSHATRA_SPAN) / NAKSHATRA_SPAN,
+  );
+  const subSub = divide(sub.index, sub.elapsed);
+  return {
+    subLord: VIMSHOTTARI_CYCLE[sub.index][0],
+    subSubLord: VIMSHOTTARI_CYCLE[subSub.index][0],
+  };
+}
+
+export function kpSubLordOf(longitude: number): string {
+  return kpLordsOf(longitude).subLord;
 }

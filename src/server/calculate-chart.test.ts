@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { kpSubLordOf } from "./kp-sub-lord";
+import { kpLordsOf, kpSubLordOf } from "./kp-sub-lord";
 import { castChart, TEST_BIRTHS } from "./test-charts";
 
 const results = await Promise.all(TEST_BIRTHS.map(castChart));
@@ -60,6 +60,14 @@ describe("calculateChart", () => {
     for (const result of results) {
       for (const cusp of result.kp.cusps) {
         expect(kpSubLordOf(cusp.longitude ?? 0)).toBe(cusp.subLord);
+      }
+    }
+  });
+
+  test("planet sub-sub lords use the same division as the library's cusp sub-sub lords", () => {
+    for (const result of results) {
+      for (const cusp of result.kp.cusps) {
+        expect(kpLordsOf(cusp.longitude ?? 0).subSubLord).toBe(cusp.subSubLord);
       }
     }
   });

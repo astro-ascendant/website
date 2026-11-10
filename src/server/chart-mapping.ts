@@ -19,7 +19,7 @@ import type {
 } from "@/lib/chart";
 import { SIGNS } from "@/lib/zodiac";
 import type { CalculateChartInput } from "./calculate-chart";
-import { kpSubLordOf } from "./kp-sub-lord";
+import { kpLordsOf } from "./kp-sub-lord";
 
 export const HOUSES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
@@ -328,6 +328,7 @@ function readKpChart(
       signLord: lagnaHouse.signLord,
       starLord: lagnaHouse.starLord,
       subLord: lagnaHouse.subLord,
+      subSubLord: lagnaHouse.subSubLord,
       signifyingHouses: signifyingHousesOf(
         planetSignification(d1, lagnaHouse.subLord),
       ),
@@ -337,6 +338,7 @@ function readKpChart(
   for (const name of PLANET_ORDER) {
     const entry = placed.get(name);
     const planet = entry?.planet;
+    const lords = planet === undefined ? null : kpLordsOf(planet.longitude);
     rows.push({
       name,
       sign: planet?.sign.name ?? "",
@@ -345,7 +347,8 @@ function readKpChart(
       retrograde: planet?.is_retrograde ?? false,
       signLord: planet?.sign.lord ?? "",
       starLord: sourceByName.get(name)?.star.lord ?? "",
-      subLord: planet === undefined ? "" : kpSubLordOf(planet.longitude),
+      subLord: lords?.subLord ?? "",
+      subSubLord: lords?.subSubLord ?? "",
       signifyingHouses: signifyingHousesOf(planetSignification(d1, name)),
     });
   }

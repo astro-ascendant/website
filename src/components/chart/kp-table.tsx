@@ -55,21 +55,21 @@ export function ChartKpCuspTable() {
           {result.kp.cusps.map((cusp) => (
             <TableRow key={cusp.house}>
               <TableCell>{cusp.house}</TableCell>
-              <TableCell>{cusp.sign === "" ? "—" : cusp.sign}</TableCell>
+              <TableCell>{cusp.sign === "" ? "-" : cusp.sign}</TableCell>
               <TableCell>
                 {cusp.longitude === null
-                  ? "—"
+                  ? "-"
                   : formatLongitude(cusp.longitude)}
               </TableCell>
               <TableCell>
-                {cusp.signLord === "" ? "—" : cusp.signLord}
+                {cusp.signLord === "" ? "-" : cusp.signLord}
               </TableCell>
               <TableCell>
-                {cusp.starLord === "" ? "—" : cusp.starLord}
+                {cusp.starLord === "" ? "-" : cusp.starLord}
               </TableCell>
-              <TableCell>{cusp.subLord === "" ? "—" : cusp.subLord}</TableCell>
+              <TableCell>{cusp.subLord === "" ? "-" : cusp.subLord}</TableCell>
               <TableCell>
-                {cusp.subSubLord === "" ? "—" : cusp.subSubLord}
+                {cusp.subSubLord === "" ? "-" : cusp.subSubLord}
               </TableCell>
             </TableRow>
           ))}
@@ -95,6 +95,7 @@ export function ChartKpTable() {
             <TableHead>Sign Lord</TableHead>
             <TableHead>Star Lord</TableHead>
             <TableHead>Sub Lord</TableHead>
+            <TableHead>Sub-Sub Lord</TableHead>
             <TableHead>Signifying Houses</TableHead>
           </TableRow>
         </TableHeader>
@@ -102,9 +103,12 @@ export function ChartKpTable() {
           {result.kp.rows.map((row) => (
             <TableRow key={row.name}>
               <TableCell>{row.name}</TableCell>
-              <TableCell>{row.signLord === "" ? "—" : row.signLord}</TableCell>
-              <TableCell>{row.starLord === "" ? "—" : row.starLord}</TableCell>
-              <TableCell>{row.subLord === "" ? "—" : row.subLord}</TableCell>
+              <TableCell>{row.signLord === "" ? "-" : row.signLord}</TableCell>
+              <TableCell>{row.starLord === "" ? "-" : row.starLord}</TableCell>
+              <TableCell>{row.subLord === "" ? "-" : row.subLord}</TableCell>
+              <TableCell>
+                {row.subSubLord === "" ? "-" : row.subSubLord}
+              </TableCell>
               <TableCell>
                 {formatSignifyingHouses(row.signifyingHouses)}
               </TableCell>

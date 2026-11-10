@@ -12,7 +12,7 @@ import { formatLongitude, signShortName } from "./zodiac";
  * the prompt takes `now` to pick the running antardasha.
  */
 export function formatSignifyingHouses(houses: readonly number[]): string {
-  return houses.length === 0 ? "—" : houses.join(", ");
+  return houses.length === 0 ? "-" : houses.join(", ");
 }
 
 function toPlacementRows(
@@ -151,11 +151,13 @@ export function buildChartMarkdown(result: ChartResult): string {
   lines.push(`- Ayanamsa: ${result.kp.astroParams.ayanamsa}`);
   lines.push(`- House system: ${result.kp.astroParams.houseSystem}`);
   lines.push("");
-  lines.push("| Body | Sign Lord | Star Lord | Sub Lord | Signifying Houses |");
-  lines.push("| --- | --- | --- | --- | --- |");
+  lines.push(
+    "| Body | Sign Lord | Star Lord | Sub Lord | Sub-Sub Lord | Signifying Houses |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- |");
   for (const row of result.kp.rows) {
     lines.push(
-      `| ${row.name} | ${row.signLord} | ${row.starLord} | ${row.subLord} | ${formatSignifyingHouses(row.signifyingHouses)} |`,
+      `| ${row.name} | ${row.signLord} | ${row.starLord} | ${row.subLord} | ${row.subSubLord} | ${formatSignifyingHouses(row.signifyingHouses)} |`,
     );
   }
   lines.push("", "### KP House Cusps", "");
@@ -273,14 +275,16 @@ function buildChartPrompt(result: ChartResult, now: string): string {
         "Sign Lord",
         "Star Lord",
         "Sub Lord",
+        "Sub-Sub Lord",
         "Signifying Houses",
       ],
       result.kp.rows.map((row) => [
         row.name,
-        row.house === null ? "—" : String(row.house),
+        row.house === null ? "-" : String(row.house),
         row.signLord,
         row.starLord,
         row.subLord,
+        row.subSubLord,
         formatSignifyingHouses(row.signifyingHouses),
       ]),
     ),

@@ -99,6 +99,7 @@ export interface KpSignificatorRow {
   signLord: string;
   starLord: string;
   subLord: string;
+  subSubLord: string;
   signifyingHouses: number[];
 }
 
