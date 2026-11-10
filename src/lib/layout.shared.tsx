@@ -1,18 +1,12 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { gitConfig } from "./shared";
-import wordmark from "../../assets/wordmark.webp";
+import { BrandWordmark } from "@/components/brand-wordmark";
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       title: (
-        <img
-          src={wordmark}
-          alt="Ascendant"
-          width={973}
-          height={200}
-          className="h-6 w-auto"
-        />
+        <BrandWordmark className="h-8" />
       ),
     },
     githubUrl: `https://github.com/${gitConfig.user}`,

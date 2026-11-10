@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/wordmark.webp" alt="Ascendant" width="360" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/wordmark-white.svg" />
+    <img src="assets/brand/wordmark.svg" alt="Ascendant" width="360" />
+  </picture>
 </p>
 
 This site is the TypeScript documentation for Ascendant: a library for sidereal

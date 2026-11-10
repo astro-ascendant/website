@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckIcon, CopyIcon, GithubLogoIcon } from "@phosphor-icons/react";
-import wordmark from "../../assets/wordmark.webp";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import animatedSignature from "../../assets/sign-animated.svg";
 import {
   Dialog,
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
   head: () => ({
     meta: [
-      { title: "About - Ascendant" },
+      { title: "Ascendant - About" },
       {
         name: "description",
         content:
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/about")({
       },
       {
         property: "og:title",
-        content: "About - Ascendant",
+        content: "Ascendant - About",
       },
       {
         property: "og:description",
@@ -59,13 +59,7 @@ function AboutPage() {
             aria-label="Ascendant home"
             className="inline-block transition-opacity duration-150 ease-out hover:opacity-80 active:scale-[0.98]"
           >
-            <img
-              src={wordmark}
-              alt="Ascendant"
-              width={973}
-              height={200}
-              className="h-7 w-auto sm:h-8"
-            />
+            <BrandWordmark className="h-9 sm:h-11" />
           </Link>
           <p className="text-xs text-muted-foreground sm:text-sm">
             Modern Developer Ecosystem for Astrology

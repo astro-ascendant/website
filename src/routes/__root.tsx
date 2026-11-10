@@ -6,12 +6,8 @@ import {
 } from "@tanstack/react-router";
 import appCss from "@/styles/app.css?url";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
-import { Banner } from "fumadocs-ui/components/banner";
-import { ArrowRightIcon } from "@phosphor-icons/react";
-import favicon from "../../assets/favicon.png";
-import { gitConfig, siteUrl } from "@/lib/shared";
-
-const changelogUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/CHANGELOG.md`;
+import favicon from "../../assets/brand/favicon.svg";
+import { siteUrl } from "@/lib/shared";
 
 export const Route = createRootRoute({
   head: ({ matches }) => {
@@ -74,7 +70,7 @@ export const Route = createRootRoute({
       links: [
         { rel: "canonical", href: canonical },
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", type: "image/png", href: favicon },
+        { rel: "icon", type: "image/svg+xml", href: favicon },
       ],
     };
   },
@@ -89,32 +85,6 @@ function RootComponent() {
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider>
-          <Banner
-            id="astro-ascendant-v5-rainbow"
-            variant="rainbow"
-            rainbowColors={[
-              "rgba(76,0,255,0.55)",
-              "rgba(180,60,255,0.6)",
-              "rgba(0,200,255,0.55)",
-              "rgba(90,80,255,0.5)",
-            ]}
-            className="banner group h-auto! min-h-[3rem] px-4 py-2 pe-10 text-center text-xs leading-snug font-medium text-balance sm:text-[13px]"
-          >
-            <a
-              href={changelogUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="astro-ascendant 6.1 is here: read the changelog"
-              className="absolute inset-0"
-            />
-            <span aria-hidden="true" className="banner-line" />
-            <span className="pointer-events-none flex flex-1 items-center justify-center gap-2">
-              <span>
-                <span className="font-mono">astro-ascendant</span> 6.1 is here
-              </span>
-              <ArrowRightIcon size={16} className="banner-arrow shrink-0" />
-            </span>
-          </Banner>
           <Outlet />
         </RootProvider>
         <Scripts />
