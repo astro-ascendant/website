@@ -286,7 +286,7 @@ function LandingPage() {
             Enter a birth date, time, and place. It is free, with nothing
             to install.
           </p>
-          <ArrowLink to="/chart" className="mt-8">
+          <ArrowLink to="/chart" className="mt-8 w-full sm:w-auto">
             Create horoscope
           </ArrowLink>
         </section>

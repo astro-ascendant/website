@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckIcon, CopyIcon, GithubLogoIcon } from "@phosphor-icons/react";
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import { BrandWordmark } from "@/components/brand-wordmark";
+import { GithubDark } from "@/components/ui/svgs/githubDark";
+import { GithubLight } from "@/components/ui/svgs/githubLight";
 import animatedSignature from "../../assets/sign-animated.svg";
 import {
   Dialog,
@@ -274,7 +276,11 @@ function AboutPage() {
               title="GitHub: astro-ascendant"
               className="opacity-70 transition-opacity hover:opacity-100"
             >
-              <GithubLogoIcon size={18} />
+              <GithubLight aria-hidden="true" className="size-4.5 dark:hidden" />
+              <GithubDark
+                aria-hidden="true"
+                className="hidden size-4.5 dark:block"
+              />
             </a>
           </div>
         </div>
