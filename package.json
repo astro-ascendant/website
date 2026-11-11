@@ -64,9 +64,5 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
-  },
-  "patchedDependencies": {
-    "env-runner@0.2.1": "patches/env-runner@0.2.1.patch",
-    "nf3@0.3.24": "patches/nf3@0.3.24.patch"
   }
 }
