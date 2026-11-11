@@ -181,8 +181,8 @@ function LandingPage() {
               generate your full horoscope.
             </p>
             <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-              <ArrowLink to="/chart">Create horoscope</ArrowLink>
-              <BaseLink to="/docs/$" params={{ _splat: "" }} variant="secondary" size="lg">
+              <ArrowLink to="/chart" className="w-full sm:w-auto">Create horoscope</ArrowLink>
+              <BaseLink to="/docs/$" params={{ _splat: "" }} variant="secondary" size="lg" className="w-full sm:w-auto">
                 Read the docs
               </BaseLink>
             </div>

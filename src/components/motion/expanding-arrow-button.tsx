@@ -89,7 +89,7 @@ export const ExpandingArrowButton = forwardRef<
   };
 
   const handleFocus = (event: FocusEvent<HTMLAnchorElement>) => {
-    setFocused(true);
+    setFocused(event.currentTarget.matches(":focus-visible"));
     onFocus?.(event);
   };
 
@@ -108,7 +108,7 @@ export const ExpandingArrowButton = forwardRef<
       whileTap={reduce ? undefined : { scale: 0.97 }}
       transition={SPRING_PRESS}
       className={cn(
-        "bg-muted text-foreground relative inline-flex h-12 items-center overflow-hidden rounded-lg p-1 select-none",
+        "bg-muted text-foreground relative inline-flex h-12 touch-manipulation items-center justify-center overflow-hidden rounded-lg p-1 select-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]",
         "focus-visible:ring-(--focus-ring) focus-visible:ring-offset-background outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         className,
       )}

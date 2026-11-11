@@ -112,7 +112,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         transition={SPRING_PRESS}
         onPointerDown={handlePointerDown}
         className={cn(
-          "inline-flex items-center justify-center font-medium select-none",
+          "inline-flex touch-manipulation items-center justify-center font-medium select-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]",
           "transition-colors",
           "disabled:pointer-events-none disabled:opacity-50",
           ripple && "relative overflow-hidden",
@@ -177,7 +177,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
         whileHover={reduce || !canHover ? undefined : { scale: 1.02 }}
         transition={SPRING_PRESS}
         className={cn(
-          "inline-flex items-center justify-center font-medium select-none",
+          "inline-flex touch-manipulation items-center justify-center font-medium select-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]",
           "transition-colors",
           VARIANT_CLASS[variant],
           SIZE_CLASS[size],

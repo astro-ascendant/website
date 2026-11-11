@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { Dialog } from "@base-ui/react/dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
@@ -115,15 +117,22 @@ function HoroscopeMenu() {
 
 /** Opens the docs search dialog the root provider already mounts. */
 function SearchButton() {
-  const { enabled, hotKey, setOpenSearch } = useSearchContext();
+  const { enabled, hotKey, setOpenSearch, dialogHandle } = useSearchContext();
   if (!enabled) {
     return null;
   }
+  const openSearch = () => {
+    // Keep focus inside the tap event: iOS won't open the keyboard from
+    // the dialog's deferred autofocus alone.
+    flushSync(() => setOpenSearch(true));
+    document.querySelector<HTMLInputElement>("[data-fd-search-dialog-input]")?.focus({ preventScroll: true });
+  };
   return (
     <>
-      <button
+      <Dialog.Trigger
+        handle={dialogHandle}
         type="button"
-        onClick={() => setOpenSearch(true)}
+        onClick={openSearch}
         className="border-border/70 bg-card/60 text-muted-foreground hover:text-foreground hidden h-9 w-56 items-center gap-2 rounded-lg border px-3 text-sm transition-colors duration-150 ease-out md:inline-flex lg:w-36 xl:w-72"
       >
         <MagnifyingGlassIcon aria-hidden="true" className="size-4" />
@@ -139,15 +148,16 @@ function SearchButton() {
             </kbd>
           ))}
         </span>
-      </button>
-      <button
+      </Dialog.Trigger>
+      <Dialog.Trigger
+        handle={dialogHandle}
         type="button"
         aria-label="Search docs"
-        onClick={() => setOpenSearch(true)}
+        onClick={openSearch}
         className={`${iconButtonClassName} md:hidden`}
       >
         <MagnifyingGlassIcon aria-hidden="true" className="size-5" />
-      </button>
+      </Dialog.Trigger>
     </>
   );
 }

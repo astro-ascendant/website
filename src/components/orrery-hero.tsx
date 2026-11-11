@@ -2,6 +2,7 @@ import { useHydrated } from "@tanstack/react-router";
 import { motion, useAnimationFrame, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import { EASE_OUT } from "../lib/ease";
+import { useHoverCapable } from "../lib/hooks/use-hover-capable";
 import {
   geocentricSidereal,
   GRAHAS,
@@ -155,6 +156,7 @@ export function OrreryHero() {
   // the client; the bezel and orbits are static and render on the server.
   const hydrated = useHydrated();
   const time = useSkyTime();
+  const canHover = useHoverCapable();
   const [hovered, setHovered] = useState<Body | null>(null);
 
   return (
@@ -294,7 +296,7 @@ export function OrreryHero() {
             })}
 
             {/* Sight line from Earth to the hovered body's sign */}
-            {hovered &&
+            {canHover && hovered &&
               (() => {
                 const [ex, ey] = polar(heliocentricSidereal("earth", time), PLANETS.earth.orbit);
                 const [sx, sy] = polar(
@@ -321,7 +323,9 @@ export function OrreryHero() {
               <g
                 key={planet}
                 transform={translate(heliocentricSidereal(planet, time), PLANETS[planet].orbit)}
-                onPointerEnter={() => setHovered(planet)}
+                onPointerEnter={(event) => {
+                  if (canHover && event.pointerType !== "touch") setHovered(planet);
+                }}
               >
                 <circle r={PLANETS[planet].size + 4} fill="transparent" />
                 <PlanetBody planet={planet} />
@@ -338,7 +342,7 @@ export function OrreryHero() {
                       transform={translate(geocentricSidereal("Moon", time), MOON.orbit)}
                       onPointerEnter={(event) => {
                         event.stopPropagation();
-                        setHovered("moon");
+                        if (canHover && event.pointerType !== "touch") setHovered("moon");
                       }}
                     >
                       <circle r={2.6} fill="transparent" />
