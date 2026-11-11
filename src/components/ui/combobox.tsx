@@ -4,7 +4,7 @@ import * as React from "react";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import { cn } from "cn";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import {
   InputGroup,
   InputGroupAddon,
@@ -68,13 +68,11 @@ function ComboboxInput({
       />
       <InputGroupAddon align="inline-end">
         {showTrigger && (
-          <InputGroupButton
-            size="icon-xs"
-            variant="ghost"
-            render={<ComboboxTrigger />}
+          <ComboboxTrigger
+            render={<InputGroupButton size="icon-xs" variant="ghost" />}
             data-slot="input-group-button"
             aria-label="Show suggestions"
-            className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
+            className="group-has-data-[slot=combobox-clear]/input-group:hidden! data-pressed:bg-transparent!"
             disabled={disabled}
           />
         )}

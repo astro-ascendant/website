@@ -8,7 +8,12 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
-import type { ButtonHTMLAttributes, ReactNode, Ref, RefObject } from "react";
+import type {
+  ButtonHTMLAttributes,
+  ReactNode,
+  Ref,
+  RefObject,
+} from "react";
 import {
   AnimatePresence,
   animate,
@@ -22,7 +27,8 @@ import { motionTokens } from "../lib/motion-tokens";
 import styles from "./button.module.css";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-export type ButtonSize = "sm" | "md" | "lg";
+/** The icon sizes are square, for a lone icon with an aria-label. */
+export type ButtonSize = "sm" | "md" | "lg" | "icon-xs" | "icon-sm" | "icon";
 
 export interface ButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
@@ -33,9 +39,20 @@ export interface ButtonProps extends Omit<
   loading?: boolean;
 }
 
+/** The button's classes, for markup a library renders itself (a date picker's month arrows, say). */
+export function buttonClassName({
+  variant = "primary",
+  size = "md",
+  className,
+}: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
+  return [styles.button, styles[variant], styles[size], className]
+    .filter(Boolean)
+    .join(" ");
+}
+
 /** Icon buttons press a little deeper, wide buttons a little less, so every size reads as the same push. */
 const pressVariants: Variants = {
-  pressed: (button: RefObject<HTMLButtonElement | null>) => {
+  pressed: (button: RefObject<HTMLElement | null>) => {
     const width = button.current?.offsetWidth ?? 0;
     return {
       scale: width > 220 ? 0.985 : width && width <= 48 ? 0.96 : 0.97,
@@ -238,9 +255,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading ||
       props["aria-disabled"] === true ||
       props["aria-disabled"] === "true";
-    const classes = [styles.button, styles[variant], styles[size], className]
-      .filter(Boolean)
-      .join(" ");
+    const classes = buttonClassName({ variant, size, className });
 
     return (
       <motion.button

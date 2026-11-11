@@ -144,6 +144,35 @@
   padding-inline: var(--space-5);
   font-size: var(--text-sm);
 }
+/* Square sizes for a lone icon. */
+.icon-xs,
+.icon-sm,
+.icon {
+  padding: 0;
+}
+.icon-xs {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-height: 1.5rem;
+}
+.icon-sm {
+  width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+}
+.icon {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+}
+/* Icons take 1rem unless they size themselves; the smallest button takes .75rem. */
+.labelPhase svg:not([class*="size-"]) {
+  width: 1rem;
+  height: 1rem;
+}
+.icon-xs .labelPhase svg:not([class*="size-"]) {
+  width: 0.75rem;
+  height: 0.75rem;
+}
 .loader {
   position: absolute;
   left: 50%;

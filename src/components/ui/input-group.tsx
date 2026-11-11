@@ -2,7 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -61,22 +61,16 @@ function InputGroupAddon({
   );
 }
 
-const inputGroupButtonVariants = cva(
-  "flex items-center gap-2 rounded-md text-sm shadow-none",
-  {
-    variants: {
-      size: {
-        xs: "h-6 gap-1 rounded-md px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
-        sm: "",
-        "icon-xs": "size-6 rounded-md p-0 has-[>svg]:p-0",
-        "icon-sm": "size-8 p-0 has-[>svg]:p-0",
-      },
-    },
-    defaultVariants: {
-      size: "xs",
-    },
-  },
-);
+/** Buttons inside the field are smaller than standalone ones. */
+const INPUT_GROUP_BUTTON_SIZE = {
+  xs: { size: "sm", className: "min-h-6! gap-1! px-1.5!" },
+  sm: { size: "sm", className: "" },
+  "icon-xs": { size: "icon-xs", className: "" },
+  "icon-sm": { size: "icon-sm", className: "" },
+} as const satisfies Record<
+  string,
+  { size: React.ComponentProps<typeof Button>["size"]; className: string }
+>;
 
 function InputGroupButton({
   className,
@@ -84,16 +78,18 @@ function InputGroupButton({
   variant = "ghost",
   size = "xs",
   ...props
-}: Omit<React.ComponentProps<typeof Button>, "size" | "type"> &
-  VariantProps<typeof inputGroupButtonVariants> & {
-    type?: "button" | "submit" | "reset";
-  }) {
+}: Omit<React.ComponentProps<typeof Button>, "size" | "type"> & {
+  size?: keyof typeof INPUT_GROUP_BUTTON_SIZE;
+  type?: "button" | "submit" | "reset";
+}) {
+  const mapped = INPUT_GROUP_BUTTON_SIZE[size];
   return (
     <Button
       type={type}
       data-size={size}
       variant={variant}
-      className={cn(inputGroupButtonVariants({ size }), className)}
+      size={mapped.size}
+      className={cn(mapped.className, className)}
       {...props}
     />
   );

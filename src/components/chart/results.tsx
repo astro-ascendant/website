@@ -1,6 +1,6 @@
 import { WarningCircleIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -84,7 +84,7 @@ export function ChartFailure({
               type="button"
               variant="ghost"
               size="sm"
-              className="text-foreground"
+              className="text-foreground!"
               onClick={onEditDetails}
             >
               Edit details

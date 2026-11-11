@@ -35,7 +35,7 @@ import {
   SiteFrame,
   SiteHeader,
 } from "@/components/site-frame";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import {
   Dialog,
   DialogContent,
@@ -503,7 +503,7 @@ function SkyContent() {
                 type="button"
                 variant="secondary"
                 aria-label="Change place"
-                className="size-9 px-0 sm:h-9 sm:w-auto sm:px-3"
+                className="max-sm:size-9 max-sm:px-0!"
                 disabled={loading}
                 onClick={() => {
                   setLocationError("");

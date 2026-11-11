@@ -15,7 +15,7 @@ import {
   SiteHeader,
 } from "@/components/site-frame";
 import { useChartSession } from "@/components/chart/session";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { buildHeadlineView } from "@/lib/chart-view";
 import { formatTimeZoneLabel } from "@/lib/timezone";
@@ -246,7 +246,7 @@ export function ChartPage() {
                     type="button"
                     variant="secondary"
                     aria-label="Edit birth details"
-                    className="size-9 shrink-0 px-0 sm:h-9 sm:w-auto sm:px-3"
+                    className="shrink-0 max-sm:size-9 max-sm:px-0!"
                     onClick={() => setEditorOpen(true)}
                   >
                     <PencilSimpleIcon aria-hidden="true" />

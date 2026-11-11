@@ -2,7 +2,7 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { cn } from "cn";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/arc/button/button";
 import { XIcon } from "@phosphor-icons/react";
 
 function Drawer({ ...props }: DrawerPrimitive.Root.Props) {
@@ -71,7 +71,7 @@ function DrawerContent({
               render={
                 <Button
                   variant="ghost"
-                  className="absolute top-4 right-4 bg-secondary"
+                  className="absolute! top-4 right-4 bg-secondary!"
                   size="icon-sm"
                 />
               }
