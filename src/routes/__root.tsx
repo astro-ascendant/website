@@ -56,7 +56,19 @@ export const Route = createRootRoute({
         },
         {
           property: "og:image",
-          content: `${siteUrl}/solar-system.webp`,
+          content: `${siteUrl}/og.png`,
+        },
+        {
+          property: "og:image:width",
+          content: "1200",
+        },
+        {
+          property: "og:image:height",
+          content: "630",
+        },
+        {
+          property: "og:image:alt",
+          content: "Ascendant: Modern Developer Ecosystem for Astrology",
         },
         {
           name: "twitter:card",
@@ -64,7 +76,7 @@ export const Route = createRootRoute({
         },
         {
           name: "twitter:image",
-          content: `${siteUrl}/solar-system.webp`,
+          content: `${siteUrl}/og.png`,
         },
       ],
       links: [
