@@ -9,6 +9,7 @@ import {
   XIcon,
 } from "@phosphor-icons/react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
+import { ThemeSwitch } from "fumadocs-ui/layouts/shared/slots/theme-switch";
 import { GithubDark } from "@/components/ui/svgs/githubDark";
 import { GithubLight } from "@/components/ui/svgs/githubLight";
 import { changelogUrl, gitConfig, libraryVersion } from "@/lib/shared";
@@ -123,11 +124,12 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpenSearch(true)}
-        className="border-border/70 bg-card/60 text-muted-foreground hover:text-foreground hidden h-9 w-56 items-center gap-2 rounded-lg border px-3 text-sm transition-colors duration-150 ease-out md:inline-flex lg:w-44 xl:w-72"
+        className="border-border/70 bg-card/60 text-muted-foreground hover:text-foreground hidden h-9 w-56 items-center gap-2 rounded-lg border px-3 text-sm transition-colors duration-150 ease-out md:inline-flex lg:w-36 xl:w-72"
       >
         <MagnifyingGlassIcon aria-hidden="true" className="size-4" />
         Search
-        <span className="ms-auto inline-flex gap-0.5">
+        {/* Dropped at lg, where the nav links leave the bar little room. */}
+        <span className="ms-auto inline-flex gap-0.5 lg:max-xl:hidden">
           {hotKey.map((key, index) => (
             <kbd
               key={index}
@@ -203,7 +205,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 /**
- * Wordmark and section links on the left, search and GitHub on the right.
+ * Wordmark and section links on the left; search, GitHub and the theme
+ * toggle on the right.
  * Below the large breakpoint the links fold into a menu under the bar.
  */
 export function SiteHeader() {
@@ -240,6 +243,9 @@ export function SiteHeader() {
               className="hidden size-5 dark:block"
             />
           </a>
+          {/* Control radius to match the icon buttons; the items sit inside
+              the 4px padding and 1px border, so they take what is left. */}
+          <ThemeSwitch className="rounded-lg *:rounded-[calc(var(--radius)-5px)]" />
           <button
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}

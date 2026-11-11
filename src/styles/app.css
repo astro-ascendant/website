@@ -34,6 +34,9 @@
   --gray-12: oklch(0.244 0 95);
   --selection-highlight: oklch(0.9 0.17 105 / 0.58);
   --signal: oklch(0.62 0.17 45);
+  /* The wordmark colour (#874c48), for brand accents. */
+  --brand: oklch(0.485 0.081 24.6);
+  --brand-foreground: var(--gray-1);
 
   --background: var(--gray-1);
   --foreground: var(--gray-12);
@@ -156,6 +159,9 @@
   --gray-12: oklch(0.949 0 95);
   --selection-highlight: oklch(0.8 0.14 105 / 0.28);
   --signal: oklch(0.7 0.17 48);
+  /* Same hue and chroma, lifted to read on the dark page. */
+  --brand: oklch(0.7 0.081 24.6);
+  --brand-foreground: var(--gray-1);
 
   --background: var(--gray-1);
   --foreground: var(--gray-12);
@@ -286,6 +292,8 @@ body {
 
 @theme inline {
   --color-signal: var(--signal);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
   --color-paper: var(--paper);
   --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
   --font-heading: var(--font-sans);

@@ -8,6 +8,8 @@
   "ignoreIssues": {
     "src/components/ui/**": ["exports", "types", "duplicates"],
     "src/components/arc/**": ["exports", "types", "duplicates"],
+    "src/components/motion/**": ["exports", "types", "duplicates"],
+    "src/lib/ease.ts": ["exports"],
     "src/components/mdx.tsx": ["exports", "duplicates"]
   }
 }

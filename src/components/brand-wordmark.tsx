@@ -1,28 +1,25 @@
 import { cn } from "cn";
 import wordmark from "../../assets/brand/wordmark.svg";
-import wordmarkWhite from "../../assets/brand/wordmark-white.svg";
 
 /**
- * The Eastern Cusp wordmark: the thematic colour on light surfaces, white on
- * dark. Size it with a height class; the width follows the 390 × 110 artwork.
+ * The Eastern Cusp wordmark in the brand red. The artwork is used as a mask
+ * and painted with `--brand`, so one asset follows the theme: the logo's own
+ * #874c48 in light, lifted to the same hue in dark. Size it with a height
+ * class; the width follows the 390 × 110 artwork.
  */
 export function BrandWordmark({ className }: { className?: string }) {
   return (
-    <>
-      <img
-        src={wordmark}
-        alt="Ascendant"
-        width={390}
-        height={110}
-        className={cn("w-auto dark:hidden", className)}
-      />
-      <img
-        src={wordmarkWhite}
-        alt="Ascendant"
-        width={390}
-        height={110}
-        className={cn("hidden w-auto dark:block", className)}
-      />
-    </>
+    <span
+      role="img"
+      aria-label="Ascendant"
+      style={{
+        maskImage: `url("${wordmark}")`,
+        WebkitMaskImage: `url("${wordmark}")`,
+      }}
+      className={cn(
+        "bg-brand inline-block aspect-[390/110] mask-contain mask-no-repeat",
+        className,
+      )}
+    />
   );
 }

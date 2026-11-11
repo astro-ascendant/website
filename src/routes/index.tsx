@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, createLink, Link } from "@tanstack/react-router";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { OrreryHero } from "../components/orrery-hero";
-import { SpecularLink } from "../components/specular-link";
+import { ExpandingArrowButton } from "../components/motion/expanding-arrow-button";
+import { ButtonLink } from "../components/motion/button/base";
 import {
   gutterClassName,
   SiteFrame,
@@ -39,8 +40,9 @@ const INSTALL_COMMANDS = [
   { runtime: "Node", command: "npm install astro-ascendant effect" },
 ] as const;
 
-const secondaryButtonClassName =
-  "border-border bg-background text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-[background-color,transform] duration-150 ease-out active:scale-[0.96]";
+/** Router-aware versions: client navigation, preloading and typed routes. */
+const ArrowLink = createLink(ExpandingArrowButton);
+const BaseLink = createLink(ButtonLink);
 
 const cardClassName =
   "bg-background flex h-full flex-col gap-2 p-5 sm:p-6";
@@ -179,14 +181,10 @@ function LandingPage() {
               generate your full horoscope.
             </p>
             <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-              <SpecularLink to="/chart">Create horoscope</SpecularLink>
-              <Link
-                to="/docs/$"
-                params={{ _splat: "" }}
-                className={secondaryButtonClassName}
-              >
+              <ArrowLink to="/chart">Create horoscope</ArrowLink>
+              <BaseLink to="/docs/$" params={{ _splat: "" }} variant="secondary" size="lg">
                 Read the docs
-              </Link>
+              </BaseLink>
             </div>
           </div>
           <div
@@ -288,9 +286,9 @@ function LandingPage() {
             Enter a birth date, time, and place. It is free, with nothing
             to install.
           </p>
-          <SpecularLink to="/chart" className="mt-8">
+          <ArrowLink to="/chart" className="mt-8">
             Create horoscope
-          </SpecularLink>
+          </ArrowLink>
         </section>
 
         <footer
