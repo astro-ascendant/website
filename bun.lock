@@ -56,6 +56,7 @@
     },
   },
   "patchedDependencies": {
+    "nf3@0.3.24": "patches/nf3@0.3.24.patch",
     "env-runner@0.2.1": "patches/env-runner@0.2.1.patch",
   },
   "packages": {

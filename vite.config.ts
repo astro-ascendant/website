@@ -23,7 +23,10 @@ export default defineConfig({
       preset: "vercel",
       // These packages load data/native files with __dirname. Nitro's ESM
       // bundle drops that, so keep them as CJS and copy their full trees.
-      traceDeps: ["@swisseph/node*", "geo-tz*"],
+      // tslib is traced through @turf (via geo-tz) and then left external,
+      // but the tracer copies only its ES6 build while Node resolves the
+      // "node" export to modules/index.js, so copy the whole package.
+      traceDeps: ["@swisseph/node*", "geo-tz*", "tslib*"],
       // Vercel reads headers from the generated output config, so they are
       // declared here rather than in vercel.json (which a prebuilt deployment
       // ignores). CSP starts report-only: the app inlines its bootstrap script.

@@ -1,0 +1,13 @@
+diff --git a/dist/_chunks/trace.mjs b/dist/_chunks/trace.mjs
+index a72bc1ec57fbd03dfb7e3c80c490c3f4f14fc5df..77fa6e16e7276497bf3ba4df33d04c4b159fa021 100644
+--- a/dist/_chunks/trace.mjs
++++ b/dist/_chunks/trace.mjs
+@@ -486,7 +486,7 @@ async function indexTracedFiles(files, ctx) {
+ 				} else tracedPackageVersion.files.push(...await listPkgFiles(tracedFile.pkgPath));
+ 			}
+ 		}
+-		tracedPackageVersion.files.push(tracedFile.path);
++		if (!tracedPackageVersion.files.includes(tracedFile.path)) tracedPackageVersion.files.push(tracedFile.path);
+ 		tracedFile.pkgName = pkgName;
+ 		tracedFile.pkgVersion = pkgJSON.version || "0.0.0";
+ 	}
