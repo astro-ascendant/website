@@ -55,6 +55,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "env-runner@0.2.1": "patches/env-runner@0.2.1.patch",
+  },
   "packages": {
     "@astrologer/astro-core": ["@astrologer/astro-core@1.0.1", "", { "dependencies": { "@swisseph/core": "^1.1.0", "luxon": "^3.7.2" }, "peerDependencies": { "@swisseph/browser": "^1.1.0", "@swisseph/node": "^1.2.0" }, "optionalPeers": ["@swisseph/browser", "@swisseph/node"] }, "sha512-5MvcOfXd6+xfHLioVvKvrD5l4HGQWH/+MdBWF97WlfZNvSqn2nK91UFEzyIq0WjRwXV9q7IKCdXetLV7ZA/wKw=="],
 
