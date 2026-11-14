@@ -4,7 +4,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/arc/tabs/tabs";
+} from "@/components/motion/tabs";
 import { ChartQuote } from "@/components/chart/quote";
 import {
   buildDivisionView,
@@ -329,8 +329,8 @@ export function ChartSignHouseCharts({
   captions?: { d1: string; d9: string } | null;
 } = {}) {
   return (
-    <Tabs defaultValue="D1">
-      <TabsList variant="line" containerClassName="max-w-full self-start">
+    <Tabs defaultValue="D1" variant="underline">
+      <TabsList wrapperClassName="max-w-full self-start">
         <TabsTrigger value="D1">D1 · Rashi</TabsTrigger>
         <TabsTrigger value="D9">D9 · Navamsha</TabsTrigger>
       </TabsList>

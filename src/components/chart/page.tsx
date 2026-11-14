@@ -185,16 +185,6 @@ export function KpiStrip({
 }
 
 /**
- * On phones the result tabs float at the bottom edge of the screen, where a
- * thumb actually reaches, instead of sitting above the analysis. Desktop keeps
- * the in-flow bar. Driven by the same breakpoint as the birth-details overlay
- * so the two can never disagree. `fill` splits the strip evenly, so all five
- * tabs stay visible instead of scrolling.
- */
-export const MOBILE_TAB_LIST =
-  "flex w-[calc(100vw-2rem)] max-w-none! items-center rounded-[calc(var(--radius-control)+var(--space-1))]! border-transparent! bg-transparent! [&_[data-slot=tabs-trigger]]:min-w-0! [&_[data-slot=tabs-trigger]]:px-2! [&_[data-slot=tabs-trigger]]:text-xs! [&_[data-slot=tabs-trigger]]:rounded-(--radius-control)!";
-
-/**
  * The chart generator, outside the docs shell. Opens as a report on one
  * person (headline facts, then the tabbed analysis) with the birth-details
  * form behind one action, in a dialog on desktop and a drawer on mobile.
@@ -311,9 +301,6 @@ export function ChartPage() {
             {showResults ? (
               <>
                 <Chart.ResultSwitch
-                  tabListContainerClassName={
-                    isMobile ? MOBILE_TAB_LIST : undefined
-                  }
                   tabListFill={isMobile}
                   onEditDetails={() => setEditorOpen(true)}
                 />

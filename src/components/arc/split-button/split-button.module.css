@@ -1,4 +1,4 @@
-/* One pill, two actions. The whole pill presses in for the main action; the menu half answers in color only, because Radix measures it on pointerdown to place the menu. */
+/* One pill, two actions. The whole pill presses in for the main action; the menu half answers in color only, because the menu is placed from the trigger on pointerdown. */
 .group {
   display: inline-flex;
   align-items: stretch;
@@ -99,7 +99,7 @@
   transition: transform var(--duration-spring) var(--ease-spring);
 }
 
-.trigger[data-state="open"] .chevron {
+.trigger[data-popup-open] .chevron {
   transform: rotate(180deg);
 }
 
@@ -117,7 +117,7 @@
 
 .primary:active:not(:disabled),
 .trigger:active:not(:disabled),
-.trigger[data-state="open"] {
+.trigger[data-popup-open] {
   background: color-mix(in oklab, var(--foreground) 80%, var(--background));
 }
 
@@ -155,7 +155,7 @@
 
 .secondary .primary:active:not(:disabled),
 .secondary .trigger:active:not(:disabled),
-.secondary .trigger[data-state="open"] {
+.secondary .trigger[data-popup-open] {
   background: color-mix(in oklab, var(--surface-muted), var(--border) 55%);
 }
 
@@ -172,22 +172,26 @@
   white-space: nowrap;
 }
 
-/* The menu grows from the trigger edge: offset toward the trigger, scale from the Radix origin, fade quickly; it leaves faster than it arrives.
+/* Positions the popup above the page; the popup itself only animates. */
+.positioner {
+  z-index: 60;
+}
+
+/* The menu grows from the trigger edge: offset toward the trigger, scale from the popup origin, fade quickly; it leaves faster than it arrives.
    Transitions instead of keyframes, so a close that interrupts the open reverses from where the menu is instead of snapping to rest first. */
 .menu {
   --menu-x: 0px;
   --menu-y: -5px;
 
-  z-index: 60;
-  min-width: min(12rem, var(--radix-dropdown-menu-content-available-width));
-  max-width: var(--radix-dropdown-menu-content-available-width);
+  min-width: min(12rem, var(--available-width));
+  max-width: var(--available-width);
   padding: 5px;
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   background: var(--surface-raised);
   color: var(--foreground);
   box-shadow: var(--shadow-floating);
-  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  transform-origin: var(--transform-origin);
   transition:
     opacity var(--duration-fast) var(--ease-enter),
     transform var(--duration-spring) var(--ease-spring);
@@ -207,27 +211,24 @@
   --menu-y: 0px;
 }
 
-@starting-style {
-  .menu[data-state="open"] {
-    opacity: 0;
-    transform: translate(var(--menu-x), var(--menu-y)) scale(0.97);
-  }
-
-  .menu[data-state="open"] .item {
-    opacity: 0;
-    transform: translate(calc(var(--menu-x) * 0.4), calc(var(--menu-y) * 0.4));
-  }
+.menu[data-starting-style] {
+  opacity: 0;
+  transform: translate(var(--menu-x), var(--menu-y)) scale(0.97);
 }
 
-/* Radix unmounts when the exit animation ends, so a no-op keyframe times the exit while the transition does the visual work. */
-.menu[data-state="closed"] {
+.menu[data-starting-style] .item {
+  opacity: 0;
+  transform: translate(calc(var(--menu-x) * 0.4), calc(var(--menu-y) * 0.4));
+}
+
+/* Base UI keeps the popup mounted until this transition ends. */
+.menu[data-ending-style] {
   opacity: 0;
   transform: translate(calc(var(--menu-x) * 0.5), calc(var(--menu-y) * 0.5))
     scale(0.985);
   transition:
     opacity 130ms var(--ease-standard),
     transform 130ms var(--ease-standard);
-  animation: menu-exit 130ms linear both;
   pointer-events: none;
 }
 
@@ -266,12 +267,6 @@
   background: color-mix(in oklab, var(--danger) 8%, var(--surface));
 }
 
-@keyframes menu-exit {
-  to {
-    --menu-exit: 1;
-  }
-}
-
 /* Below 400px the action row still keeps both buttons on one line: the pair
    gives up horizontal padding and a slice of the menu half before the label
    would clip. */
@@ -306,7 +301,7 @@
   }
 
   .menu,
-  .menu[data-state="closed"] {
+  .menu[data-ending-style] {
     transform: none;
     transition: opacity var(--duration-instant) linear;
   }

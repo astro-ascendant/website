@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { WarningCircleIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/arc/button/button";
@@ -17,7 +18,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/arc/tabs/tabs";
+} from "@/components/motion/tabs";
 import { cn } from "cn";
 import { useChartSession } from "@/components/chart/session";
 import { ChartQuote } from "@/components/chart/quote";
@@ -236,8 +237,8 @@ export function ChartKpTabs({ showDasha = true }: { showDasha?: boolean } = {}) 
     return null;
   }
   return (
-    <Tabs defaultValue="wheel">
-      <TabsList variant="line" containerClassName="max-w-full self-start">
+    <Tabs defaultValue="wheel" variant="underline">
+      <TabsList wrapperClassName="max-w-full self-start">
         <TabsTrigger value="wheel">Chart</TabsTrigger>
         <TabsTrigger value="planets">Planets</TabsTrigger>
         <TabsTrigger value="cusps">Cusps</TabsTrigger>
@@ -330,6 +331,41 @@ function ChartSavTable() {
   );
 }
 
+const RESULT_TABS = [
+  { value: "chart", label: "Chart" },
+  { value: "kp", label: "KP" },
+  { value: "dasha", label: "Dasha" },
+  { value: "jaimini", label: "Jaimini" },
+  { value: "sav", label: "SAV" },
+] as const;
+
+/**
+ * Phone navigation for the result tabs: a frosted pill floating at the foot of
+ * the screen, where a thumb reaches. It lives inside the same Tabs as the
+ * panels, so there is one selection. The bar is the pill plus its 4px padding,
+ * so the two radii stay concentric.
+ */
+function MobileTabBar() {
+  return (
+    <nav
+      aria-label="Report sections"
+      className="border-border/60 bg-background/70 fixed bottom-4 left-1/2 z-40 w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full border p-1 shadow-lg backdrop-blur-xl backdrop-saturate-150"
+    >
+      <TabsList className="flex w-full gap-0 bg-transparent p-0 [&>div]:flex-1">
+        {RESULT_TABS.map((entry) => (
+          <TabsTrigger
+            key={entry.value}
+            value={entry.value}
+            className="w-full px-2 text-xs"
+          >
+            {entry.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </nav>
+  );
+}
+
 function ChartSuccess({
   tabListContainerClassName,
   tabListFill,
@@ -342,27 +378,37 @@ function ChartSuccess({
   const {
     state: { result },
   } = useChartSession();
+  const [tab, setTab] = useState("chart");
+  const changeTab = (next: string) => {
+    setTab(next);
+    onTabChange?.();
+  };
   if (!result) {
     return null;
   }
   return (
     <div className="flex flex-col gap-4">
-      <Tabs defaultValue="chart" onValueChange={onTabChange}>
-        <TabsList
-          fill={tabListFill}
-          glass={tabListFill}
-          variant={tabListFill ? "segmented" : "line"}
-          containerClassName={cn(
-            "max-w-full self-start",
-            tabListContainerClassName,
-          )}
-        >
-          <TabsTrigger value="chart">Chart</TabsTrigger>
-          <TabsTrigger value="kp">KP</TabsTrigger>
-          <TabsTrigger value="dasha">Dasha</TabsTrigger>
-          <TabsTrigger value="jaimini">Jaimini</TabsTrigger>
-          <TabsTrigger value="sav">SAV</TabsTrigger>
-        </TabsList>
+      <Tabs
+        value={tab}
+        onValueChange={changeTab}
+        variant={tabListFill ? "pill" : "underline"}
+      >
+        {tabListFill ? (
+          <MobileTabBar />
+        ) : (
+          <TabsList
+            wrapperClassName={cn(
+              "max-w-full self-start",
+              tabListContainerClassName,
+            )}
+          >
+            {RESULT_TABS.map((entry) => (
+              <TabsTrigger key={entry.value} value={entry.value}>
+                {entry.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        )}
         <TabsContent value="chart" className="max-md:mt-0!">
           <h2 className="sr-only">Rashi and Navamsha charts</h2>
           <ChartSignHouseCharts />

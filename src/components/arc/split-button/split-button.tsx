@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { CSSProperties, ReactNode, RefObject } from "react";
-import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu";
+import { Menu } from "@base-ui/react/menu";
 import {
   AnimatePresence,
   animate,
@@ -252,7 +252,7 @@ export function SplitButton({
   const glyph = iconKey(icon);
   const width = useMorphWidth(contentRef, `${glyph}|${label}`, reduced);
   return (
-    <DropdownPrimitive.Root>
+    <Menu.Root>
       <div
         className={[
           styles.group,
@@ -301,7 +301,7 @@ export function SplitButton({
             {label}
           </span>
         </button>
-        <DropdownPrimitive.Trigger
+        <Menu.Trigger
           className={styles.trigger}
           type="button"
           aria-label={`${label} more actions`}
@@ -312,40 +312,41 @@ export function SplitButton({
             size={16}
             aria-hidden="true"
           />
-        </DropdownPrimitive.Trigger>
+        </Menu.Trigger>
       </div>
-      <DropdownPrimitive.Portal>
-        <DropdownPrimitive.Content
-          className={styles.menu}
+      <Menu.Portal>
+        <Menu.Positioner
+          className={styles.positioner}
           sideOffset={4}
           align="end"
           collisionPadding={12}
-          loop
         >
-          {actions.map((action, index) => (
-            <DropdownPrimitive.Item
-              key={action.label}
-              className={[
-                styles.item,
-                action.destructive ? styles.destructive : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              style={{ "--i": index } as CSSProperties}
-              disabled={action.disabled}
-              onSelect={action.onSelect}
-            >
-              {action.icon ? (
-                <span className={styles.icon} aria-hidden="true">
-                  {action.icon}
-                </span>
-              ) : null}
-              {action.label}
-            </DropdownPrimitive.Item>
-          ))}
-        </DropdownPrimitive.Content>
-      </DropdownPrimitive.Portal>
-    </DropdownPrimitive.Root>
+          <Menu.Popup className={styles.menu}>
+            {actions.map((action, index) => (
+              <Menu.Item
+                key={action.label}
+                className={[
+                  styles.item,
+                  action.destructive ? styles.destructive : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={{ "--i": index } as CSSProperties}
+                disabled={action.disabled}
+                onClick={action.onSelect}
+              >
+                {action.icon ? (
+                  <span className={styles.icon} aria-hidden="true">
+                    {action.icon}
+                  </span>
+                ) : null}
+                {action.label}
+              </Menu.Item>
+            ))}
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
   );
 }
 

@@ -17,7 +17,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/arc/tabs/tabs";
+} from "@/components/motion/tabs";
 import {
   findCurrentPeriodIndex,
   formatDashaDate,
@@ -150,8 +150,8 @@ export function ChartDashaTimelines() {
     { name: "Sthira", periods: result.dasha.sthira },
   ];
   return (
-    <Tabs defaultValue="Vimshottari">
-      <TabsList variant="line" containerClassName="max-w-full self-start">
+    <Tabs defaultValue="Vimshottari" variant="underline">
+      <TabsList wrapperClassName="max-w-full self-start">
         {systems.map((system) => (
           <TabsTrigger key={system.name} value={system.name}>
             {system.name}
