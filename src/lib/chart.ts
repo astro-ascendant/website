@@ -76,6 +76,8 @@ export interface ChartHouse {
 
 export interface ChartDivision {
   division: number;
+  /** Lagna inside this division: its sign and the longitude the library maps it to. */
+  lagna?: { sign: string; longitude: number | null };
   placements: ChartPlacement[];
   houses: ChartHouse[];
 }
@@ -150,6 +152,9 @@ export interface ChartResult {
     sign: string;
     longitude: number | null;
     house: number;
+    /** Nakshatra and pada the Lagna falls in (D1). */
+    star?: string;
+    pada?: number | null;
   };
   kp: KpChart;
   divisions: ChartDivision[];

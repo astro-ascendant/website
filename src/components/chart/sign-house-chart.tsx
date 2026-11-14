@@ -215,7 +215,7 @@ function bodyRank(body: string): number {
 
 /**
  * The same division as a table: Lagna, then each planet's sign, degree and
- * house. Nakshatra shows on D1 only, where the star is the planet's own.
+ * house. Star shows on D1 only, where the star is the planet's own.
  */
 function DivisionPlanetsTable({ division }: { division: number }) {
   const {
@@ -234,7 +234,9 @@ function DivisionPlanetsTable({ division }: { division: number }) {
   const lagnaHouse = divisionData.houses.find((house) => house.number === 1);
   const lagna = {
     sign: isD1 ? result.lagna.sign : (lagnaHouse?.sign ?? result.lagna.sign),
-    longitude: isD1 ? result.lagna.longitude : (lagnaHouse?.cusp ?? null),
+    longitude: isD1
+      ? result.lagna.longitude
+      : (divisionData.lagna?.longitude ?? lagnaHouse?.cusp ?? null),
   };
   const placements = [...divisionData.placements].sort(
     (a, b) => bodyRank(a.body) - bodyRank(b.body),
@@ -246,7 +248,7 @@ function DivisionPlanetsTable({ division }: { division: number }) {
           <TableHead>Planet</TableHead>
           <TableHead>Sign</TableHead>
           <TableHead>Degree</TableHead>
-          {isD1 ? <TableHead>Nakshatra</TableHead> : null}
+          {isD1 ? <TableHead>Star</TableHead> : null}
           <TableHead>House</TableHead>
         </TableRow>
       </TableHeader>
@@ -257,7 +259,17 @@ function DivisionPlanetsTable({ division }: { division: number }) {
           <TableCell className="tabular-nums">
             {formatLongitude(lagna.longitude) || "-"}
           </TableCell>
-          {isD1 ? <TableCell>-</TableCell> : null}
+          {isD1 ? (
+            <TableCell>
+              {result.lagna.star ? result.lagna.star : "-"}
+              {result.lagna.pada ? (
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {result.lagna.pada}
+                </span>
+              ) : null}
+            </TableCell>
+          ) : null}
           <TableCell className="tabular-nums">1</TableCell>
         </TableRow>
         {placements.map((placement) => (

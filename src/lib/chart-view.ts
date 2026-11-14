@@ -75,7 +75,7 @@ export function buildDivisionView({
   const lagnaDegree =
     division.division === 1
       ? formatLongitude(lagna.longitude)
-      : formatLongitude(lagnaHouse?.cusp);
+      : formatLongitude(division.lagna?.longitude ?? lagnaHouse?.cusp);
 
   const cells = SOUTH_INDIAN_LAYOUT.map((slot) => {
     const house = division.houses.find((entry) => entry.sign === slot.sign);

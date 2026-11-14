@@ -45,7 +45,7 @@ import { formatTimeZoneLabel } from "@/lib/timezone";
 import { formatLongitude } from "@/lib/zodiac";
 import { getChart } from "@/server/chart.functions";
 
-const TITLE = "Current sidereal planetary position";
+const TITLE = "Planets now";
 
 interface SkyPlace {
   place: string;

@@ -29,8 +29,8 @@ function toPlacementRows(
       sign: result.lagna.sign,
       longitude: result.lagna.longitude,
       house: result.lagna.house,
-      star: "",
-      pada: null,
+      star: result.lagna.star ?? "",
+      pada: result.lagna.pada ?? null,
       state: "",
     },
     ...match.placements,
@@ -205,18 +205,31 @@ function divisionChartMarkdown(result: ChartResult, division: number): string {
         }
       : {
           sign: lagnaHouse?.sign ?? "",
-          degree: formatLongitude(lagnaHouse?.cusp),
+          degree: formatLongitude(match.lagna?.longitude ?? lagnaHouse?.cusp),
         };
+  // Star is a D1 fact; divisional charts reuse projected signs, so only D1 shows it.
+  const isD1 = division === 1;
+  const starCell = (star: string | undefined, pada: number | null | undefined) =>
+    star ? `${star}${pada ? ` ${pada}` : ""}` : "-";
   return markdownTable(
-    ["Body", "Sign", "Degree", "House"],
+    isD1
+      ? ["Body", "Sign", "Degree", "Star", "House"]
+      : ["Body", "Sign", "Degree", "House"],
     [
-      ["Lagna", lagna.sign, lagna.degree, "1"],
+      [
+        "Lagna",
+        lagna.sign,
+        lagna.degree,
+        ...(isD1 ? [starCell(result.lagna.star, result.lagna.pada)] : []),
+        "1",
+      ],
       ...match.placements.map((placement) => [
         placement.state === "Retrograde"
           ? `${placement.body} (r)`
           : placement.body,
         placement.sign,
         formatLongitude(placement.longitude),
+        ...(isD1 ? [starCell(placement.star, placement.pada)] : []),
         String(placement.house),
       ]),
     ],

@@ -114,6 +114,8 @@ export function toChartResult({
       sign: lagna.sign,
       longitude: lagna.longitude,
       house: 1,
+      star: calculation.placements.lagna.star.name,
+      pada: calculation.placements.lagna.star.pada,
     },
     kp: readKpChart(
       kpCalculation,
@@ -254,7 +256,17 @@ function readDivisions(
         };
       }),
     );
-    return { division, placements, houses };
+    // Divisional houses are whole signs, so their cusp is always 0 degrees;
+    // the Lagna's own mapped longitude sits on the house that holds it.
+    const lagnaHouseNumber =
+      HOUSES.find((houseNumber) => chart.houses[houseNumber].lagna !== null) ??
+      1;
+    const lagnaHouse = chart.houses[lagnaHouseNumber];
+    const lagna = {
+      sign: lagnaHouse.sign,
+      longitude: lagnaHouse.lagna?.longitude ?? null,
+    };
+    return { division, lagna, placements, houses };
   });
 }
 
