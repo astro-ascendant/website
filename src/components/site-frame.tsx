@@ -27,7 +27,7 @@ export const gutterClassName = "px-4 sm:px-6 lg:px-10";
  */
 export function SiteFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="border-border mx-1.5 flex flex-1 flex-col border-x sm:mx-3 lg:mx-5">
+    <div className="border-border mx-[3px] flex flex-1 flex-col border-x sm:mx-1.5 lg:mx-2.5">
       {children}
     </div>
   );

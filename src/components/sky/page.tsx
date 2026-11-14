@@ -7,27 +7,14 @@ import {
   MapPinIcon,
   NavigationArrowIcon,
 } from "@phosphor-icons/react";
-import { cn } from "cn";
 import { ActionButton } from "@/components/arc/action-button/action-button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/arc/tabs/tabs";
 import { Chart } from "@/components/chart";
 import {
   KpiStrip,
   MetaFact,
-  MOBILE_TAB_LIST,
   type SummaryItem,
 } from "@/components/chart/page";
-import { ChartKpCaption } from "@/components/chart/kp-table";
-import {
-  ChartCalculating,
-  ChartFailure,
-  ChartKpTabs,
-} from "@/components/chart/results";
+import { ChartCalculating, ChartFailure } from "@/components/chart/results";
 import { useChartSession } from "@/components/chart/session";
 import { ChartSignHouseCharts } from "@/components/chart/sign-house-chart";
 import {
@@ -152,11 +139,6 @@ async function requestNow(
   return response.result;
 }
 
-const SKY_CAPTIONS = {
-  d1: "D1 is the sky as it stands right now: the sign each planet is passing through, and the sign rising on the eastern horizon at the chosen place. Read it against a birth chart to see what the current transits touch.",
-  d9: "D9 divides each sign into nine parts. Planets move through it far faster than through D1, so it shows the finer texture of the present moment.",
-};
-
 /** Headline facts for the band under the title. */
 function skySummary(result: ChartResult): SummaryItem[] {
   const d1 = result.divisions.find((division) => division.division === 1);
@@ -186,15 +168,7 @@ function skySummary(result: ChartResult): SummaryItem[] {
   ];
 }
 
-function SkyResults({
-  fill,
-  containerClassName,
-  onChangePlace,
-}: {
-  fill: boolean;
-  containerClassName?: string;
-  onChangePlace: () => void;
-}) {
+function SkyResults({ onChangePlace }: { onChangePlace: () => void }) {
   const {
     state: { status, result },
   } = useChartSession();
@@ -205,32 +179,10 @@ function SkyResults({
         <ChartFailure onEditDetails={onChangePlace} />
       ) : null}
       {result !== null ? (
-        <Tabs
-          defaultValue="chart"
-          onValueChange={() =>
-            window.scrollTo({ top: 0, left: 0, behavior: "instant" })
-          }
-        >
-          <TabsList
-            fill={fill}
-            variant={fill ? "segmented" : "line"}
-            containerClassName={cn("max-w-full self-start", containerClassName)}
-          >
-            <TabsTrigger value="chart">Chart</TabsTrigger>
-            <TabsTrigger value="kp">KP</TabsTrigger>
-          </TabsList>
-          <TabsContent value="chart" className="max-md:mt-0!">
-            <h2 className="sr-only">Rashi and Navamsha charts</h2>
-            <ChartSignHouseCharts captions={SKY_CAPTIONS} />
-          </TabsContent>
-          <TabsContent value="kp" className="max-md:mt-0!">
-            <div className="flex flex-col gap-4">
-              <h2 className="sr-only">KP chart</h2>
-              <ChartKpCaption />
-              <ChartKpTabs showDasha={false} />
-            </div>
-          </TabsContent>
-        </Tabs>
+        <>
+          <h2 className="sr-only">Rashi and Navamsha charts</h2>
+          <ChartSignHouseCharts captions={null} />
+        </>
       ) : null}
     </div>
   );
@@ -374,9 +326,8 @@ const LOCATION_BLOCKED =
 function SkyContent() {
   const {
     state: { result, status, selectedPlace },
-    actions: { calculateFor },
+    actions: { calculateFor, selectPlace },
   } = useChartSession();
-  const isMobile = useIsMobile();
   const [place, setPlace] = useState<SkyPlace>(DEFAULT_PLACE);
   const [source, setSource] = useState<PlaceSource | null>(null);
   const [locating, setLocating] = useState(false);
@@ -439,6 +390,23 @@ function SkyContent() {
       document.removeEventListener("visibilitychange", tick);
     };
   }, [source]);
+
+  // The picker mirrors the place in use: it shows it when opened, drops an
+  // unapplied pick when reopened, and never lets a stale pick override a place
+  // that arrived from the device.
+  useEffect(() => {
+    if (source === null) {
+      return;
+    }
+    selectPlace({
+      id: `sky:${place.latitude},${place.longitude}`,
+      name: place.place.split(",")[0]?.trim() || place.place,
+      displayName: place.place,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [place, source, editorOpen]);
 
   // Casting in progress closes the picker; the result updates behind it.
   useEffect(() => {
@@ -544,15 +512,7 @@ function SkyContent() {
 
       <main id="content" className="section-ticks w-full flex-1">
         <div className={`w-full pt-4 pb-4 sm:py-10 ${gutterClassName}`}>
-          <SkyResults
-            fill={isMobile}
-            containerClassName={isMobile ? MOBILE_TAB_LIST : undefined}
-            onChangePlace={() => setEditorOpen(true)}
-          />
-          {/* Clearance for the floating tab bar; only where it floats. */}
-          {isMobile && result ? (
-            <div aria-hidden="true" className="h-16" />
-          ) : null}
+          <SkyResults onChangePlace={() => setEditorOpen(true)} />
         </div>
       </main>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import LiquidGlass from "liquid-glass-react";
 import {
   createContext,
   useCallback,
@@ -102,11 +103,14 @@ export function TabsList({
   className,
   containerClassName,
   fill,
+  glass,
   variant = "segmented",
   ...props
 }: ComponentPropsWithoutRef<typeof TabsPrimitive.List> & {
   containerClassName?: string;
   fill?: boolean;
+  /** Float the list at the foot of the screen on a liquid-glass pill. */
+  glass?: boolean;
   /** `line`: bare labels on a hairline rule, with a gliding underline. */
   variant?: "segmented" | "line";
 }) {
@@ -189,7 +193,7 @@ export function TabsList({
       left: direction * (viewport.current?.clientWidth ?? 0) * 0.75,
       behavior: reduced ? "instant" : "smooth",
     });
-  return (
+  const strip = (
     <div
       ref={shell}
       className={[styles.listShell, containerClassName]
@@ -243,6 +247,28 @@ export function TabsList({
         </button>
       )}
     </div>
+  );
+  if (!glass) {
+    return strip;
+  }
+  return (
+    <LiquidGlass
+      cornerRadius={18}
+      padding="4px"
+      displacementScale={48}
+      blurAmount={0.08}
+      saturation={150}
+      aberrationIntensity={1.5}
+      elasticity={0.15}
+      style={{
+        position: "fixed",
+        top: "calc(100dvh - 2.75rem)",
+        left: "50%",
+        zIndex: 40,
+      }}
+    >
+      {strip}
+    </LiquidGlass>
   );
 }
 

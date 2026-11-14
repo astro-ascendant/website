@@ -350,6 +350,7 @@ function ChartSuccess({
       <Tabs defaultValue="chart" onValueChange={onTabChange}>
         <TabsList
           fill={tabListFill}
+          glass={tabListFill}
           variant={tabListFill ? "segmented" : "line"}
           containerClassName={cn(
             "max-w-full self-start",

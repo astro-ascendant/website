@@ -192,7 +192,7 @@ export function KpiStrip({
  * tabs stay visible instead of scrolling.
  */
 export const MOBILE_TAB_LIST =
-  "fixed! inset-x-3 bottom-3 z-40 flex w-auto max-w-none! items-center rounded-(--radius-panel)! border-border/70! bg-muted/90! shadow-lg backdrop-blur [&_[data-slot=tabs-trigger]]:min-w-0! [&_[data-slot=tabs-trigger]]:px-2! [&_[data-slot=tabs-trigger]]:text-xs! [&_[data-slot=tabs-trigger]]:rounded-(--radius-control)!";
+  "flex w-[calc(100vw-2rem)] max-w-none! items-center rounded-[calc(var(--radius-control)+var(--space-1))]! border-transparent! bg-transparent! [&_[data-slot=tabs-trigger]]:min-w-0! [&_[data-slot=tabs-trigger]]:px-2! [&_[data-slot=tabs-trigger]]:text-xs! [&_[data-slot=tabs-trigger]]:rounded-(--radius-control)!";
 
 /**
  * The chart generator, outside the docs shell. Opens as a report on one

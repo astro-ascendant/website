@@ -255,7 +255,7 @@ export function ChartTimeField() {
 const SEX_OPTIONS = [
   { value: "Male", label: "Male" },
   { value: "Female", label: "Female" },
-  { value: "", label: "Prefer not to say" },
+  { value: "", label: "Not specified" },
 ] as const;
 
 export function ChartSexField() {
@@ -283,7 +283,7 @@ export function ChartSexField() {
             <TabsTrigger
               key={option.label}
               value={option.value}
-              className="h-auto min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs leading-tight whitespace-normal transition-colors duration-(--duration-fast) ease-(--ease-out) data-active:bg-transparent dark:data-active:bg-transparent"
+              className="h-auto min-w-0 flex-1 rounded-md px-2 py-1.5 text-center text-xs leading-tight whitespace-nowrap transition-colors duration-(--duration-fast) ease-(--ease-out) data-active:bg-transparent dark:data-active:bg-transparent"
             >
               {option.label}
             </TabsTrigger>

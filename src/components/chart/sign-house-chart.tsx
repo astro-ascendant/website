@@ -310,11 +310,11 @@ const BIRTH_CAPTIONS = {
   d9: "D9 is the chart of what ripens underneath the surface. Astrologers read it for marriage and for the true strength of a planet, since a planet that looks powerful in D1 but sits poorly here delivers less in real life.",
 };
 
-/** Rashi and Navamsha tabs. `captions` swaps the birth-chart copy for another context. */
+/** Rashi and Navamsha tabs. `captions` swaps the birth-chart copy; `null` hides it. */
 export function ChartSignHouseCharts({
   captions = BIRTH_CAPTIONS,
 }: {
-  captions?: { d1: string; d9: string };
+  captions?: { d1: string; d9: string } | null;
 } = {}) {
   return (
     <Tabs defaultValue="D1">
@@ -323,11 +323,11 @@ export function ChartSignHouseCharts({
         <TabsTrigger value="D9">D9 · Navamsha</TabsTrigger>
       </TabsList>
       <TabsContent value="D1" className="flex flex-col gap-4">
-        <ChartQuote>{captions.d1}</ChartQuote>
+        {captions ? <ChartQuote>{captions.d1}</ChartQuote> : null}
         <DivisionPanel division={1} />
       </TabsContent>
       <TabsContent value="D9" className="flex flex-col gap-4">
-        <ChartQuote>{captions.d9}</ChartQuote>
+        {captions ? <ChartQuote>{captions.d9}</ChartQuote> : null}
         <DivisionPanel division={9} />
       </TabsContent>
     </Tabs>

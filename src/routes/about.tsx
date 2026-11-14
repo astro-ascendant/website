@@ -4,6 +4,7 @@ import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import { BrandWordmark } from "@/components/brand-wordmark";
 import { GithubDark } from "@/components/ui/svgs/githubDark";
 import { GithubLight } from "@/components/ui/svgs/githubLight";
+import { libraryVersion } from "@/lib/shared";
 import animatedSignature from "../../assets/sign-animated.svg";
 import {
   Dialog,
@@ -41,7 +42,7 @@ function AboutPage() {
 
   const copyVersion = async () => {
     try {
-      await navigator.clipboard.writeText("5.1.0");
+      await navigator.clipboard.writeText(libraryVersion);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -231,10 +232,10 @@ function AboutPage() {
               type="button"
               onClick={copyVersion}
               title="Click to copy version number"
-              aria-label="Copy version number 5.1.0"
+              aria-label={`Copy version number ${libraryVersion}`}
               className="group inline-flex cursor-pointer items-center gap-1.5 transition-colors hover:text-foreground"
             >
-              <span>Version 5.1.0</span>
+              <span>Version {libraryVersion}</span>
               {copied ? (
                 <span className="inline-flex items-center gap-0.5 rounded-xs bg-secondary px-1 py-0.2 text-[10px] font-mono font-medium text-foreground">
                   <CheckIcon size={11} className="text-foreground" />

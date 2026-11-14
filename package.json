@@ -39,6 +39,7 @@
     "fumadocs-mdx": "15.4.10",
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.17.9",
     "geo-tz": "^8.1.10",
+    "liquid-glass-react": "^1.1.1",
     "motion": "^14.7.1",
     "pele": "1.12.0",
     "react": "^19.3.1",

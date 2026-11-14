@@ -51,6 +51,7 @@ const R_SIGN_INNER_RULE = R_SIGN_OUT - 1.6;
 const R_SIGN_IN = 100;
 const R_NAK_IN = 94;
 const R_MARK = 87;
+const SIGN_FONT = 4.4;
 
 /**
  * Screen point for a sidereal longitude, with 0° Aries on the left and signs
@@ -180,22 +181,32 @@ export function OrreryHero() {
         {SIGNS.map((sign, i) => {
           const [x1, y1] = polar(i * 30, R_SIGN_IN);
           const [x2, y2] = polar(i * 30, R_SIGN_OUT);
-          const [lx, ly] = polar(i * 30 + 15, (R_SIGN_IN + R_SIGN_INNER_RULE) / 2);
+          const mid = i * 30 + 15;
+          // Signs in the lower half read along the counter-clockwise arc;
+          // those in the upper half run clockwise so no label is upside down.
+          const upper = mid > 180;
+          const bandMid = (R_SIGN_IN + R_SIGN_INNER_RULE) / 2;
+          const baseline = bandMid + (upper ? -1 : 1) * SIGN_FONT * 0.36;
+          const [ax, ay] = polar(upper ? mid + 14 : mid - 14, baseline);
+          const [bx, by] = polar(upper ? mid - 14 : mid + 14, baseline);
+          const pathId = `orrery-sign-${i}`;
           return (
             <g key={sign}>
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth={0.45} />
+              <path
+                id={pathId}
+                d={`M ${ax} ${ay} A ${baseline} ${baseline} 0 0 ${upper ? 1 : 0} ${bx} ${by}`}
+                fill="none"
+              />
               <text
-                x={lx}
-                y={ly}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize={4.4}
+                fontSize={SIGN_FONT}
                 letterSpacing={0.9}
                 className="font-sans font-medium"
                 fill="currentColor"
-                fillOpacity={0.62}
               >
-                {signShortName(sign).toUpperCase()}
+                <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
+                  {signShortName(sign).toUpperCase()}
+                </textPath>
               </text>
             </g>
           );
@@ -282,7 +293,6 @@ export function OrreryHero() {
                     dominantBaseline="central"
                     fontSize={3.6}
                     className="font-sans"
-                    fillOpacity={0.8}
                   >
                     {bodyShortName(graha)}
                     {retrograde && graha !== "Rahu" && graha !== "Ketu" ? (

@@ -37,7 +37,7 @@ export default defineConfig({
             "x-frame-options": "SAMEORIGIN",
             "referrer-policy": "strict-origin-when-cross-origin",
             "permissions-policy":
-              "camera=(), microphone=(), geolocation=(), payment=()",
+              "camera=(), microphone=(), geolocation=(self), payment=()",
             "content-security-policy-report-only":
               "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
           },
@@ -47,6 +47,7 @@ export default defineConfig({
   ],
   resolve: {
     tsconfigPaths: true,
+    dedupe: ["react", "react-dom"],
     alias: {
       tslib: "tslib/tslib.es6.js",
     },
