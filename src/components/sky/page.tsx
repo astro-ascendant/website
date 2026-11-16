@@ -17,9 +17,13 @@ import {
 import { ChartCalculating, ChartFailure } from "@/components/chart/results";
 import { useChartSession } from "@/components/chart/session";
 import { ChartSignHouseCharts } from "@/components/chart/sign-house-chart";
+import { OrreryHero } from "@/components/orrery-hero";
 import {
   gutterClassName,
+  heroLeadClassName,
+  heroTitleClassName,
   SiteFrame,
+  SiteFrameEnd,
   SiteHeader,
 } from "@/components/site-frame";
 import { Button } from "@/components/arc/button/button";
@@ -450,40 +454,19 @@ function SkyContent() {
 
   return (
     <>
-      <section className="section-ticks">
-        <div className={`w-full py-6 sm:py-10 ${gutterClassName}`}>
-          <div className="flex items-start justify-between gap-3">
-            <h1 className="font-heading min-w-0 text-xl font-medium tracking-tight text-balance sm:text-3xl">
-              {TITLE}
-            </h1>
-            <div className="flex shrink-0 items-center gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                aria-label="Refresh positions"
-                disabled={loading || status === "calculating"}
-                onClick={() => void cast(place).catch(() => {})}
-              >
-                <ArrowClockwiseIcon aria-hidden="true" />
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                aria-label="Change place"
-                className="max-sm:size-9 max-sm:px-0!"
-                disabled={loading}
-                onClick={() => {
-                  setLocationError("");
-                  setEditorOpen(true);
-                }}
-              >
-                <MapPinIcon aria-hidden="true" />
-                <span className="hidden sm:inline">Change place</span>
-              </Button>
-            </div>
-          </div>
-          <dl className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 sm:mt-3 sm:gap-x-6 sm:gap-y-2">
+      <section
+        aria-label={TITLE}
+        className="section-ticks divide-border grid md:min-h-[38rem] md:grid-cols-2 md:divide-x"
+      >
+        <div
+          className={`flex flex-col items-center justify-center py-14 text-center sm:py-20 md:items-start md:text-left ${gutterClassName}`}
+        >
+          <h1 className={`max-w-xl ${heroTitleClassName}`}>{TITLE}</h1>
+          <p className={heroLeadClassName}>
+            Where the Sun, Moon and planets stand at this moment in the
+            sidereal zodiac, updated every minute.
+          </p>
+          <dl className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 sm:gap-y-2 md:justify-start">
             <MetaFact
               icon={CalendarBlankIcon}
               label="Date"
@@ -501,14 +484,50 @@ function SkyContent() {
               value={placeLabel}
               hint={locating ? "Finding your location…" : undefined}
               title={shown !== placeLabel ? shown : undefined}
-              className="max-sm:basis-full"
+              className="max-sm:basis-full max-sm:justify-center"
             />
           </dl>
-          {result ? (
-            <KpiStrip items={skySummary(result)} className="mt-4 sm:mt-8" />
-          ) : null}
+          <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+            <Button
+              type="button"
+              size="lg"
+              className="w-full sm:w-auto"
+              disabled={loading}
+              onClick={() => {
+                setLocationError("");
+                setEditorOpen(true);
+              }}
+            >
+              <MapPinIcon aria-hidden="true" />
+              Change place
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full sm:w-auto"
+              disabled={loading || status === "calculating"}
+              onClick={() => void cast(place).catch(() => {})}
+            >
+              <ArrowClockwiseIcon aria-hidden="true" />
+              Refresh
+            </Button>
+          </div>
+        </div>
+        <div
+          className={`border-border flex items-center justify-center py-14 max-md:border-t sm:py-20 ${gutterClassName}`}
+        >
+          <OrreryHero />
         </div>
       </section>
+
+      {result ? (
+        <section aria-label="Headline positions" className="section-ticks">
+          <div className={`w-full py-6 sm:py-10 ${gutterClassName}`}>
+            <KpiStrip items={skySummary(result)} />
+          </div>
+        </section>
+      ) : null}
 
       <main id="content" className="section-ticks w-full flex-1">
         <div className={`w-full pt-4 pb-4 sm:py-10 ${gutterClassName}`}>
@@ -551,6 +570,7 @@ export function SkyPage() {
         <SiteFrame>
           <SiteHeader />
           <SkyContent />
+          <SiteFrameEnd />
         </SiteFrame>
       </div>
     </Chart.Provider>

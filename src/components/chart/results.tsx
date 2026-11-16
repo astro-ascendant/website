@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { WarningCircleIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/arc/button/button";
@@ -13,15 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/motion/tabs";
+import { gutterClassName, SectionHeading } from "@/components/site-frame";
 import { cn } from "cn";
+import { ChartCode } from "@/components/chart/quote";
 import { useChartSession } from "@/components/chart/session";
-import { ChartQuote } from "@/components/chart/quote";
 import {
   ChartAskChatGPTButton,
   ChartSavePdfButton,
@@ -32,7 +28,6 @@ import {
   ChartKpDashaTimeline,
 } from "@/components/chart/dasha-timeline";
 import {
-  ChartKpCaption,
   ChartKpCuspTable,
   ChartKpTable,
 } from "@/components/chart/kp-table";
@@ -97,6 +92,32 @@ export function ChartFailure({
   );
 }
 
+/** One Jaimini reading, styled like the chart subsections: heading, caption, table. */
+function JaiminiPart({
+  title,
+  caption,
+  children,
+}: {
+  title: string;
+  caption: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="flex min-w-0 flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-foreground text-base font-medium">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
+          {caption}
+        </p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+const listOrDash = (values: readonly string[]) =>
+  values.length > 0 ? values.join(", ") : "-";
+
 function ChartJaiminiTables() {
   const {
     state: { result },
@@ -104,132 +125,115 @@ function ChartJaiminiTables() {
   if (!result) {
     return null;
   }
+  const { jaimini } = result;
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-      {/* Two stacks pair the cards so neither column trails the other by a tall gap. */}
-      <div className="flex flex-col gap-4 sm:w-[calc(50%-0.5rem)]">
-        <section className="border-border/70 bg-card/40 flex flex-col gap-4 rounded-xl border p-6">
-          <h3 className="font-heading text-base font-medium">Chara Karakas</h3>
-          <ChartQuote>
-            Chara Karakas introduce the cast of your chart. The planet furthest
-            along in its journey becomes your Atmakaraka, representing your own
-            soul, and the next strongest steps in as your advisor.
-          </ChartQuote>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Role</TableHead>
-                <TableHead>Planet</TableHead>
+    <div className="grid items-start gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
+      <JaiminiPart
+        title="Chara Karakas"
+        caption="The cast of your chart. The planet furthest along in its journey is your Atmakaraka, your own soul, and the next strongest is your advisor."
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Role</TableHead>
+              <TableHead>Planet</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody tone="muted">
+            {jaimini.karakas.map((karaka) => (
+              <TableRow key={karaka.role}>
+                <TableCell tone="default">{karaka.role}</TableCell>
+                <TableCell>{karaka.planet}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody tone="muted">
-              {result.jaimini.karakas.map((karaka) => (
-                <TableRow key={karaka.role}>
-                  <TableCell>{karaka.role}</TableCell>
-                  <TableCell>{karaka.planet}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </section>
-        <section className="border-border/70 bg-card/40 flex flex-col gap-4 rounded-xl border p-6">
-          <h3 className="font-heading text-base font-medium">
-            Karakamsha and Upapada
-          </h3>
-          <ChartQuote>
-            Karakamsha points to what you came here to become: it is read for
-            purpose and livelihood. Upapada is about the person you share life
-            with, so astrologers read it first for marriage.
-          </ChartQuote>
-          <Table>
-            <TableBody tone="muted">
-              <TableRow>
-                <TableHead>Karakamsha</TableHead>
-                <TableCell>
-                  {result.jaimini.karakamsha === ""
-                    ? "-"
-                    : result.jaimini.karakamsha}
-                </TableCell>
+            ))}
+          </TableBody>
+        </Table>
+      </JaiminiPart>
+
+      <JaiminiPart
+        title="Arudha Pada"
+        caption="How you are seen. A house says what is true in your life; its arudha says what the world believes about it."
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>House</TableHead>
+              <TableHead>Pada</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody tone="muted">
+            {jaimini.arudha.map((entry) => (
+              <TableRow key={entry.house}>
+                <TableCell tone="default">{entry.house}</TableCell>
+                <TableCell>{entry.pada === "" ? "-" : entry.pada}</TableCell>
               </TableRow>
-              <TableRow>
-                <TableHead>Upapada</TableHead>
-                <TableCell>
-                  {result.jaimini.upapada === "" ? "-" : result.jaimini.upapada}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </section>
-      </div>
-      <div className="flex flex-col gap-4 sm:w-[calc(50%-0.5rem)]">
-        <section className="border-border/70 bg-card/40 flex flex-col gap-4 rounded-xl border p-6">
-          <h3 className="font-heading text-base font-medium">Arudha Pada</h3>
-          <ChartQuote>
-            Arudha pada shows how you are seen. A house says what is true in
-            your life, while its arudha says what the world believes about it.
-          </ChartQuote>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>House</TableHead>
-                <TableHead>Pada</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody tone="muted">
-              {result.jaimini.arudha.map((entry) => (
-                <TableRow key={entry.house}>
-                  <TableCell>{entry.house}</TableCell>
-                  <TableCell>{entry.pada === "" ? "-" : entry.pada}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </section>
-        <section className="border-border/70 bg-card/40 flex flex-col gap-4 rounded-xl border p-6">
-          <h3 className="font-heading text-base font-medium">
-            Drishti and Argala
-          </h3>
-          <ChartQuote>
-            Drishti shows which parts of your chart are in conversation with
-            each other. Argala tells you who is holding a door open for a house
-            and who is standing in its doorway.
-          </ChartQuote>
-          <Table>
-            <TableBody tone="muted">
-              <TableRow>
-                <TableHead>Rashi Drishti on Lagna</TableHead>
-                <TableCell>
-                  {result.jaimini.drishti.length > 0
-                    ? result.jaimini.drishti.join(", ")
-                    : "-"}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableHead>Supporting Argala</TableHead>
-                <TableCell>
-                  {result.jaimini.argala.supporting.length > 0
-                    ? result.jaimini.argala.supporting.join(", ")
-                    : "-"}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableHead>Obstructing Argala</TableHead>
-                <TableCell>
-                  {result.jaimini.argala.obstructing.length > 0
-                    ? result.jaimini.argala.obstructing.join(", ")
-                    : "-"}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </section>
-      </div>
+            ))}
+          </TableBody>
+        </Table>
+      </JaiminiPart>
+
+      <JaiminiPart
+        title="Karakamsha and Upapada"
+        caption="Karakamsha points to what you came here to become, read for purpose and livelihood. Upapada is read first for marriage."
+      >
+        <Table>
+          <TableBody tone="muted">
+            <TableRow>
+              <TableHead>Karakamsha</TableHead>
+              <TableCell>{jaimini.karakamsha === "" ? "-" : jaimini.karakamsha}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableHead>Upapada</TableHead>
+              <TableCell>{jaimini.upapada === "" ? "-" : jaimini.upapada}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </JaiminiPart>
+
+      <JaiminiPart
+        title="Drishti and Argala"
+        caption="Drishti shows which parts of your chart are in conversation. Argala shows who holds a door open for a house, and who stands in its way."
+      >
+        <Table>
+          <TableBody tone="muted">
+            <TableRow>
+              <TableHead>Rashi Drishti on Lagna</TableHead>
+              <TableCell>{listOrDash(jaimini.drishti)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableHead>Supporting Argala</TableHead>
+              <TableCell>{listOrDash(jaimini.argala.supporting)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableHead>Obstructing Argala</TableHead>
+              <TableCell>{listOrDash(jaimini.argala.obstructing)}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </JaiminiPart>
     </div>
   );
 }
 
-/** The KP views. `showDasha` is off where no birth is involved, as for the sky now. */
-export function ChartKpTabs({ showDasha = true }: { showDasha?: boolean } = {}) {
+function Subsection({
+  title,
+  className,
+  children,
+}: {
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-4", className)}>
+      <h3 className="text-foreground text-base font-medium">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+/** The wheel beside the planets, then the cusps and the KP dasha. */
+function ChartKpPanels() {
   const {
     state: { result },
   } = useChartSession();
@@ -237,28 +241,20 @@ export function ChartKpTabs({ showDasha = true }: { showDasha?: boolean } = {}) 
     return null;
   }
   return (
-    <Tabs defaultValue="wheel" variant="underline">
-      <TabsList wrapperClassName="max-w-full self-start">
-        <TabsTrigger value="wheel">Chart</TabsTrigger>
-        <TabsTrigger value="planets">Planets</TabsTrigger>
-        <TabsTrigger value="cusps">Cusps</TabsTrigger>
-        {showDasha ? <TabsTrigger value="dasha">Dasha</TabsTrigger> : null}
-      </TabsList>
-      <TabsContent value="wheel">
+    <div className="flex flex-col gap-12 sm:gap-14">
+      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-8">
         <ChartKpCircularChart />
-      </TabsContent>
-      <TabsContent value="planets">
-        <ChartKpTable />
-      </TabsContent>
-      <TabsContent value="cusps">
+        <Subsection title="Planets">
+          <ChartKpTable />
+        </Subsection>
+      </div>
+      <Subsection title="Cusps">
         <ChartKpCuspTable />
-      </TabsContent>
-      {showDasha ? (
-        <TabsContent value="dasha">
-          <ChartKpDashaTimeline />
-        </TabsContent>
-      ) : null}
-    </Tabs>
+      </Subsection>
+      <Subsection title="Vimshottari, KP ayanamsa">
+        <ChartKpDashaTimeline />
+      </Subsection>
+    </div>
   );
 }
 
@@ -331,159 +327,236 @@ function ChartSavTable() {
   );
 }
 
-const RESULT_TABS = [
-  { value: "chart", label: "Chart" },
-  { value: "kp", label: "KP" },
-  { value: "dasha", label: "Dasha" },
-  { value: "jaimini", label: "Jaimini" },
-  { value: "sav", label: "SAV" },
+const REPORT_SECTIONS = [
+  { id: "charts", label: "Charts" },
+  { id: "dasha", label: "Dasha" },
+  { id: "kp", label: "KP" },
+  { id: "jaimini", label: "Jaimini" },
+  { id: "sav", label: "SAV" },
 ] as const;
 
+type SectionId = (typeof REPORT_SECTIONS)[number]["id"];
+
+/** One band of the report, laid out like a landing page section. */
+function ReportSection({
+  id,
+  title,
+  subtitle,
+  children,
+}: {
+  id: SectionId;
+  title: string;
+  subtitle: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className={`section-ticks scroll-mt-6 py-14 sm:py-20 ${gutterClassName}`}
+    >
+      <SectionHeading id={`${id}-title`} title={title} subtitle={subtitle} />
+      <div className="mt-10 sm:mt-14">{children}</div>
+    </section>
+  );
+}
+
+/** The section whose band has reached a third of the way down the screen. */
+function useCurrentSection(): SectionId {
+  const [current, setCurrent] = useState<SectionId>(REPORT_SECTIONS[0].id);
+  useEffect(() => {
+    const update = () => {
+      const line = window.innerHeight / 3;
+      let next: SectionId = REPORT_SECTIONS[0].id;
+      for (const section of REPORT_SECTIONS) {
+        const element = document.getElementById(section.id);
+        if (element && element.getBoundingClientRect().top <= line) {
+          next = section.id;
+        }
+      }
+      setCurrent(next);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+  return current;
+}
+
 /**
- * Phone navigation for the result tabs: a frosted pill floating at the foot of
- * the screen, where a thumb reaches. It lives inside the same Tabs as the
- * panels, so there is one selection. The bar is the pill plus its 4px padding,
- * so the two radii stay concentric.
+ * Jump links to each band, in a frosted pill floating at the foot of the
+ * screen where a thumb reaches. Every section stays on the page; the pill only
+ * scrolls to one and marks the one being read.
  */
-function MobileTabBar() {
+function ReportNav() {
+  const current = useCurrentSection();
+  const reduce = useReducedMotion();
   return (
     <nav
       aria-label="Report sections"
-      className="border-border/60 bg-background/70 fixed bottom-4 left-1/2 z-40 w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full border p-1 shadow-lg backdrop-blur-xl backdrop-saturate-150"
+      className="border-border/60 bg-background/70 fixed bottom-4 left-1/2 z-40 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 rounded-full border p-1 shadow-lg backdrop-blur-xl backdrop-saturate-150"
     >
-      <TabsList className="flex w-full gap-0 bg-transparent p-0 [&>div]:flex-1">
-        {RESULT_TABS.map((entry) => (
-          <TabsTrigger
-            key={entry.value}
-            value={entry.value}
-            className="w-full px-2 text-xs"
-          >
-            {entry.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <ul className="flex">
+        {REPORT_SECTIONS.map((section) => {
+          const active = section.id === current;
+          return (
+            <li key={section.id} className="flex-1">
+              <a
+                href={`#${section.id}`}
+                aria-current={active ? "location" : undefined}
+                onClick={(event) => {
+                  event.preventDefault();
+                  document.getElementById(section.id)?.scrollIntoView({
+                    behavior: reduce ? "auto" : "smooth",
+                    block: "start",
+                  });
+                  window.history.replaceState(null, "", `#${section.id}`);
+                }}
+                className={cn(
+                  "relative flex h-9 items-center justify-center rounded-full px-2 text-xs font-medium transition-colors duration-150 ease-out sm:text-sm",
+                  active
+                    ? "text-background"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {active ? (
+                  <motion.span
+                    layoutId="report-nav-active"
+                    transition={
+                      reduce
+                        ? { duration: 0 }
+                        : { type: "spring", bounce: 0.15, duration: 0.4 }
+                    }
+                    className="bg-foreground absolute inset-0 rounded-full"
+                  />
+                ) : null}
+                <span className="relative">{section.label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }
 
-function ChartSuccess({
-  tabListContainerClassName,
-  tabListFill,
-  onTabChange,
-}: {
-  tabListContainerClassName?: string;
-  tabListFill?: boolean;
-  onTabChange?: () => void;
-}) {
-  const {
-    state: { result },
-  } = useChartSession();
-  const [tab, setTab] = useState("chart");
-  const changeTab = (next: string) => {
-    setTab(next);
-    onTabChange?.();
-  };
-  if (!result) {
-    return null;
-  }
+/** Ask ChatGPT (or another assistant) and Save as PDF. */
+export function ChartActions({ className }: { className?: string }) {
   return (
-    <div className="flex flex-col gap-4">
-      <Tabs
-        value={tab}
-        onValueChange={changeTab}
-        variant={tabListFill ? "pill" : "underline"}
-      >
-        {tabListFill ? (
-          <MobileTabBar />
-        ) : (
-          <TabsList
-            wrapperClassName={cn(
-              "max-w-full self-start",
-              tabListContainerClassName,
-            )}
-          >
-            {RESULT_TABS.map((entry) => (
-              <TabsTrigger key={entry.value} value={entry.value}>
-                {entry.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        )}
-        <TabsContent value="chart" className="max-md:mt-0!">
-          <h2 className="sr-only">Rashi and Navamsha charts</h2>
-          <ChartSignHouseCharts />
-        </TabsContent>
-        <TabsContent value="kp" className="max-md:mt-0!">
-          <div className="flex flex-col gap-4">
-            <h2 className="sr-only">KP chart</h2>
-            <ChartKpCaption />
-            <ChartKpTabs />
-          </div>
-        </TabsContent>
-        <TabsContent value="dasha" className="max-md:mt-0!">
-          <h2 className="sr-only">Dasha periods</h2>
-          <ChartDashaTimelines />
-        </TabsContent>
-        <TabsContent value="jaimini" className="max-md:mt-0!">
-          <h2 className="sr-only">Jaimini</h2>
-          <ChartJaiminiTables />
-        </TabsContent>
-        <TabsContent value="sav" className="flex flex-col gap-4 max-md:mt-0!">
-          <h2 className="sr-only">Sarvashtakavarga</h2>
-          <ChartQuote>
-            SAV scores each sign by how much support it gives your planets. The
-            highlighted numbers mark the signs that back you up most, and the
-            dimmed ones show where you carry the weight yourself. In red: the
-            sign where that planet runs weakest.
-          </ChartQuote>
-          <ChartSavTable />
-        </TabsContent>
-      </Tabs>
-      <div className="flex flex-row items-center gap-2 sm:gap-3">
-        <ChartAskChatGPTButton />
-        <ChartSavePdfButton />
-      </div>
+    <div className={cn("flex flex-row items-center gap-2 sm:gap-3", className)}>
+      <ChartAskChatGPTButton />
+      <ChartSavePdfButton />
     </div>
   );
 }
 
+/** The whole report on one page: every section is a band, nothing hidden. */
+function ChartSuccess() {
+  const {
+    state: { result },
+  } = useChartSession();
+  if (!result) {
+    return null;
+  }
+  return (
+    <>
+      <ReportSection
+        id="charts"
+        title="Birth charts"
+        subtitle="The Rashi chart shows the sky at your birth. The Navamsha zooms into it for marriage and the real strength of each planet."
+      >
+        <ChartSignHouseCharts />
+      </ReportSection>
+
+      <ReportSection
+        id="dasha"
+        title="Dashas"
+        subtitle="The planetary periods of your life, with the one running now marked. Pick any period to zoom into the periods inside it."
+      >
+        <ChartDashaTimelines />
+      </ReportSection>
+
+      <ReportSection
+        id="kp"
+        title="Krishnamurthi Paddhati"
+        subtitle={
+          <>
+            A precise system built for timing questions, using the{" "}
+            <ChartCode>{result.kp.astroParams.ayanamsa}</ChartCode> ayanamsa
+            and{" "}
+            {result.kp.astroParams.houseSystem} houses.
+          </>
+        }
+      >
+        <ChartKpPanels />
+      </ReportSection>
+
+      <ReportSection
+        id="jaimini"
+        title="Jaimini"
+        subtitle="The cast of your chart, how the world sees you, and which houses help or block each other."
+      >
+        <ChartJaiminiTables />
+      </ReportSection>
+
+      <ReportSection
+        id="sav"
+        title="Sarvashtakavarga"
+        subtitle="A score for every sign by how much it supports your planets. Highlighted numbers back you up most; red marks where a planet runs weakest."
+      >
+        <ChartSavTable />
+      </ReportSection>
+
+      <section
+        className={`section-ticks bg-card/40 flex flex-col items-center py-16 text-center sm:py-24 ${gutterClassName}`}
+      >
+        <h2 className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl">
+          Ask about your chart
+        </h2>
+        <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed text-pretty sm:text-base">
+          Send this chart to ChatGPT, Claude or Gemini with the /ascendant
+          skill, or keep a copy as a PDF.
+        </p>
+        <ChartActions className="mt-8 justify-center" />
+      </section>
+
+      {/* Clearance so the floating nav never covers the last band. */}
+      <div aria-hidden="true" className="h-20" />
+      <ReportNav />
+    </>
+  );
+}
+
 export function ChartResultSwitch({
-  tabListContainerClassName,
-  tabListFill,
   onEditDetails,
 }: {
-  tabListContainerClassName?: string;
-  tabListFill?: boolean;
   onEditDetails?: () => void;
 } = {}) {
   const {
     state: { status, result },
   } = useChartSession();
-  // Each outer tab is a fresh view of the report, so start it from the top
-  // instead of leaving the reader halfway down the previous analysis.
-  const handleTabChange = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  };
+  const notice =
+    status === "calculating" && result === null ? (
+      <ChartCalculating />
+    ) : status === "calculating" ? (
+      <p className="text-muted-foreground text-sm">
+        Recalculating with the updated details…
+      </p>
+    ) : status === "failure" ? (
+      <ChartFailure onEditDetails={onEditDetails} />
+    ) : null;
   return (
-    <div role="status" className="flex flex-col gap-4">
-      {status === "calculating" && result === null ? (
-        <ChartCalculating />
+    <div role="status" className="flex flex-col">
+      {notice ? (
+        <div className={`section-ticks py-6 sm:py-10 ${gutterClassName}`}>
+          {notice}
+        </div>
       ) : null}
-      {status === "calculating" && result !== null ? (
-        <p className="text-muted-foreground text-sm">
-          Recalculating with the updated details…
-        </p>
-      ) : null}
-      {status === "failure" ? (
-        <ChartFailure onEditDetails={onEditDetails} />
-      ) : null}
-      {result !== null ? (
-        <ChartSuccess
-          tabListContainerClassName={tabListContainerClassName}
-          tabListFill={tabListFill}
-          onTabChange={handleTabChange}
-        />
-      ) : null}
+      {result !== null ? <ChartSuccess /> : null}
     </div>
   );
 }

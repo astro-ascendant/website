@@ -82,6 +82,13 @@ export interface ChartDivision {
   houses: ChartHouse[];
 }
 
+/** A Pratyantardasha or Sookshma period, fetched when its parent is opened. */
+export interface ChartSubPeriod {
+  lord: string;
+  start: string;
+  end: string;
+}
+
 export interface ChartDashaPeriod {
   mahadasha: string;
   start: string;

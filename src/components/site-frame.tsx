@@ -284,3 +284,79 @@ export function SiteHeader() {
     </header>
   );
 }
+
+/** The landing page's hero title and lead, shared by the tool pages. */
+export const heroTitleClassName =
+  "text-foreground text-4xl font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl";
+export const heroLeadClassName =
+  "text-muted-foreground mt-5 max-w-lg text-base leading-relaxed text-pretty sm:text-lg";
+
+const footerLinkClassName =
+  "text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground";
+
+function FooterDot() {
+  return (
+    <span aria-hidden="true" className="text-xs text-muted-foreground/60">
+      •
+    </span>
+  );
+}
+
+/** Copyright, licence and About, closing the landing page. */
+export function SiteFooter() {
+  return (
+    <footer
+      className={`section-ticks flex w-full justify-center py-8 ${gutterClassName}`}
+    >
+      <nav
+        aria-label="Footer"
+        className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
+      >
+        <span className="text-xs text-muted-foreground">© 2026 Laxman K R</span>
+        <FooterDot />
+        <a
+          href="https://www.gnu.org/licenses/agpl-3.0.html"
+          target="_blank"
+          rel="noreferrer"
+          className={footerLinkClassName}
+        >
+          GNU AGPL v3
+        </a>
+        <FooterDot />
+        <Link to="/about" className={footerLinkClassName}>
+          About
+        </Link>
+      </nav>
+    </footer>
+  );
+}
+
+/** A closing ticked rule under the last band, for pages without the footer. */
+export function SiteFrameEnd() {
+  return <div aria-hidden="true" className="section-ticks pb-6 sm:pb-10" />;
+}
+
+/** A band's centred title and lead, as on the landing page. */
+export function SectionHeading({
+  id,
+  title,
+  subtitle,
+}: {
+  id?: string;
+  title: string;
+  subtitle: ReactNode;
+}) {
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+      <h2
+        id={id}
+        className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl"
+      >
+        {title}
+      </h2>
+      <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty sm:text-base">
+        {subtitle}
+      </p>
+    </div>
+  );
+}

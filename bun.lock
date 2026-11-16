@@ -16,7 +16,7 @@
         "@phosphor-icons/react": "^2.1.10",
         "@tanstack/react-router": "1.170.46",
         "@tanstack/react-start": "1.169.4",
-        "astro-ascendant": "6.1.0",
+        "astro-ascendant": "6.2.0",
         "chrono-node": "^2.10.3",
         "class-variance-authority": "^0.7.1",
         "cn": "^0.5.0",
@@ -676,7 +676,7 @@
 
     "astring": ["astring@1.9.0", "", { "bin": { "astring": "bin/astring" } }, "sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg=="],
 
-    "astro-ascendant": ["astro-ascendant@6.1.0", "", { "dependencies": { "@swisseph/node": "^1.4.0" }, "peerDependencies": { "effect": "^4.0.0" } }, "sha512-TKFduBsiPV+aUTAtJJdT42T8CANfWrOi56njveth0uLjjRHowtn8IDUYgenbRiJ2KOuvH6F1rwbh/fnDMlKcfw=="],
+    "astro-ascendant": ["astro-ascendant@6.2.0", "", { "dependencies": { "@swisseph/node": "^1.4.0" }, "peerDependencies": { "effect": "^4.0.0" } }, "sha512-zQ1GOLQgY/m7/jU8uFL/iBEO0Veqhwk8ejnkq7pA25nyvmgz4B3tbDMoaWiWjlwx78B7pGLAlMFokXHU8mA4LA=="],
 
     "atomically": ["atomically@1.7.0", "", {}, "sha512-Xcz9l0z7y9yQ9rdDaxlmaI4uJHf/T8g9hOEzJcsEqX2SjCj4J20uK7+ldkDHMbpJDK76wF7xEIgxc/vSlsfw5w=="],
 

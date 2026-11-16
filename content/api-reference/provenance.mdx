@@ -3,7 +3,7 @@ title: Provenance
 description: Method specification and provenance records attached to calculations.
 ---
 
-{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.2.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/provenance`:
 
@@ -606,10 +606,15 @@ const vimshottariDasha: {
       readonly id: "build-antardashas";
       readonly description: "Split each Mahadasha by the lords' shares of the 120-year cycle.";
     },
+    {
+      readonly id: "subdivide-deeper-levels";
+      readonly description: "On request, split an Antardasha into Pratyantardashas and those into Sookshmas, from the parent's lord, by the lords' shares of the parent's actual span on whole minutes.";
+    },
   ];
   readonly verification: readonly [
     "The nine Mahadashas are contiguous and span 120 years.",
     "Antardashas tile their Mahadasha and end on its end.",
+    "Pratyantardashas and Sookshmas tile their parent, never run backwards, and end on its end.",
   ];
 };
 ```

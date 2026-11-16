@@ -60,7 +60,12 @@ A `ChartCalculationError` at the `"houses"` stage means the chosen house system'
 D1 cusps did not divide the circle into twelve houses. See [Choose a school and
 settings](/docs/guides/settings).
 
-## Handle an error by tag
+## Handle errors
+
+Recover from a failure inside Effect by matching its tag, or at the edge of
+your app, where the effect becomes a promise.
+
+### By tag
 
 Use `Effect.catchTag` to recover from one error:
 
@@ -112,7 +117,7 @@ Because `catchTags` lists every tag in the function's error type, the result no
 longer has an error channel, and TypeScript will flag the call if a future version
 adds a new error.
 
-## Handle errors at the promise boundary
+### At the promise boundary
 
 `runtime.runPromise` rejects with the error itself. The rejection is a real
 `Error` instance with its `_tag`, so you can branch on the tag in an ordinary
