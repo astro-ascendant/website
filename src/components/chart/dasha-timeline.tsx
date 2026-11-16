@@ -53,8 +53,7 @@ export function ChartDashaTimelines() {
         now={now}
         depth={4}
       />
-      {/* A hairline between the two Jaimini systems where they sit side by side. */}
-      <div className="divide-border grid gap-14 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:[&>*:first-child]:pe-10 lg:[&>*:last-child]:ps-10">
+      <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-10">
         <DashaSystem name="Chara" periods={result.dasha.chara} now={now} depth={2} />
         <DashaSystem name="Sthira" periods={result.dasha.sthira} now={now} depth={2} />
       </div>
