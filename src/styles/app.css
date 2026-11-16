@@ -226,9 +226,14 @@
 }
 
 html {
-  scrollbar-gutter: stable both-edges;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mirror the scrollbar gutter on both edges only for pages inside the site
+   frame (the landing page); docs pages run edge to edge. */
+html:has([data-site-frame]) {
+  scrollbar-gutter: stable both-edges;
 }
 
 html > body[data-scroll-locked] {
