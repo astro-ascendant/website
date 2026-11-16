@@ -9,26 +9,6 @@ import {
 import { useChartSession } from "@/components/chart/session";
 import { formatSignifyingHouses } from "@/lib/chart-report";
 import { formatLongitude } from "@/lib/zodiac";
-import { ChartCode, ChartQuote } from "@/components/chart/quote";
-
-export function ChartKpCaption() {
-  const {
-    state: { result },
-  } = useChartSession();
-  if (!result) {
-    return null;
-  }
-  return (
-    <ChartQuote>
-      Krishnamurthi Paddhathi is a modern astrological system designed to
-      analyse charts with greater precision. It uses the{" "}
-      <ChartCode>{result.kp.astroParams.ayanamsa}</ChartCode> ayanamsa and the{" "}
-      <ChartCode>{result.kp.astroParams.houseSystem}</ChartCode> cusp-based
-      house system. While it can be applied to a wide range of astrological
-      questions, it is particularly effective for questions involving timing.
-    </ChartQuote>
-  );
-}
 
 export function ChartKpCuspTable() {
   const {

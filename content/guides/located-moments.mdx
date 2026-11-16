@@ -69,7 +69,7 @@ Two options matter here:
 - `disambiguation: "reject"` returns `Option.none()` for times that are ambiguous
   or do not exist. See the next section.
 
-## Local times that are ambiguous or do not exist
+### Local times that are ambiguous or do not exist
 
 Clock changes create two kinds of bad local times:
 
@@ -83,7 +83,7 @@ pick an answer. That can move a birth by an hour and change the Lagna. For
 astrology, prefer `"reject"` and ask the user which of the two moments they mean,
 or for the exact UTC offset from their birth record.
 
-## Convert in one function
+### Convert in one function
 
 Put the conversion in one place so every input takes the same path:
 
@@ -123,7 +123,11 @@ pass straight to `Chart.generate`:
 const calculation = yield* toLocatedMoment(input).pipe(Effect.flatMap(Chart.generate));
 ```
 
-## Find the time zone for a place
+## The place
+
+A Located Moment also records where the birth happened.
+
+### Find the time zone for a place
 
 Ascendant does not map coordinates to a time zone, and the UTC offset depends on
 both the place and the date. A place can change its offset over time, and
@@ -138,7 +142,7 @@ package, or ask for it, and always combine it with the birth date.
   zone name.
 </Callout>
 
-## Coordinates
+### Coordinates
 
 Give latitude and longitude as decimal degrees. If you hold degrees, minutes, and
 seconds, convert them first: `degrees + minutes / 60 + seconds / 3600`, negated

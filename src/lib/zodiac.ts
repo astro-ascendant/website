@@ -72,6 +72,58 @@ export function normalizeLongitude(longitude: number): number {
   return ((longitude % 360) + 360) % 360;
 }
 
+/** The 27 nakshatras in zodiac order, from 0° Aries. */
+export const NAKSHATRAS = [
+  "Ashwini",
+  "Bharani",
+  "Krittika",
+  "Rohini",
+  "Mrigashira",
+  "Ardra",
+  "Punarvasu",
+  "Pushya",
+  "Ashlesha",
+  "Magha",
+  "Purva Phalguni",
+  "Uttara Phalguni",
+  "Hasta",
+  "Chitra",
+  "Swati",
+  "Vishakha",
+  "Anuradha",
+  "Jyeshtha",
+  "Mula",
+  "Purva Ashadha",
+  "Uttara Ashadha",
+  "Shravana",
+  "Dhanishta",
+  "Shatabhisha",
+  "Purva Bhadrapada",
+  "Uttara Bhadrapada",
+  "Revati",
+] as const;
+
+const NAKSHATRA_ARC = 360 / 27;
+const PADA_ARC = NAKSHATRA_ARC / 4;
+
+/**
+ * The nakshatra and pada at a sidereal longitude: 13°20′ stars of four
+ * 3°20′ padas each. The engine attaches stars to birth (D1) positions only;
+ * this reads them for divisional longitudes such as the Navamsha. Null for a
+ * missing or non-finite longitude.
+ */
+export function starAt(
+  longitude: number | null | undefined,
+): { name: string; pada: number } | null {
+  if (longitude === null || longitude === undefined || !Number.isFinite(longitude)) {
+    return null;
+  }
+  const position = normalizeLongitude(longitude);
+  const index = Math.min(26, Math.floor(position / NAKSHATRA_ARC));
+  const pada = Math.min(4, Math.floor((position - index * NAKSHATRA_ARC) / PADA_ARC) + 1);
+  return { name: NAKSHATRAS[index]!, pada };
+}
+
 /**
  * Absolute sidereal longitude rendered as sign-relative degrees and arcminutes:
  * "1°51'". Minutes round to the nearest one; a value that would round up to

@@ -1,5 +1,6 @@
 import {
   findBirthProfile,
+  mergeBirthProfiles,
   upsertBirthProfile,
   type BirthProfile,
 } from "@/lib/birth-profiles";
@@ -37,6 +38,10 @@ export type ChartSessionEvent =
   | { readonly type: "edit"; readonly patch: Partial<ChartBirthInput> }
   | { readonly type: "selectPlace"; readonly option: PlaceOption }
   | { readonly type: "applyProfile"; readonly name: string }
+  | {
+      readonly type: "profilesLoaded";
+      readonly profiles: readonly BirthProfile[];
+    }
   | { readonly type: "searchStart"; readonly query: string }
   | {
       readonly type: "searchResults";
@@ -130,6 +135,15 @@ export function reduceChartSession(
         },
         fieldErrors: withoutErrors(state.fieldErrors, ["place"]),
       };
+    case "profilesLoaded": {
+      const savedProfiles = mergeBirthProfiles(
+        state.savedProfiles,
+        event.profiles,
+      );
+      return savedProfiles.length === state.savedProfiles.length
+        ? state
+        : { ...state, savedProfiles };
+    }
     case "applyProfile": {
       const profile = findBirthProfile(state.savedProfiles, event.name);
       if (!profile) {

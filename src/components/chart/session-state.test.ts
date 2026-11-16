@@ -110,6 +110,35 @@ describe("reduceChartSession", () => {
     expect(state.savedProfiles).toEqual([]);
   });
 
+  test("stored profiles join the list behind the browser's own", () => {
+    const local = run([
+      { type: "start", birth: BIRTH },
+      { type: "succeed", result: RESULT },
+    ]);
+    const state = run(
+      [
+        {
+          type: "profilesLoaded",
+          profiles: [
+            { ...BIRTH, time: "09:00" },
+            { ...BIRTH, name: "Test" },
+          ],
+        },
+      ],
+      local,
+    );
+    expect(state.savedProfiles.map((profile) => profile.name)).toEqual([
+      "Harini",
+      "Test",
+    ]);
+    expect(state.savedProfiles[0]?.time).toBe("10:00");
+  });
+
+  test("loading nothing new leaves the state as it was", () => {
+    const state = initialChartSessionState([]);
+    expect(run([{ type: "profilesLoaded", profiles: [] }], state)).toBe(state);
+  });
+
   test("recasting keeps the previous result until the new one lands", () => {
     const state = run([
       { type: "start", birth: BIRTH },

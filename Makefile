@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install dev build preview typecheck fmt fmt-check lint lint-fix check sync-api
+.PHONY: help install dev build preview typecheck fmt fmt-check lint lint-fix check sync-api db-migrate
 
 help: ## Show available development commands.
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "%-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -36,3 +36,6 @@ check: fmt-check lint typecheck ## Run format, lint, and type checks.
 
 sync-api: ## Check installed astro-ascendant exports against curated api-reference pages.
 	bun run scripts/sync-api.ts
+
+db-migrate: ## Create the birth_profiles table in the database at DATABASE_URL.
+	bun run db:migrate

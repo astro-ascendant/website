@@ -176,10 +176,11 @@ export interface HeadlineFacts {
   ascendant: string;
   moon: string;
   star: string;
-  mahadasha: string;
+  /** The running Mahadasha and its Antardasha, e.g. "Jupiter · Moon". */
+  dasha: string;
 }
 
-/** Headline facts under the name, with the current mahadasha evaluated at `now`. */
+/** Headline facts under the name, with the running dasha evaluated at `now`. */
 export function buildHeadlineView(
   { lagna, d1, vimshottari }: HeadlineInput,
   now: string,
@@ -197,6 +198,15 @@ export function buildHeadlineView(
       moon && moon.star !== ""
         ? `${moon.star}${moon.pada ? ` · Pada ${moon.pada}` : ""}`
         : "-",
-    mahadasha: currentDasha ? currentDasha.mahadasha : "-",
+    dasha: currentDasha
+      ? [
+          currentDasha.mahadasha,
+          currentDasha.antardashas[
+            findCurrentPeriodIndex(currentDasha.antardashas, now)
+          ]?.antardasha,
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      : "-",
   };
 }

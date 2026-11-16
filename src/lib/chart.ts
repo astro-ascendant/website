@@ -82,6 +82,20 @@ export interface ChartDivision {
   houses: ChartHouse[];
 }
 
+/** The Pratyantaras inside one Antardasha, named by its Mahadasha and Antardasha. */
+export interface ChartCurrentPratyantaras {
+  mahadasha: string;
+  antardasha: string;
+  periods: ChartSubPeriod[];
+}
+
+/** A Pratyantardasha or Sookshma period, fetched when its parent is opened. */
+export interface ChartSubPeriod {
+  lord: string;
+  start: string;
+  end: string;
+}
+
 export interface ChartDashaPeriod {
   mahadasha: string;
   start: string;
@@ -162,6 +176,11 @@ export interface ChartResult {
     vimshottari: ChartDashaPeriod[];
     chara: ChartDashaPeriod[];
     sthira: ChartDashaPeriod[];
+    /**
+     * The nine Pratyantaras of the Vimshottari Antardasha running when the
+     * chart was cast. Null when that moment falls outside the timeline.
+     */
+    currentPratyantaras?: ChartCurrentPratyantaras | null;
   };
   jaimini: {
     karakas: { role: string; planet: string }[];

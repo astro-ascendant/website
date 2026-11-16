@@ -3,7 +3,7 @@ title: Dasha
 description: Vimshottari, Chara, and Sthira dasha calculations and queries.
 ---
 
-{/* Generated from astro-ascendant@6.1.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.2.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/dasha`:
 
@@ -23,6 +23,20 @@ class DashaCalculationError extends DashaCalculationError_base {}
 
 ```ts
 class DashaEvidenceError extends DashaEvidenceError_base {}
+```
+
+## Interfaces
+
+### `PratyantarDasha`
+
+```ts
+interface PratyantarDasha extends Schema.Schema.Type<typeof PratyantarDasha> {}
+```
+
+### `SookshmaDasha`
+
+```ts
+interface SookshmaDasha extends Schema.Schema.Type<typeof SookshmaDasha> {}
 ```
 
 ## Types
@@ -269,91 +283,31 @@ const CharaDashaProvenance: Schema.Struct<{
 
 ```ts
 const CurrentDasha: Schema.Struct<{
-  readonly mahadasha: Schema.Struct<{
-    readonly mahadasha: Schema.Literals<
-      readonly [
-        "Sun",
-        "Moon",
-        "Mars",
-        "Mercury",
-        "Jupiter",
-        "Venus",
-        "Saturn",
-        "Rahu",
-        "Ketu",
-      ]
-    >;
-    readonly provenance: Schema.Struct<{
-      readonly school: Schema.Literal<"Parashari">;
-      readonly method: Schema.Literal<"moon-nakshatra-balance">;
-      readonly version: Schema.Literal<"2026-11-01">;
-    }>;
-    readonly start: Schema.DateTimeUtc;
-    readonly end: Schema.DateTimeUtc;
-    readonly antardashas: Schema.$Array<
-      Schema.Struct<{
-        readonly mahadasha: Schema.Literals<
-          readonly [
-            "Sun",
-            "Moon",
-            "Mars",
-            "Mercury",
-            "Jupiter",
-            "Venus",
-            "Saturn",
-            "Rahu",
-            "Ketu",
-          ]
-        >;
-        readonly antardasha: Schema.Literals<
-          readonly [
-            "Sun",
-            "Moon",
-            "Mars",
-            "Mercury",
-            "Jupiter",
-            "Venus",
-            "Saturn",
-            "Rahu",
-            "Ketu",
-          ]
-        >;
+    readonly mahadasha: Schema.Struct<{
+        readonly mahadasha: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+        readonly provenance: Schema.Struct<{
+            readonly school: Schema.Literal<"Parashari">;
+            readonly method: Schema.Literal<"moon-nakshatra-balance">;
+            readonly version: Schema.Literal<"2026-11-01">;
+        }>;
         readonly start: Schema.DateTimeUtc;
         readonly end: Schema.DateTimeUtc;
-      }>
-    >;
-  }>;
-  readonly antardasha: Schema.Struct<{
-    readonly mahadasha: Schema.Literals<
-      readonly [
-        "Sun",
-        "Moon",
-        "Mars",
-        "Mercury",
-        "Jupiter",
-        "Venus",
-        "Saturn",
-        "Rahu",
-        "Ketu",
-      ]
-    >;
-    readonly antardasha: Schema.Literals<
-      readonly [
-        "Sun",
-        "Moon",
-        "Mars",
-        "Mercury",
-        "Jupiter",
-        "Venus",
-        "Saturn",
-        "Rahu",
-        "Ketu",
-      ]
-    >;
-    readonly start: Schema.DateTimeUtc;
-    readonly end: Schema.DateTimeUtc;
-  }>;
-}>;
+        readonly antardashas: Schema.$Array<Schema.Struct<{
+            readonly mahadasha: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+            readonly antardasha: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+            readonly start: Schema.DateTimeUtc;
+            readonly end: Schema.DateTimeUtc;
+        }>>;
+    }>;
+    readonly antardasha: Schema.Struct<{
+        readonly mahadasha: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+        readonly antardasha: Schema.Literals<readonly ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]>;
+        readonly start: Schema.DateTimeUtc;
+        readonly end: Schema.DateTimeUtc;
+    }>;
+    readonly pratyantardasha: Schema.Struct<{
+        readonly mahadasha: Schema.Literals<re
+// … truncated
 ```
 
 ### `CurrentRashiDasha`

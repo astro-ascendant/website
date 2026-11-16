@@ -17,9 +17,12 @@ export const TEST_BIRTHS = [
 ] as const;
 
 /** Cast a chart through the real ephemeris, the same path `getChart` takes. */
-export function castChart(
-  birth: (typeof TEST_BIRTHS)[number],
-): Promise<ChartResult> {
+export function castChart(birth: {
+  readonly date: string;
+  readonly time: string;
+  readonly latitude: number;
+  readonly longitude: number;
+}): Promise<ChartResult> {
   return runtime.runPromise(
     Effect.gen(function* () {
       const resolved = yield* resolveMoment(birth);

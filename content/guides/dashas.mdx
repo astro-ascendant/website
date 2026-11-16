@@ -1,6 +1,6 @@
 ---
 title: Dashas
-description: Calculate Vimshottari, Chara, and Sthira dasha timelines from shared placements and query the period active on any date.
+description: Calculate Vimshottari, Chara, and Sthira dasha timelines from shared placements, split Vimshottari down to Pratyantardasha and Sookshma, and query the period active on any date.
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
@@ -15,8 +15,11 @@ systems from the same **Placements** you already have from `Chart.generate`:
 | **Chara** | Signs | 12 | 12 | Jaimini |
 | **Sthira** | Signs | 12 | 12 | Jaimini |
 
-This guide builds each one, reads it, and asks which period is running on a given
-date.
+Vimshottari goes two levels deeper: each Antardasha splits into nine
+**Pratyantardashas**, and each of those into nine **Sookshma** dashas.
+
+This guide builds each one, reads it, splits Vimshottari down to Sookshma, and
+asks which period is running on a given date.
 
 ## Start from placements
 
@@ -94,10 +97,55 @@ for (const sub of first.antardashas) {
 }
 ```
 
-## Find the running period
+### Pratyantardasha and Sookshma
 
-`Dasha.at` returns the Mahadasha and Antardasha active at a moment. It uses the
-current time when you pass none:
+The timeline stops at Antardashas, because the deeper levels multiply fast: 729
+Pratyantardashas and 6,561 Sookshmas across 120 years. Split a period only when
+you need it. `Dasha.pratyantardashas` takes an Antardasha and returns its nine
+Pratyantardashas, and `Dasha.sookshmas` takes a Pratyantardasha and returns its
+nine Sookshmas. Both are plain functions, not effects, so no runtime is needed:
+
+```ts
+const saturn = timeline[2];
+const sun = saturn.antardashas.find((sub) => sub.antardasha === "Sun")!;
+
+const pratyantardashas = Dasha.pratyantardashas(sun);
+for (const period of pratyantardashas) {
+  console.log(`${period.pratyantardasha}: ${day(period.start)} to ${day(period.end)}`);
+}
+
+const sookshmas = Dasha.sookshmas(pratyantardashas[0]);
+```
+
+Each level starts from its parent's lord and follows the Vimshottari order, taking
+the same share of its parent that the lord takes of the 120-year cycle. For the
+Saturn Mahadasha's Sun Antardasha, the nine Pratyantardashas are:
+
+| Pratyantardasha | Start | End |
+| --- | --- | --- |
+| Sun | `2026-08-02` | `2026-08-19` |
+| Moon | `2026-08-19` | `2026-09-17` |
+| Mars | `2026-09-17` | `2026-10-08` |
+| Rahu | `2026-10-08` | `2026-11-29` |
+| Jupiter | `2026-11-29` | `2027-01-14` |
+| Saturn | `2027-01-14` | `2027-03-10` |
+| Mercury | `2027-03-10` | `2027-04-28` |
+| Ketu | `2027-04-28` | `2027-05-18` |
+| Venus | `2027-05-18` | `2027-07-15` |
+
+The first Sookshma of the Sun Pratyantardasha runs from `2026-08-02T12:48Z` to
+`2026-08-03T09:37Z`, under a day. Sookshma boundaries are rounded to the minute,
+and the last child always ends exactly where its parent ends, so the levels line
+up with no gaps.
+
+KP practice calls the third level **Antara**. It is the same period:
+`PratyantarDasha` in the API.
+
+### Find the running period
+
+`Dasha.at` returns the whole chain active at a moment: the Mahadasha,
+Antardasha, Pratyantardasha and Sookshma. It uses the current time when you
+pass none:
 
 ```ts
 const when = DateTime.makeUnsafe("2026-11-01T00:00:00Z");
@@ -108,8 +156,16 @@ if (current) {
   console.log(current.antardasha.antardasha); // "Sun"
   console.log(day(current.antardasha.start), day(current.antardasha.end));
   // 2026-08-02 2027-07-15
+  console.log(current.pratyantardasha.pratyantardasha); // "Rahu"
+  console.log(current.sookshma.sookshma); // "Mercury"
+  console.log(day(current.sookshma.start), day(current.sookshma.end));
+  // 2026-10-31 2026-11-07
 }
 ```
+
+Only the running branch is split, so the query stays cheap however deep it
+goes. Call `Dasha.pratyantardashas` or `Dasha.sookshmas` yourself for any other
+period.
 
 It returns `null` when the date falls outside the timeline, for example in 1900 or
 2500, so always check before reading the result.
@@ -168,7 +224,8 @@ For the same date, the Chara period is Pisces-Virgo, from `2026-08-01` to
 <Callout type="warn" title="Use the matching query">
   `Dasha.at` takes a Vimshottari timeline and `Dasha.atRashi` takes a Chara or
   Sthira one. Each result carries the types of its own system, so TypeScript
-  stops you from mixing them.
+  stops you from mixing them. `Dasha.atRashi` goes to the Antardasha only: the
+  Pratyantardasha and Sookshma levels are Vimshottari's.
 </Callout>
 
 ## How dates are counted
@@ -177,7 +234,8 @@ The systems measure time differently, and you can see it in the boundaries:
 
 - **Vimshottari** periods are decimal years converted into calendar months, days,
   hours, and minutes. Their boundaries fall at any time of day. In the example,
-  Saturn begins at `12:48 UTC` on `2016-08-12`.
+  Saturn begins at `12:48 UTC` on `2016-08-12`. Pratyantardashas and Sookshmas
+  divide their parent's actual span, rounded to the minute.
 - **Chara and Sthira** periods are whole calendar months. Their boundaries fall
   on the first of a month, such as `2026-08-01`.
 

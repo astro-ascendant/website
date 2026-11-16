@@ -1,3 +1,4 @@
+import { pdfFileName } from "@/lib/file-name";
 import {
   createContext,
   use,
@@ -24,6 +25,10 @@ import {
 } from "@/lib/chart-report";
 import { searchPlaces, type PlaceOption } from "@/lib/place";
 import { getChart } from "@/server/chart.functions";
+import {
+  listBirthProfiles,
+  saveBirthProfile,
+} from "@/server/profile.functions";
 import { createLatestRequest, type LatestRequestGate } from "./latest-request";
 import {
   firstInvalidField,
@@ -65,6 +70,10 @@ export interface ChartSessionDeps {
   clock: () => string;
   loadProfiles: () => BirthProfile[];
   saveProfiles: (profiles: readonly BirthProfile[]) => void;
+  /** Profiles the database holds for this browser. */
+  fetchProfiles: () => Promise<BirthProfile[]>;
+  /** Stores one cast birth in the database. */
+  recordProfile: (profile: BirthProfile) => Promise<void>;
   savePdf: (result: ChartResult) => Promise<void>;
   openUrl: (url: string) => void;
 }
@@ -91,13 +100,29 @@ async function requestChart(
   return response.result;
 }
 
+async function recordProfile(profile: BirthProfile): Promise<void> {
+  await saveBirthProfile({
+    data: {
+      name: profile.name.trim(),
+      date: profile.date,
+      time: profile.time,
+      place: profile.place,
+      latitude: profile.latitude,
+      longitude: profile.longitude,
+      ...(profile.sex ? { sex: profile.sex } : {}),
+    },
+  });
+}
+
 /** The PDF renderer loads on the first save, not with the page. */
 async function downloadPdf(result: ChartResult): Promise<void> {
   const { buildChartPdf } = await import("@/lib/chart-pdf");
-  const url = URL.createObjectURL(await buildChartPdf(result));
+  const url = URL.createObjectURL(
+    await buildChartPdf(result),
+  );
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "birth-chart.pdf";
+  anchor.download = pdfFileName(result.birth.name);
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
@@ -111,6 +136,8 @@ const defaultDeps: ChartSessionDeps = {
   clock: () => new Date().toISOString(),
   loadProfiles: loadBirthProfiles,
   saveProfiles: saveBirthProfiles,
+  fetchProfiles: () => listBirthProfiles(),
+  recordProfile,
   savePdf: downloadPdf,
   openUrl: (url) => window.open(url, "_blank", "noopener"),
 };
@@ -154,6 +181,24 @@ function useChartSessionController(
     },
     [search, chart],
   );
+
+  // Profiles stored from another visit fill in what this browser lacks.
+  useEffect(() => {
+    let live = true;
+    deps
+      .fetchProfiles()
+      .then((profiles) => {
+        if (live) {
+          dispatch({ type: "profilesLoaded", profiles });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+    // Runs once per mount; deps are fixed for the provider's life.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // A chart cast under a name is remembered for the next visit.
   useEffect(() => {
@@ -214,6 +259,8 @@ function useChartSessionController(
       if (chart.isCurrent(request.id)) {
         dispatch({ type: "succeed", result });
       }
+      // Every cast birth is stored; the privacy page says so.
+      deps.recordProfile(birth).catch(() => {});
     } catch (error) {
       if (!chart.isCurrent(request.id)) {
         return;

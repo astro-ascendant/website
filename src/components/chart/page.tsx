@@ -8,15 +8,23 @@ import {
 import { cn } from "cn";
 import { Chart } from "@/components/chart";
 import { ChatGptIcon } from "@/components/chart/chatgpt-icon";
+import { HeroConversation } from "@/components/chart/hero-conversation";
 import { ChartDetailsEditor } from "@/components/chart/details-editor";
 import {
   gutterClassName,
+  heroLeadClassName,
+  heroTitleClassName,
   SiteFrame,
+  SiteFrameEnd,
   SiteHeader,
 } from "@/components/site-frame";
+import { ChartActions } from "@/components/chart/results";
 import { useChartSession } from "@/components/chart/session";
 import { Button } from "@/components/arc/button/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DottedPencil,
+  ExpandingActionButton,
+} from "@/components/motion/expanding-arrow-button";
 import { buildHeadlineView } from "@/lib/chart-view";
 import { formatTimeZoneLabel } from "@/lib/timezone";
 
@@ -131,7 +139,7 @@ function useChartSummary(): { items: SummaryItem[] } | null {
       { label: "Ascendant", value: facts.ascendant },
       { label: "Moon", value: facts.moon },
       { label: "Star", value: facts.star },
-      { label: "Mahadasha", value: facts.mahadasha },
+      { label: "Mahadasha · Antardasha", value: facts.dasha },
     ],
   };
 }
@@ -184,9 +192,13 @@ export function KpiStrip({
   );
 }
 
+/** The landing hero's type, a step smaller: a name sits beside the edit action. */
+export const reportTitleClassName =
+  "text-foreground text-3xl font-medium tracking-tight text-balance sm:text-4xl lg:text-5xl";
+
 /**
  * The chart generator, outside the docs shell. Opens as a report on one
- * person (headline facts, then the tabbed analysis) with the birth-details
+ * person (headline facts, then the analysis as one page of bands) with the birth-details
  * form behind one action, in a dialog on desktop and a drawer on mobile.
  */
 export function ChartPage() {
@@ -194,7 +206,6 @@ export function ChartPage() {
     state: { status, result, attempt },
   } = useChartSession();
   const summary = useChartSummary();
-  const isMobile = useIsMobile();
   const [editorOpen, setEditorOpen] = useState(false);
   // A failed calculation has no result, so the header reads the submitted
   // details instead: the reader keeps their place and the way back in.
@@ -224,108 +235,101 @@ export function ChartPage() {
       <SiteFrame>
         <SiteHeader />
 
-        <section className="section-ticks">
-          <div className={`w-full py-6 sm:py-10 ${gutterClassName}`}>
-            <div className="flex flex-col gap-0">
+        {hasBirth ? (
+          <section className="section-ticks">
+            <div className={`w-full py-10 sm:py-16 ${gutterClassName}`}>
               <div className="flex items-start justify-between gap-3">
-                <h1 className="font-heading min-w-0 text-xl font-medium tracking-tight text-balance sm:text-3xl">
-                  {hasBirth ? birth.name || "Untitled chart" : "Create horoscope"}
+                <h1 className={`min-w-0 ${reportTitleClassName}`}>
+                  {birth.name || "Untitled chart"}
                 </h1>
-                {hasBirth ? (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    aria-label="Edit birth details"
-                    className="shrink-0 max-sm:size-9 max-sm:px-0!"
-                    onClick={() => setEditorOpen(true)}
-                  >
-                    <PencilSimpleIcon aria-hidden="true" />
-                    <span className="hidden sm:inline">Edit details</span>
-                  </Button>
-                ) : null}
-              </div>
-              {hasBirth ? (
-                <dl className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 sm:mt-3 sm:gap-x-6 sm:gap-y-2">
-                  <MetaFact
-                    icon={CalendarBlankIcon}
-                    label="Birth date"
-                    value={formatLongDate(birth.date)}
-                  />
-                  <MetaFact
-                    icon={ClockIcon}
-                    label="Birth time"
-                    value={formatClockTime(birth.time)}
-                    hint={formatZoneHint(birth.timeZone, birth.utcIso)}
-                  />
-                  <MetaFact
-                    icon={MapPinIcon}
-                    label="Birth place"
-                    value={placeLabel}
-                    title={placeTitle}
-                    className="max-sm:basis-full"
-                  />
-                </dl>
-              ) : (
-                <p className="text-muted-foreground mt-2 max-w-prose text-sm leading-relaxed text-pretty sm:text-base">
-                  Create your horoscope and uncover personalised insights about
-                  your career, relationships, timing, and life patterns with{" "}
-                  <span className="text-primary font-semibold whitespace-nowrap">
-                    <ChatGptIcon
-                      aria-hidden="true"
-                      className="me-1 inline-block size-4 align-[-0.125em]"
-                    />
-                    ChatGPT
-                  </span>{" "}
-                  using the{" "}
-                  <code className="bg-muted rounded-[0.3rem] px-[0.3rem] py-[0.15rem] font-mono text-[0.9em]">
-                    /ascendant
-                  </code>{" "}
-                  astrology skill.
-                </p>
-              )}
-            </div>
-
-            {summary ? (
-              <KpiStrip items={summary.items} className="mt-4 sm:mt-8" />
-            ) : null}
-          </div>
-        </section>
-
-        <main id="content" className="section-ticks w-full flex-1">
-          <div
-            className={cn(
-              `w-full pb-4 sm:py-10 ${gutterClassName}`,
-              showResults ? "pt-4" : "pt-6",
-            )}
-          >
-            {showResults ? (
-              <>
-                <Chart.ResultSwitch
-                  tabListFill={isMobile}
-                  onEditDetails={() => setEditorOpen(true)}
-                />
-                {/* Clearance for the floating tab bar; only where it floats. */}
-                {isMobile ? <div aria-hidden="true" className="h-16" /> : null}
-              </>
-            ) : (
-              <section className="border-border/70 bg-card/40 flex flex-col items-start gap-4 rounded-xl border p-4 sm:p-8">
-                <div className="flex flex-col gap-1.5">
-                  <h2 className="font-heading text-base font-medium">
-                    No horoscope yet?
-                  </h2>
-                  <p className="text-muted-foreground max-w-prose text-sm text-pretty">
-                    Enter a birth date, time and place to generate a Rashi chart,
-                    Navamsha chart, KP chart, Vimshottari dasha, Jaimini karakas
-                    and Sarvashtakavarga.
-                  </p>
-                </div>
-                <Button type="button" onClick={() => setEditorOpen(true)}>
-                  Enter birth details
+                <Button
+                  type="button"
+                  variant="secondary"
+                  aria-label="Edit birth details"
+                  className="shrink-0 max-sm:size-9 max-sm:px-0!"
+                  onClick={() => setEditorOpen(true)}
+                >
+                  <PencilSimpleIcon aria-hidden="true" />
+                  <span className="hidden sm:inline">Edit details</span>
                 </Button>
-              </section>
-            )}
-          </div>
-        </main>
+              </div>
+              <dl className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 sm:mt-5 sm:gap-x-6 sm:gap-y-2">
+                <MetaFact
+                  icon={CalendarBlankIcon}
+                  label="Birth date"
+                  value={formatLongDate(birth.date)}
+                />
+                <MetaFact
+                  icon={ClockIcon}
+                  label="Birth time"
+                  value={formatClockTime(birth.time)}
+                  hint={formatZoneHint(birth.timeZone, birth.utcIso)}
+                />
+                <MetaFact
+                  icon={MapPinIcon}
+                  label="Birth place"
+                  value={placeLabel}
+                  title={placeTitle}
+                  className="max-sm:basis-full"
+                />
+              </dl>
+              {result ? <ChartActions className="mt-6 sm:mt-8" /> : null}
+              {summary ? (
+                <KpiStrip items={summary.items} className="mt-8 sm:mt-12" />
+              ) : null}
+            </div>
+          </section>
+        ) : (
+          <section
+            id={showResults ? undefined : "content"}
+            aria-label="Create horoscope"
+            className="section-ticks divide-border grid flex-1 md:grid-cols-2 md:divide-x"
+          >
+            <div
+              className={`flex flex-col items-center justify-center py-16 text-center sm:py-24 md:items-start md:text-left ${gutterClassName}`}
+            >
+              <h1 className={`max-w-xl ${heroTitleClassName}`}>
+                Create horoscope
+              </h1>
+              <p className={heroLeadClassName}>
+                Uncover personalised insights about your career,
+                relationships, timing, and life patterns with{" "}
+                <span className="text-primary font-semibold whitespace-nowrap">
+                  <ChatGptIcon
+                    aria-hidden="true"
+                    className="-my-2 me-0.5 inline-block size-8 align-middle"
+                  />
+                  ChatGPT
+                </span>{" "}
+                using the{" "}
+                <code className="bg-muted rounded-[0.3rem] px-[0.3rem] py-[0.15rem] font-mono text-[0.9em]">
+                  /ascendant
+                </code>{" "}
+                astrology skill.
+              </p>
+              <ExpandingActionButton
+                icon={<DottedPencil className="size-5" />}
+                className="mt-8 w-full sm:w-auto"
+                onClick={() => setEditorOpen(true)}
+              >
+                Enter birth details
+              </ExpandingActionButton>
+            </div>
+            <div
+              className={`border-border flex items-center justify-center py-14 max-md:border-t sm:py-20 ${gutterClassName}`}
+            >
+              <HeroConversation />
+            </div>
+          </section>
+        )}
+
+        {showResults ? (
+          <main id="content" className="w-full flex-1">
+            <Chart.ResultSwitch onEditDetails={() => setEditorOpen(true)} />
+          </main>
+        ) : null}
+
+        <SiteFrameEnd />
       </SiteFrame>
 
       <ChartDetailsEditor open={editorOpen} onOpenChange={setEditorOpen} />

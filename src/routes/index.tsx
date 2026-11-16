@@ -8,6 +8,10 @@ import { ExpandingArrowButton } from "../components/motion/expanding-arrow-butto
 import { ButtonLink } from "../components/motion/button/base";
 import {
   gutterClassName,
+  heroLeadClassName,
+  heroTitleClassName,
+  SectionHeading,
+  SiteFooter,
   SiteFrame,
   SiteHeader,
 } from "../components/site-frame";
@@ -137,25 +141,6 @@ function CardGrid({
   );
 }
 
-function SectionHeading({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle: ReactNode;
-}) {
-  return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-      <h2 className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl">
-        {title}
-      </h2>
-      <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty sm:text-base">
-        {subtitle}
-      </p>
-    </div>
-  );
-}
-
 function LandingPage() {
   return (
     <main className="bg-background text-foreground flex min-h-screen flex-col antialiased">
@@ -171,10 +156,10 @@ function LandingPage() {
           <div
             className={`flex flex-col items-center justify-center py-14 text-center sm:py-20 md:items-start md:text-left ${gutterClassName}`}
           >
-            <h1 className="text-foreground max-w-xl text-4xl font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
+            <h1 className={`max-w-xl ${heroTitleClassName}`}>
               Understand your horoscope.
             </h1>
-            <p className="text-muted-foreground mt-5 max-w-lg text-base leading-relaxed text-pretty sm:text-lg">
+            <p className={heroLeadClassName}>
               Unlike the broad and vague magazine horoscopes that only use your{" "}
               <span className="font-serif italic">sun sign</span>, we use a
               complete picture of the sky when and where you were born to
@@ -291,38 +276,7 @@ function LandingPage() {
           </ArrowLink>
         </section>
 
-        <footer
-          className={`section-ticks flex w-full justify-center py-8 ${gutterClassName}`}
-        >
-          <nav
-            aria-label="Footer"
-            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
-          >
-            <span className="text-xs text-muted-foreground">
-              © 2026 Laxman K R
-            </span>
-            <span aria-hidden="true" className="text-xs text-muted-foreground/60">
-              •
-            </span>
-            <a
-              href="https://www.gnu.org/licenses/agpl-3.0.html"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
-            >
-              GNU AGPL v3
-            </a>
-            <span aria-hidden="true" className="text-xs text-muted-foreground/60">
-              •
-            </span>
-            <Link
-              to="/about"
-              className="text-xs text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
-            >
-              About
-            </Link>
-          </nav>
-        </footer>
+        <SiteFooter />
       </SiteFrame>
     </main>
   );

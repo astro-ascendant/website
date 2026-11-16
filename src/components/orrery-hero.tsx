@@ -47,7 +47,6 @@ const BODY_GRAHA: Record<Body, Graha> = {
 
 // Bezel radii, from the rim inward.
 const R_SIGN_OUT = 112;
-const R_SIGN_INNER_RULE = R_SIGN_OUT - 1.6;
 const R_SIGN_IN = 100;
 const R_NAK_IN = 94;
 const R_MARK = 87;
@@ -170,13 +169,6 @@ export function OrreryHero() {
       >
         {/* Bezel: sign band */}
         <circle r={R_SIGN_OUT} fill="none" stroke="currentColor" strokeWidth={0.6} />
-        <circle
-          r={R_SIGN_INNER_RULE}
-          fill="none"
-          stroke="currentColor"
-          strokeOpacity={0.35}
-          strokeWidth={0.25}
-        />
         <circle r={R_SIGN_IN} fill="none" stroke="currentColor" strokeWidth={0.45} />
         {SIGNS.map((sign, i) => {
           const [x1, y1] = polar(i * 30, R_SIGN_IN);
@@ -185,7 +177,7 @@ export function OrreryHero() {
           // Signs in the lower half read along the counter-clockwise arc;
           // those in the upper half run clockwise so no label is upside down.
           const upper = mid > 180;
-          const bandMid = (R_SIGN_IN + R_SIGN_INNER_RULE) / 2;
+          const bandMid = (R_SIGN_IN + R_SIGN_OUT) / 2;
           const baseline = bandMid + (upper ? -1 : 1) * SIGN_FONT * 0.36;
           const [ax, ay] = polar(upper ? mid + 14 : mid - 14, baseline);
           const [bx, by] = polar(upper ? mid - 14 : mid + 14, baseline);
