@@ -71,7 +71,11 @@ export interface ChartMappingOptional {
   readonly drishti: DrishtiResult | null;
   readonly argala: ArgalaResult | null;
   readonly arudha: readonly (ArudhaMappingResult | null)[];
+  /** The running Antardasha's Pratyantaras, split by the library. */
+  readonly currentPratyantaras?: readonly CurrentPratyantara[] | null;
 }
+
+type CurrentPratyantara = ReturnType<typeof Dasha.pratyantardashas>[number];
 
 export interface ChartMappingInput {
   readonly input: CalculateChartInput;
@@ -126,6 +130,7 @@ export function toChartResult({
       vimshottari: toDashaPeriods(optional.vimshottari ?? []),
       chara: toDashaPeriods(optional.chara?.mahadashas ?? []),
       sthira: toDashaPeriods(optional.sthira?.mahadashas ?? []),
+      currentPratyantaras: toCurrentPratyantaras(optional.currentPratyantaras),
     },
     jaimini: readJaimini(optional),
     sav: readSav(optional.sav),
@@ -185,6 +190,24 @@ function dignityLabel(
 
 function toIsoDate(moment: DateTime.Utc): string {
   return DateTime.toDateUtc(moment).toISOString();
+}
+
+function toCurrentPratyantaras(
+  periods: readonly CurrentPratyantara[] | null | undefined,
+): ChartResult["dasha"]["currentPratyantaras"] {
+  const first = periods?.[0];
+  if (!periods || !first) {
+    return null;
+  }
+  return {
+    mahadasha: first.mahadasha,
+    antardasha: first.antardasha,
+    periods: periods.map((period) => ({
+      lord: period.pratyantardasha,
+      start: toIsoDate(period.start),
+      end: toIsoDate(period.end),
+    })),
+  };
 }
 
 function toDashaPeriods(

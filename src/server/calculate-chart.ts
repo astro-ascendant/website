@@ -10,7 +10,7 @@ import {
   SAV,
   Upapada,
 } from "astro-ascendant";
-import { Data, Effect, Option } from "effect";
+import { Data, DateTime, Effect, Option } from "effect";
 import { ALL_DIVISIONS } from "@/lib/chart";
 import {
   HOUSES,
@@ -95,6 +95,18 @@ export const calculateChart = Effect.fn("Chart.calculate")(
       const vimshottari = yield* Effect.option(
         Dasha.calculate(moment, placements),
       );
+      // The AI prompt is built when the reader clicks, and a popup must
+      // open in that same tick, so the Pratyantaras of the Antardasha running
+      // now travel with the chart rather than being fetched on demand.
+      const today = yield* DateTime.now;
+      const running = Option.isSome(vimshottari)
+        ? yield* Effect.option(Dasha.at(vimshottari.value, today))
+        : Option.none();
+      const currentPratyantaras = Option.match(running, {
+        onNone: () => null,
+        onSome: (current) =>
+          current === null ? null : Dasha.pratyantardashas(current.antardasha),
+      });
       const chara = yield* Effect.option(
         Dasha.calculateChara(moment, placements),
       );
@@ -130,6 +142,7 @@ export const calculateChart = Effect.fn("Chart.calculate")(
         drishti: Option.getOrElse(drishti, () => null),
         argala: Option.getOrElse(argala, () => null),
         arudha,
+        currentPratyantaras,
       };
       return optional;
     }).pipe(

@@ -263,6 +263,49 @@ function antardashaMarkdownTable(period: ChartDashaPeriod): string {
   );
 }
 
+/**
+ * The running Antardasha's Pratyantaras, when the chart carries them and they
+ * still belong to the Antardasha running at `now`: a line naming the one
+ * running, then all nine. Null otherwise, so a stale set is never sent.
+ */
+function pratyantaraMarkdown(
+  result: ChartResult,
+  currentMahadasha: ChartDashaPeriod | undefined,
+  now: string,
+): string | null {
+  const set = result.dasha.currentPratyantaras;
+  if (!set || !currentMahadasha || set.mahadasha !== currentMahadasha.mahadasha) {
+    return null;
+  }
+  const antardasha =
+    currentMahadasha.antardashas[
+      findCurrentPeriodIndex(currentMahadasha.antardashas, now)
+    ];
+  if (!antardasha || antardasha.antardasha !== set.antardasha) {
+    return null;
+  }
+  const running = set.periods[findCurrentPeriodIndex(set.periods, now)];
+  if (!running) {
+    return null;
+  }
+  return [
+    `Current Pratyantardasha: ${running.lord} (${set.mahadasha} Mahadasha, ${set.antardasha} Antardasha), ${formatDashaDate(running.start)} to ${formatDashaDate(running.end)}`,
+    "",
+    markdownTable(
+      ["Pratyantardasha", "Start", "End", "Duration"],
+      set.periods.map((period) => [
+        period === running ? `${period.lord} (current)` : period.lord,
+        formatDashaDate(period.start),
+        formatDashaDate(period.end),
+        formatDashaDuration(period.start, period.end),
+      ]),
+    ),
+  ].join("\n");
+}
+
+const pratyantaraSection = (markdown: string | null): string[] =>
+  markdown === null ? [] : ["", "#Pratyantardasha", markdown];
+
 function buildChartPrompt(result: ChartResult, now: string): string {
   const currentIndex = findCurrentPeriodIndex(result.dasha.vimshottari, now);
   const currentMahadasha =
@@ -331,6 +374,7 @@ function buildChartPrompt(result: ChartResult, now: string): string {
     currentMahadasha
       ? antardashaMarkdownTable(currentMahadasha)
       : "_No current antardasha._",
+    ...pratyantaraSection(pratyantaraMarkdown(result, currentMahadasha, now)),
   ].join("\n");
 }
 

@@ -29,6 +29,24 @@ describe("buildChartPromptUrl", () => {
     }
   });
 
+  test("adds the running Pratyantara and its siblings for the current Antardasha", () => {
+    // The chart carries the Pratyantaras of the Antardasha running when it
+    // was cast, which is moments ago.
+    const prompt = promptFor(new Date().toISOString());
+    const set = result.dasha.currentPratyantaras!;
+    expect(set.periods).toHaveLength(9);
+    expect(prompt).toContain("#Pratyantardasha");
+    expect(prompt).toContain(
+      `(${set.mahadasha} Mahadasha, ${set.antardasha} Antardasha)`,
+    );
+    expect(prompt.match(/\(current\) \|/g)).toHaveLength(1);
+  });
+
+  test("leaves the Pratyantaras out once another Antardasha is running", () => {
+    const period = result.dasha.vimshottari[2]!;
+    expect(promptFor(period.start)).not.toContain("#Pratyantardasha");
+  });
+
   test("reads the running antardasha at the given instant", () => {
     const period = result.dasha.vimshottari[2]!;
     const prompt = promptFor(period.start);
