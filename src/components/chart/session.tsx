@@ -1,3 +1,4 @@
+import { pdfFileName } from "@/lib/file-name";
 import {
   createContext,
   use,
@@ -97,7 +98,7 @@ async function downloadPdf(result: ChartResult): Promise<void> {
   const url = URL.createObjectURL(await buildChartPdf(result));
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "birth-chart.pdf";
+  anchor.download = pdfFileName(result.birth.name);
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();

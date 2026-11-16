@@ -45,6 +45,15 @@ export default defineConfig({
       },
     }),
   ],
+  optimizeDeps: {
+    // The PDF engine is wasm-bindgen's bundler build: forme.js imports the
+    // .wasm, which imports forme_bg.js back. Pre-bundling inlines its own copy
+    // of forme_bg.js while the .wasm still imports the original, so the
+    // engine initialises one copy and Save as PDF calls the other
+    // ("Cannot read properties of undefined (reading '__wbindgen_externrefs')").
+    // Serving it unbundled in dev keeps a single copy. Builds are unaffected.
+    exclude: ["@formepdf/core"],
+  },
   resolve: {
     tsconfigPaths: true,
     alias: {
