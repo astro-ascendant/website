@@ -7,17 +7,35 @@ import interSemibold from "../../assets/fonts/inter-latin-600-normal.ttf?url";
 import serifRegular from "../../assets/fonts/libre-baskerville-latin-400-normal.ttf?url";
 import serifItalic from "../../assets/fonts/libre-baskerville-latin-400-italic.ttf?url";
 import mono from "../../assets/fonts/jetbrains-mono-latin-400-normal.ttf?url";
-import wordmark from "../../assets/brand/wordmark.svg?raw";
+import wordmarkUrl from "../../assets/brand/wordmark.jpg?url";
 import type { PdfAssets } from "./chart-pdf";
 
-export const pdfAssets: PdfAssets = {
-  fonts: {
-    interRegular,
-    interMedium,
-    interSemibold,
-    serifRegular,
-    serifItalic,
-    mono,
-  },
-  wordmark,
-};
+/** A same-origin file as a data URI. */
+async function dataUri(url: string): Promise<string> {
+  const blob = await (await fetch(url)).blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+/**
+ * The assets for one render. Fonts go by URL, which the engine fetches; the
+ * wordmark goes as a data URI, because the engine's image loader does not
+ * fetch a relative URL and would leave the cover without its logo.
+ */
+export async function loadPdfAssets(): Promise<PdfAssets> {
+  return {
+    fonts: {
+      interRegular,
+      interMedium,
+      interSemibold,
+      serifRegular,
+      serifItalic,
+      mono,
+    },
+    wordmark: await dataUri(wordmarkUrl),
+  };
+}

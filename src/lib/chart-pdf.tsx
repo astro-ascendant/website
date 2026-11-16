@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Document, Fixed, Page, Svg, Text, View } from "@formepdf/react";
+import { Document, Fixed, Image, Page, Text, View } from "@formepdf/react";
 import type { FontRegistration, Style } from "@formepdf/react";
 import type {
   ChartDashaPeriod,
@@ -47,7 +47,10 @@ export interface PdfAssets {
     | "mono",
     string | Uint8Array
   >;
-  /** The wordmark SVG file, as text. */
+  /**
+   * The official wordmark image, as a URL or data URI. The SVG wordmark
+   * cannot be used: the engine ignores group transforms and joins subpaths.
+   */
   wordmark: string;
 }
 
@@ -63,37 +66,6 @@ function fontsFrom(assets: PdfAssets): FontRegistration[] {
   ];
 }
 
-/** Shifts every coordinate pair of an absolute path (M, L, Q, C only) by (dx, dy). */
-function shiftPath(d: string, dx: number, dy: number): string {
-  let index = 0;
-  return d.replace(/-?\d*\.?\d+/g, (number) => {
-    const value = Number(number) + (index % 2 === 0 ? dx : dy);
-    index += 1;
-    return String(Math.round(value * 100) / 100);
-  });
-}
-
-/**
- * The wordmark's drawing, coloured in the brand rose. The PDF engine ignores
- * `transform` on groups, so each letter's translate is baked into its path;
- * the screen-only filter is dropped.
- */
-function wordmarkMarkup(svg: string): { viewBox: string; content: string } {
-  const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1] ?? "0 0 390 110";
-  const inner = svg
-    .replace(/^[\s\S]*?<svg[^>]*>/, "")
-    .replace(/<\/svg>\s*$/, "")
-    .replace(/<defs>[\s\S]*?<\/defs>/g, "")
-    .replace(
-      /<g transform="translate\(([-\d.]+)[ ,]+([-\d.]+)\)">([\s\S]*?)<\/g>/g,
-      (_, dx: string, dy: string, body: string) =>
-        body.replace(/\sd="([^"]*)"/g, (__, d: string) => ` d="${shiftPath(d, Number(dx), Number(dy))}"`),
-    )
-    .replace(/<g[^>]*>|<\/g>/g, "")
-    .replaceAll("currentColor", C.brand);
-  return { viewBox, content: inner };
-}
-
 /* ----------------------------- primitives ----------------------------- */
 
 const eyebrow: Style = {
@@ -106,64 +78,34 @@ const eyebrow: Style = {
 };
 
 function Section({
-  eyebrow: label,
   title,
-  lead,
   children,
   keepTogether = false,
   newPage = false,
-  compact = false,
 }: {
-  eyebrow: string;
   title: string;
-  lead?: string;
   children: ReactNode;
   keepTogether?: boolean;
   /** Starts the section on a fresh page, with no rule above it. */
   newPage?: boolean;
-  /** A tighter header, for a part that shares a page with the one above. */
-  compact?: boolean;
 }) {
   return (
     <View
       wrap={!keepTogether}
       style={{
         ...(newPage ? { breakBefore: true } : {}),
-        marginTop: newPage ? 0 : compact ? 14 : 22,
-        paddingTop: newPage ? 0 : compact ? 10 : 14,
+        marginTop: newPage ? 0 : 16,
+        paddingTop: newPage ? 0 : 12,
         borderTopWidth: newPage ? 0 : 0.75,
         borderTopColor: C.rule,
       }}
     >
-      <View wrap={false}>
-        <Text style={{ ...eyebrow, color: C.brand }}>{label}</Text>
-        <Text
-          style={{
-            fontFamily: SANS,
-            fontWeight: 600,
-            fontSize: compact ? 11.5 : 14,
-            color: C.ink,
-            marginTop: 3,
-          }}
-        >
-          {title}
-        </Text>
-        {lead ? (
-          <Text
-            style={{
-              fontFamily: SANS,
-              fontSize: 8,
-              lineHeight: 1.5,
-              color: C.muted,
-              marginTop: 3,
-              maxWidth: 420,
-            }}
-          >
-            {lead}
-          </Text>
-        ) : null}
-      </View>
-      <View style={{ marginTop: 10 }}>{children}</View>
+      <Text
+        style={{ fontFamily: SANS, fontWeight: 600, fontSize: 13, color: C.ink }}
+      >
+        {title}
+      </Text>
+      <View style={{ marginTop: 9 }}>{children}</View>
     </View>
   );
 }
@@ -176,7 +118,7 @@ function Caption({ children, detail }: { children: string; detail?: string }) {
         {children}
       </Text>
       {detail ? (
-        <Text style={{ fontFamily: MONO, fontSize: 7, color: C.faint, marginLeft: 5 }}>
+        <Text style={{ fontFamily: MONO, fontSize: 6.4, color: C.faint, marginLeft: 5 }}>
           {detail}
         </Text>
       ) : null}
@@ -199,18 +141,16 @@ type Row = Record<string, string>;
 
 /**
  * A hairline table in the site's style: a muted uppercase header over a
- * strong rule, quiet row rules, and highlighted rows washed in the brand rose
- * with a rose bar at the start.
+ * strong rule, then quiet row rules. Every row reads the same; the PDF is a
+ * record, so nothing is marked as current.
  */
 function Table({
   columns,
   rows,
-  highlight = () => false,
   size = 7.5,
 }: {
   columns: readonly Column[];
   rows: readonly Row[];
-  highlight?: (row: Row, index: number) => boolean;
   size?: number;
 }) {
   const cell = (column: Column): Style => ({
@@ -238,39 +178,33 @@ function Table({
           </Text>
         ))}
       </View>
-      {rows.map((row, index) => {
-        const marked = highlight(row, index);
-        return (
-          <View
-            key={index}
-            wrap={false}
-            style={{
-              flexDirection: "row",
-              paddingVertical: 2.2,
-              borderBottomWidth: 0.5,
-              borderBottomColor: C.rule,
-              borderLeftWidth: 1.5,
-              borderLeftColor: marked ? C.brand : "#ffffff",
-              backgroundColor: marked ? C.brandWash : "#ffffff",
-            }}
-          >
-            {columns.map((column, columnIndex) => (
-              <Text
-                key={column.key}
-                style={{
-                  ...cell(column),
-                  fontFamily: column.mono ? MONO : SANS,
-                  fontSize: column.mono ? size - 0.5 : size,
-                  fontWeight: marked || columnIndex === 0 ? 500 : 400,
-                  color: marked || columnIndex === 0 ? C.ink : C.body,
-                }}
-              >
-                {row[column.key] ?? ""}
-              </Text>
-            ))}
-          </View>
-        );
-      })}
+      {rows.map((row, index) => (
+        <View
+          key={index}
+          wrap={false}
+          style={{
+            flexDirection: "row",
+            paddingVertical: 2,
+            borderBottomWidth: 0.5,
+            borderBottomColor: C.rule,
+          }}
+        >
+          {columns.map((column, columnIndex) => (
+            <Text
+              key={column.key}
+              style={{
+                ...cell(column),
+                fontFamily: column.mono ? MONO : SANS,
+                fontSize: column.mono ? size - 0.5 : size,
+                fontWeight: columnIndex === 0 ? 500 : 400,
+                color: columnIndex === 0 ? C.ink : C.body,
+              }}
+            >
+              {row[column.key] ?? ""}
+            </Text>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -518,25 +452,20 @@ function periodRows(
   }));
 }
 
+/** Antardashas in the per-Mahadasha grid: the lord and its dates. */
+const ANTARDASHA_COLUMNS: Column[] = [
+  { key: "lord", header: "Period", flex: 1.05 },
+  { key: "start", header: "Start", flex: 1, mono: true },
+  { key: "end", header: "End", flex: 1, mono: true },
+];
+
 const mahadashaSpans = (periods: readonly ChartDashaPeriod[]) =>
   periods.map((period) => ({ lord: period.mahadasha, start: period.start, end: period.end }));
 
-/** The running Vimshottari chain at `now`, as far as the chart carries it. */
-function runningChain(result: ChartResult, now: string) {
-  const mahadasha = result.dasha.vimshottari[findCurrentPeriodIndex(result.dasha.vimshottari, now)];
-  const antardasha = mahadasha?.antardashas[findCurrentPeriodIndex(mahadasha.antardashas, now)];
-  const set = result.dasha.currentPratyantaras;
-  const pratyantaras =
-    set && mahadasha && antardasha &&
-    set.mahadasha === mahadasha.mahadasha &&
-    set.antardasha === antardasha.antardasha
-      ? set.periods
-      : null;
-  const pratyantara = pratyantaras?.[findCurrentPeriodIndex(pratyantaras, now)];
-  return { mahadasha, antardasha, pratyantaras, pratyantara };
-}
-
 /* ---------------------------- the document ---------------------------- */
+
+/** The wordmark image's proportions (3994 × 1126). */
+const WORDMARK_RATIO = 3994 / 1126;
 
 const PAGE_WIDTH = 595.28;
 const MARGIN = 44;
@@ -551,7 +480,7 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Footer({ name, wordmark }: { name: string; wordmark: { viewBox: string; content: string } }) {
+function Footer({ name }: { name: string }) {
   return (
     <Fixed position="footer">
       <View
@@ -565,12 +494,9 @@ function Footer({ name, wordmark }: { name: string; wordmark: { viewBox: string;
           borderTopColor: C.rule,
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Svg width={50} height={14} viewBox={wordmark.viewBox} content={wordmark.content} />
-          <Text style={{ fontFamily: SANS, fontSize: 6.5, color: C.faint }}>
-            {name === "" ? "Horoscope" : `${name} · Horoscope`}
-          </Text>
-        </View>
+        <Text style={{ fontFamily: SANS, fontSize: 6.5, color: C.faint }}>
+          {`${name === "" ? "Horoscope" : name}   ·   astro-ascendant ${libraryVersion}`}
+        </Text>
         <Text style={{ fontFamily: SANS, fontSize: 6.5, color: C.faint }}>
           {`${siteUrl.replace(/^https?:\/\//, "")}   ·   Page {{pageNumber}} of {{totalPages}}`}
         </Text>
@@ -581,38 +507,23 @@ function Footer({ name, wordmark }: { name: string; wordmark: { viewBox: string;
 
 export function ChartDocument({
   result,
-  now,
   assets,
 }: {
   result: ChartResult;
-  /** The instant "now" for running periods, as an ISO string. */
-  now: string;
   assets: PdfAssets;
 }) {
   const { birth } = result;
   const name = birth.name.trim();
-  const wordmark = wordmarkMarkup(assets.wordmark);
+  const wordmark = assets.wordmark;
   const d1 = result.divisions.find((division) => division.division === 1);
   const d9 = result.divisions.find((division) => division.division === 9);
   const moon = d1?.placements.find((placement) => placement.body === "Moon");
   const zone =
     birth.timeZone && birth.utcIso ? formatTimeZoneLabel(birth.timeZone, birth.utcIso) : null;
-  const chain = runningChain(result, now);
-  const chainLabel = [chain.mahadasha?.mahadasha, chain.antardasha?.antardasha, chain.pratyantara?.lord]
-    .filter(Boolean)
-    .join(" · ");
-  const nowTime = Date.parse(now);
-  const isRunning = (row: Row) => {
-    const start = Date.parse(row.startIso ?? "");
-    const end = Date.parse(row.endIso ?? "");
-    return start <= nowTime && nowTime < end;
-  };
-  const withBounds = (periods: readonly { lord: string; start: string; end: string }[]) =>
-    periodRows(periods).map((row, index) => ({
-      ...row,
-      startIso: periods[index]!.start,
-      endIso: periods[index]!.end,
-    }));
+  // The Mahadasha the birth falls in: a fact of the chart, not of today.
+  const birthDasha = birth.utcIso
+    ? result.dasha.vimshottari[findCurrentPeriodIndex(result.dasha.vimshottari, birth.utcIso)]
+    : undefined;
   const chartWidth = (CONTENT - 18) / 2;
 
   const headline = [
@@ -620,9 +531,9 @@ export function ChartDocument({
     { label: "Moon", value: moon ? `${moon.sign} ${formatLongitude(moon.longitude)}` : "-" },
     { label: "Moon star", value: moon ? star(moon.star, moon.pada) : "-" },
     {
-      label: "Running dasha",
-      value: chainLabel || "-",
-      detail: ["Mahadasha", "Antardasha", "Pratyantara"].slice(0, chainLabel.split(" · ").length).join(" · "),
+      label: "Dasha at birth",
+      value: birthDasha ? `${birthDasha.mahadasha} Mahadasha` : "-",
+      detail: birthDasha ? `until ${formatDashaDate(birthDasha.end)}` : "",
     },
   ];
 
@@ -647,13 +558,12 @@ export function ChartDocument({
       style={{ fontFamily: SANS, color: C.ink }}
     >
       <Page size="A4" margin={[MARGIN, MARGIN, 70, MARGIN]}>
-        <Footer name={name} wordmark={wordmark} />
+        <Footer name={name} />
 
         {/* Cover */}
         <View wrap={false}>
-          <Svg width={112} height={32} viewBox={wordmark.viewBox} content={wordmark.content} />
-          <Text style={{ ...eyebrow, color: C.brand, marginTop: 26 }}>Horoscope</Text>
-          <Text style={{ fontFamily: SANS, fontWeight: 600, fontSize: 28, color: C.ink, marginTop: 4 }}>
+          <Image src={wordmark} width={120} height={120 / WORDMARK_RATIO} alt="Ascendant" />
+          <Text style={{ fontFamily: SANS, fontWeight: 600, fontSize: 28, color: C.ink, marginTop: 24 }}>
             {name === "" ? "Birth chart" : name}
           </Text>
           <Text style={{ fontFamily: SANS, fontSize: 9.5, color: C.muted, marginTop: 6 }}>
@@ -679,7 +589,7 @@ export function ChartDocument({
               <View
                 key={item.label}
                 style={{
-                  flex: index === 3 ? 1.5 : 1,
+                  flex: index === 3 ? 1.3 : 1,
                   paddingVertical: 8,
                   paddingHorizontal: 10,
                   borderLeftWidth: index === 0 ? 0 : 0.5,
@@ -687,7 +597,7 @@ export function ChartDocument({
                 }}
               >
                 <Text style={eyebrow}>{item.label}</Text>
-                <Text style={{ fontFamily: SANS, fontWeight: 500, fontSize: 9.5, color: index === 3 ? C.brand : C.ink, marginTop: 3 }}>
+                <Text style={{ fontFamily: SANS, fontWeight: 500, fontSize: 9.5, color: C.ink, marginTop: 3 }}>
                   {item.value}
                 </Text>
                 {"detail" in item && item.detail ? (
@@ -709,19 +619,14 @@ export function ChartDocument({
           </View>
         </View>
 
-        <Section
-          eyebrow="Birth charts"
-          title="Rashi and Navamsha"
-          lead="The Rashi is the sky at the moment of birth. The Navamsha zooms into it, and is read for marriage and for the real strength of each planet."
-          keepTogether
-        >
+        <Section title="Rashi and Navamsha" keepTogether>
           <View style={{ flexDirection: "row", gap: 18 }}>
             {d1 ? <SouthIndianChart result={result} division={d1} title="Rashi" width={chartWidth} /> : null}
             {d9 ? <SouthIndianChart result={result} division={d9} title="Navamsha" width={chartWidth} /> : null}
           </View>
         </Section>
 
-        <Section eyebrow="Planets" title="Positions in Rashi and Navamsha" newPage>
+        <Section title="Planets" newPage>
           <TwoUp>
             {[
               d1 ? (
@@ -740,11 +645,7 @@ export function ChartDocument({
           </TwoUp>
         </Section>
 
-        <Section
-          eyebrow="Jaimini"
-          title="Karakas, padas and aspects"
-          lead="The cast of the chart, how the world sees each house, and which houses help or block each other."
-        >
+        <Section title="Jaimini">
           <TwoUp>
             {[
               <View key="karakas">
@@ -757,11 +658,11 @@ export function ChartDocument({
                   rows={result.jaimini.karakas.map((karaka) => ({ role: karaka.role, planet: karaka.planet }))}
                 />
                 <View style={{ marginTop: 14 }}>
-                  <Caption>Readings</Caption>
+                  <Caption>Rashi Drishti, Argala, Karakamsha, Upapada</Caption>
                   <Table
                     columns={[
-                      { key: "key", header: "Reading", flex: 1.3 },
-                      { key: "value", header: "Value", flex: 1.4 },
+                      { key: "key", header: "Item", flex: 1.3 },
+                      { key: "value", header: "Signs", flex: 1.4 },
                     ]}
                     rows={[
                       { key: "Karakamsha", value: result.jaimini.karakamsha || "-" },
@@ -787,78 +688,72 @@ export function ChartDocument({
           </TwoUp>
         </Section>
 
-        <Section
-          eyebrow="Dashas"
-          title="Vimshottari"
-          newPage
-          lead="The planetary periods of a life. The rows in rose are running now."
-        >
-          <Table
-            columns={PERIOD_COLUMNS}
-            rows={withBounds(mahadashaSpans(result.dasha.vimshottari))}
-            highlight={isRunning}
-          />
-          <View style={{ marginTop: 14 }}>
-            <TwoUp>
-              {[
-                chain.mahadasha ? (
-                  <View key="antar">
-                    <Caption detail={`in ${chain.mahadasha.mahadasha}`}>Antardashas</Caption>
-                    <Table
-                      columns={PERIOD_COLUMNS}
-                      rows={withBounds(
-                        chain.mahadasha.antardashas.map((antar) => ({
-                          lord: antar.antardasha,
-                          start: antar.start,
-                          end: antar.end,
-                        })),
-                      )}
-                      highlight={isRunning}
-                      size={7}
-                    />
-                  </View>
-                ) : null,
-                chain.pratyantaras && chain.antardasha ? (
-                  <View key="pratyantar">
-                    <Caption detail={`in ${chain.antardasha.antardasha}`}>Pratyantaras</Caption>
-                    <Table
-                      columns={PERIOD_COLUMNS}
-                      rows={withBounds(chain.pratyantaras)}
-                      highlight={isRunning}
-                      size={7}
-                    />
-                  </View>
-                ) : null,
-              ]}
-            </TwoUp>
+        <Section title="Vimshottari dasha" newPage>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 14, rowGap: 14 }}>
+            {result.dasha.vimshottari.map((period) => (
+              <View key={`${period.mahadasha}-${period.start}`} wrap={false} style={{ width: (CONTENT - 28) / 3 }}>
+                <Caption detail={`${formatDashaDate(period.start)} to ${formatDashaDate(period.end)}`}>
+                  {period.mahadasha}
+                </Caption>
+                <Table
+                  size={6.6}
+                  columns={ANTARDASHA_COLUMNS}
+                  rows={periodRows(
+                    period.antardashas.map((antar) => ({
+                      lord: antar.antardasha,
+                      start: antar.start,
+                      end: antar.end,
+                    })),
+                  )}
+                />
+              </View>
+            ))}
           </View>
         </Section>
 
-        <Section
-          eyebrow="Jaimini dashas"
-          title="Chara and Sthira"
-          compact
-        >
+        <Section title="Chara and Sthira dasha" newPage>
           <TwoUp>
             {[
               <View key="chara">
                 <Caption>Chara</Caption>
-                <Table columns={PERIOD_COLUMNS} rows={withBounds(mahadashaSpans(result.dasha.chara))} highlight={isRunning} size={7} />
+                <Table columns={PERIOD_COLUMNS} rows={periodRows(mahadashaSpans(result.dasha.chara))} size={7} />
               </View>,
               <View key="sthira">
                 <Caption>Sthira</Caption>
-                <Table columns={PERIOD_COLUMNS} rows={withBounds(mahadashaSpans(result.dasha.sthira))} highlight={isRunning} size={7} />
+                <Table columns={PERIOD_COLUMNS} rows={periodRows(mahadashaSpans(result.dasha.sthira))} size={7} />
               </View>,
             ]}
           </TwoUp>
         </Section>
 
-        <Section
-          eyebrow="Krishnamurthi Paddhati"
-          title="KP significators and cusps"
-          newPage
-          lead={`Calculated with the ${result.kp.astroParams.ayanamsa} ayanamsa and ${result.kp.astroParams.houseSystem} houses.`}
-        >
+        <Section title="Sarvashtakavarga" keepTogether>
+          <Table
+            columns={[
+              { key: "sign", header: "Sign", flex: 1.4 },
+              ...result.sav.rows.map((row) => ({
+                key: row.planet,
+                header: PLANET_SHORT[row.planet] ?? row.planet.slice(0, 2),
+                tight: true,
+                align: "right" as const,
+                mono: true,
+              })),
+              { key: "total", header: "Total", align: "right" as const, mono: true },
+            ]}
+            rows={result.sav.signs.map((sign, signIndex) => ({
+              sign,
+              ...Object.fromEntries(
+                result.sav.rows.map((row) => [row.planet, String(row.points[signIndex] ?? 0)]),
+              ),
+              total: String(result.sav.signTotals[signIndex] ?? 0),
+            }))}
+          />
+        </Section>
+
+        <Section title="Krishnamurthi Paddhati" newPage>
+          <Text style={{ fontFamily: MONO, fontSize: 7, color: C.muted, marginBottom: 8 }}>
+            {`${result.kp.astroParams.ayanamsa} ayanamsa · ${words(result.kp.astroParams.houseSystem)} houses`}
+          </Text>
+          <Caption>Significators</Caption>
           <Table
             columns={[
               { key: "name", header: "Body", flex: 1 },
@@ -905,43 +800,9 @@ export function ChartDocument({
         </Section>
 
 
-        <Section
-          eyebrow="Ashtakavarga"
-          title="Sarvashtakavarga"
-          newPage
-          lead="A score for every sign by how much it supports each planet. Totals above 28 are generally read as strong."
-          keepTogether
-        >
-          <Table
-            columns={[
-              { key: "sign", header: "Sign", flex: 1.4 },
-              ...result.sav.rows.map((row) => ({
-                key: row.planet,
-                header: PLANET_SHORT[row.planet] ?? row.planet.slice(0, 2),
-                tight: true,
-                align: "right" as const,
-                mono: true,
-              })),
-              { key: "total", header: "Total", align: "right" as const, mono: true },
-            ]}
-            rows={result.sav.signs.map((sign, signIndex) => ({
-              sign,
-              ...Object.fromEntries(
-                result.sav.rows.map((row) => [row.planet, String(row.points[signIndex] ?? 0)]),
-              ),
-              total: String(result.sav.signTotals[signIndex] ?? 0),
-            }))}
-            highlight={(row) => Number(row.total) > 28}
-          />
-        </Section>
 
         {divisions.length > 0 ? (
-          <Section
-            eyebrow="Divisional charts"
-            title="Every division at a glance"
-            lead="The sign each body occupies in each divisional chart."
-            keepTogether
-          >
+          <Section title="Divisional charts" keepTogether>
             <Table
               size={6.8}
               columns={[
@@ -963,26 +824,18 @@ export function ChartDocument({
           </Section>
         ) : null}
 
-        <View wrap={false} style={{ marginTop: 26, paddingTop: 12, borderTopWidth: 0.75, borderTopColor: C.rule }}>
-          <Text style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 9, lineHeight: 1.6, color: C.body }}>
-            This chart is interpretive guidance, not certainty or a substitute for medical, legal, or
-            financial advice.
-          </Text>
-          <Text style={{ fontFamily: SANS, fontSize: 6.5, color: C.faint, marginTop: 6 }}>
-            {`Calculated with astro-ascendant ${libraryVersion}. Running periods as of ${longDate(now)}.`}
-          </Text>
-        </View>
       </Page>
     </Document>
   );
 }
 
 /** Renders the chart into a PDF; fonts and the wordmark load with the first save. */
-export async function buildChartPdf(result: ChartResult, now: string): Promise<Blob> {
-  const [{ renderDocument }, { pdfAssets }] = await Promise.all([
+export async function buildChartPdf(result: ChartResult): Promise<Blob> {
+  const [{ renderDocument }, { loadPdfAssets }] = await Promise.all([
     import("@formepdf/core"),
     import("@/lib/pdf-assets"),
   ]);
-  const bytes = await renderDocument(<ChartDocument result={result} now={now} assets={pdfAssets} />);
+  const assets = await loadPdfAssets();
+  const bytes = await renderDocument(<ChartDocument result={result} assets={assets} />);
   return new Blob([bytes as BlobPart], { type: "application/pdf" });
 }

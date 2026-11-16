@@ -15,7 +15,7 @@ const assets: PdfAssets = {
     serifItalic: file("assets/fonts/libre-baskerville-latin-400-italic.ttf"),
     mono: file("assets/fonts/jetbrains-mono-latin-400-normal.ttf"),
   },
-  wordmark: readFileSync("assets/brand/wordmark.svg", "utf8"),
+  wordmark: `data:image/jpeg;base64,${readFileSync("assets/brand/wordmark.jpg").toString("base64")}`,
 };
 
 describe("ChartDocument", () => {
@@ -23,7 +23,7 @@ describe("ChartDocument", () => {
     for (const birth of TEST_BIRTHS) {
       const result = await castChart(birth);
       const bytes = await renderDocument(
-        <ChartDocument result={result} now={new Date().toISOString()} assets={assets} />,
+        <ChartDocument result={result} assets={assets} />,
       );
       const pdf = new TextDecoder("latin1").decode(bytes);
       expect(pdf.startsWith("%PDF-")).toBe(true);

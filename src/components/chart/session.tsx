@@ -96,7 +96,7 @@ async function requestChart(
 async function downloadPdf(result: ChartResult): Promise<void> {
   const { buildChartPdf } = await import("@/lib/chart-pdf");
   const url = URL.createObjectURL(
-    await buildChartPdf(result, new Date().toISOString()),
+    await buildChartPdf(result),
   );
   const anchor = document.createElement("a");
   anchor.href = url;
