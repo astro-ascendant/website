@@ -1,0 +1,36 @@
+import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { renderDocument } from "@formepdf/core";
+import { castChart, TEST_BIRTHS } from "@/server/test-charts";
+import { ChartDocument, type PdfAssets } from "./chart-pdf";
+
+// The same fonts and wordmark the browser loads by URL, read from disk.
+const file = (path: string) => new Uint8Array(readFileSync(path));
+const assets: PdfAssets = {
+  fonts: {
+    interRegular: file("assets/fonts/inter-latin-400-normal.ttf"),
+    interMedium: file("assets/fonts/inter-latin-500-normal.ttf"),
+    interSemibold: file("assets/fonts/inter-latin-600-normal.ttf"),
+    serifRegular: file("assets/fonts/libre-baskerville-latin-400-normal.ttf"),
+    serifItalic: file("assets/fonts/libre-baskerville-latin-400-italic.ttf"),
+    mono: file("assets/fonts/jetbrains-mono-latin-400-normal.ttf"),
+  },
+  wordmark: readFileSync("assets/brand/wordmark.svg", "utf8"),
+};
+
+describe("ChartDocument", () => {
+  test("renders every test chart to a PDF with the brand fonts embedded", async () => {
+    for (const birth of TEST_BIRTHS) {
+      const result = await castChart(birth);
+      const bytes = await renderDocument(
+        <ChartDocument result={result} now={new Date().toISOString()} assets={assets} />,
+      );
+      const pdf = new TextDecoder("latin1").decode(bytes);
+      expect(pdf.startsWith("%PDF-")).toBe(true);
+      // Subset font names carry the family, so each brand face is in the file.
+      for (const family of ["Inter", "LibreBaskerville", "JetBrainsMono"]) {
+        expect(pdf).toContain(family);
+      }
+    }
+  }, 60_000);
+});

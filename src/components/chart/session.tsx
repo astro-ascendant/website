@@ -95,7 +95,9 @@ async function requestChart(
 /** The PDF renderer loads on the first save, not with the page. */
 async function downloadPdf(result: ChartResult): Promise<void> {
   const { buildChartPdf } = await import("@/lib/chart-pdf");
-  const url = URL.createObjectURL(await buildChartPdf(result));
+  const url = URL.createObjectURL(
+    await buildChartPdf(result, new Date().toISOString()),
+  );
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = pdfFileName(result.birth.name);
