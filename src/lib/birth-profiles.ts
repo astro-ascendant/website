@@ -23,6 +23,21 @@ export function upsertBirthProfile(
   return [{ ...entry, name }, ...rest].slice(0, MAX_PROFILES);
 }
 
+/**
+ * Profiles this browser keeps, then any the database holds that it lacks.
+ * Local entries win on a shared name: they are the most recent edit here.
+ */
+export function mergeBirthProfiles(
+  local: readonly BirthProfile[],
+  remote: readonly BirthProfile[],
+): BirthProfile[] {
+  const names = new Set(local.map((profile) => profile.name));
+  return [
+    ...local,
+    ...remote.filter((profile) => !names.has(profile.name)),
+  ].slice(0, MAX_PROFILES);
+}
+
 export function findBirthProfile(
   profiles: readonly BirthProfile[],
   name: string,

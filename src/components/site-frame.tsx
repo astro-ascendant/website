@@ -302,7 +302,7 @@ function FooterDot() {
   );
 }
 
-/** Copyright, licence and About, closing the landing page. */
+/** Copyright, licence, About and Privacy, closing the landing page. */
 export function SiteFooter() {
   return (
     <footer
@@ -325,6 +325,10 @@ export function SiteFooter() {
         <FooterDot />
         <Link to="/about" className={footerLinkClassName}>
           About
+        </Link>
+        <FooterDot />
+        <Link to="/privacy" className={footerLinkClassName}>
+          Privacy
         </Link>
       </nav>
     </footer>

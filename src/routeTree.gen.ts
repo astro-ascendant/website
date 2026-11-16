@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ChartRouteImport } from './routes/chart'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SkyRouteImport } from './routes/sky'
@@ -45,6 +46,11 @@ const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   id: '/llms.txt',
   path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/chart': typeof ChartRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/chart': typeof ChartRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/chart': typeof ChartRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/chart'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/sky'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/chart'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/sky'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/chart'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/sky'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   ChartRoute: typeof ChartRoute
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  PrivacyRoute: typeof PrivacyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/llms.txt'
       fullPath: '/llms.txt'
       preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChartRoute: ChartRoute,
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  PrivacyRoute: PrivacyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,

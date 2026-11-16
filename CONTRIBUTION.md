@@ -27,19 +27,42 @@ make check
 
 `make fmt` rewrites files. `make lint-fix` applies lint fixes.
 
+### Stored birth details (optional)
+
+Every chart cast on `/chart` is saved to a Neon Postgres database, under an
+anonymous id in an HTTP-only cookie. `/privacy` says what is kept and lets a
+visitor delete it. Without a database the site works as before and keeps
+profiles in the browser only.
+
+| Variable       | Where it is read | What it is                                  |
+| -------------- | ---------------- | ------------------------------------------- |
+| `DATABASE_URL` | Server only      | Neon connection string (`postgresql://...`) |
+
+To use one locally, copy `.env.example` to `.env.local`, set `DATABASE_URL`,
+and create the table once:
+
+```bash
+bun run db:migrate
+```
+
+On Vercel, add the Neon integration (it sets `DATABASE_URL`), then run the
+migration against that database. Never give the variable a `VITE_` prefix:
+that would put the password in the client bundle.
+
 `npm` can install and build too, but it needs the repo `.npmrc`
 (`legacy-peer-deps=true`). Prefer Bun when you can.
 
 ## Where things live
 
-| Path                            | What it is                                |
-| ------------------------------- | ----------------------------------------- |
-| `content/`                      | Doc pages (Markdown and MDX)              |
-| `content/meta.json`             | Sidebar order for top-level pages         |
-| `content/api-reference/`        | Library API pages                         |
-| `src/components/chart/`         | Birth chart calculator UI                 |
-| `src/lib/chart.ts`              | Calculator display types and helpers      |
-| `src/server/calculate-chart.ts` | Server calculation used by the calculator |
+| Path                              | What it is                                        |
+| --------------------------------- | ------------------------------------------------- |
+| `content/`                        | Doc pages (Markdown and MDX)                      |
+| `content/meta.json`               | Sidebar order for top-level pages                 |
+| `content/api-reference/`          | Library API pages                                 |
+| `src/components/chart/`           | Birth chart calculator UI                         |
+| `src/lib/chart.ts`                | Calculator display types and helpers              |
+| `src/server/calculate-chart.ts`   | Server calculation used by the calculator         |
+| `src/server/profile.functions.ts` | Saving, listing and deleting stored birth details |
 
 Pages need a `title` and `description` in the frontmatter. To add a page, create
 the file under `content/` and add its slug to the matching `meta.json`.

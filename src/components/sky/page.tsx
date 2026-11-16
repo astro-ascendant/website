@@ -557,6 +557,8 @@ export function SkyPage() {
         requestChart: requestNow,
         loadProfiles: () => [],
         saveProfiles: () => {},
+        fetchProfiles: async () => [],
+        recordProfile: async () => {},
       }}
     >
       <div className="bg-background text-foreground relative flex min-h-[100dvh] flex-col">
