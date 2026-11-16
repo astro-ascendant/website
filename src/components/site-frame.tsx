@@ -302,7 +302,7 @@ function FooterDot() {
   );
 }
 
-/** Copyright, licence, About and Privacy, closing the landing page. */
+/** Copyright, About and Privacy, closing the landing page. */
 export function SiteFooter() {
   return (
     <footer
@@ -313,15 +313,6 @@ export function SiteFooter() {
         className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
       >
         <span className="text-xs text-muted-foreground">© 2026 Laxman K R</span>
-        <FooterDot />
-        <a
-          href="https://www.gnu.org/licenses/agpl-3.0.html"
-          target="_blank"
-          rel="noreferrer"
-          className={footerLinkClassName}
-        >
-          GNU AGPL v3
-        </a>
         <FooterDot />
         <Link to="/about" className={footerLinkClassName}>
           About
