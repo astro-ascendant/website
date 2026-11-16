@@ -32,7 +32,10 @@ export function ChartAskChatGPTButton() {
       label="Ask ChatGPT"
       onClick={() => askAI("chatgpt")}
       icon={
-        <ChatGptIcon aria-hidden="true" className="size-5 max-[399px]:size-4" />
+        <ChatGptIcon
+          aria-hidden="true"
+          className="-my-1 size-7 max-[399px]:size-6"
+        />
       }
       className="min-w-0 flex-1 sm:flex-none"
       actions={[

@@ -320,9 +320,14 @@ export function ChartSignHouseCharts({
   captions?: { d1: string; d9: string } | null;
 } = {}) {
   return (
-    <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-8">
+    <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4">
       {DIVISIONS.map((entry) => (
-        <section key={entry.division} className="flex min-w-0 flex-col gap-4">
+        // On desktop each column is a subgrid of three shared rows (caption,
+        // chart, table), so both charts start level whatever the caption length.
+        <section
+          key={entry.division}
+          className="flex min-w-0 flex-col gap-4 lg:row-span-3 lg:grid lg:grid-rows-subgrid"
+        >
           <div className="flex flex-col gap-1">
             <h3 className="text-foreground text-base font-medium">
               {entry.name}{" "}
