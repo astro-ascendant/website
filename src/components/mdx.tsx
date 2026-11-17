@@ -1,6 +1,7 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
+import { Callout } from "@/components/callout";
 import { Mermaid } from "@/components/mermaid";
 
 const DefaultLink = defaultMdxComponents.a;
@@ -18,6 +19,7 @@ export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
     a: DocLink,
+    Callout,
     Mermaid,
     ...components,
   } satisfies MDXComponents;

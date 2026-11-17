@@ -3,75 +3,71 @@ title: Ephemeris adapters and caching
 description: Choose between the plain and cached Swiss Ephemeris layers, tune the position cache, and write your own ephemeris adapter.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
+Every chart, dasha, and transit starts from planetary positions, and those come
+from one place: the **ephemeris**. Pick the layer that provides it, tune its
+position cache, or write your own adapter for tests or another position source.
 
-Every chart, dasha, and transit in Ascendant starts from planetary positions, and
-those come from one place: the **ephemeris**. This guide explains the ephemeris
-service, the layers that provide it, how the position cache works and how to tune
-it, and how to write your own adapter for testing or for another position source.
+## Ephemeris service
 
-## The ephemeris service
-
-`Ephemeris.Ephemeris` is an Effect service with three operations. Charts consume it,
-and adapters implement it.
+`Ephemeris.Ephemeris` is an Effect service with three operations. Charts consume
+it; adapters implement it.
 
 | Operation | What it does |
 | --- | --- |
 | `dateToJulianDay(date)` | Converts a UTC `DateTime` to a Julian Day. |
-| `calculatePosition(julianDay, planet, ayanamsa)` | Returns the sidereal position of one graha. It takes any of the nine, Rahu and Ketu included. |
+| `calculatePosition(julianDay, planet, ayanamsa)` | Returns the sidereal position of one graha. Takes any of the nine, Rahu and Ketu included. |
 | `calculateHouses(julianDay, latitude, longitude, houseSystem, ayanamsa)` | Returns twelve sidereal house cusps keyed 1 to 12, and the chart angles. |
 
 All three fail with a typed `EphemerisError`. The interface speaks in domain
-terms: an adapter hides its native bodies, its node conventions, its cusp layout,
-and its tropical offset, and hands back sidereal longitudes.
+terms: an adapter hides its native bodies, node conventions, cusp layout, and
+tropical offset, and hands back sidereal longitudes.
 
-## The layers you can provide
+## Layers
 
 | Layer | What it gives you |
 | --- | --- |
 | `Swisseph.SwissephLayer` | The Swiss Ephemeris adapter. Every position lookup calls the native library. |
-| `Swisseph.SwissephCachedLayer` | The same adapter with a position cache in front. Use this for transits and anything repeated. |
-| `Runtime.MainLayer` | The default AstroParams plus the cached Swiss Ephemeris layer. What the Quickstart uses. |
+| `Swisseph.SwissephCachedLayer` | The same adapter with a position cache in front. Use it for transits and anything repeated. |
+| `Runtime.MainLayer` | The default AstroParams plus the cached Swiss Ephemeris layer. The Quickstart uses it. |
 | `Ephemeris.withPositionCache(options)` | A decorator that adds the cache to any ephemeris layer, yours included. |
 
-If you do nothing else, use `Runtime.MainLayer`, which already gives you the cached
-layer.
+By default, use `Runtime.MainLayer`. It already includes the cached layer.
 
-## What the cache does
+## Position cache
 
-The cache wraps `calculatePosition` only. It remembers each result by Julian Day,
-planet, and ayanamsa. That matters because the same positions are requested over
-and over:
+The cache wraps `calculatePosition` only and keys each result by Julian Day,
+planet, and ayanamsa. The same positions are requested over and over:
 
-- A single chart makes nine position calls, one for each graha, plus one houses call.
-- A transit search looks up the same graha again and again as it scans ahead and
+- A single chart makes nine position calls, one per graha, plus one houses call.
+- A transit search looks up the same graha repeatedly as it scans ahead and
   refines each crossing to the minute.
 - A dashboard that redraws the same moment asks for the same positions again.
 
-Its behavior is simple:
+Behavior:
 
-- **Hits skip the native call.** A second chart for the same moment makes no new
-  position calls.
-- **Concurrent identical lookups share one call.** If two requests ask for the same
-  position at once, only one runs.
+- **Hits skip the native call.** A second chart for the same moment makes no
+  new position calls.
+- **Concurrent identical lookups share one call.** If two requests ask for the
+  same position at once, only one runs.
 - **Failures are never cached.** A transient native error stays retryable.
-- **Only positions are cached.** Houses and Julian Day conversion run once per chart
-  and gain nothing from caching.
+- **Only positions are cached.** Houses and Julian Day conversion run once per
+  chart and gain nothing from caching.
 - **Defaults are 10,000 entries and a 10-minute lifetime.**
 
-For measured speedups on a warm cache, see the [stress benchmark
-notes](https://github.com/astro-ascendant/ascendant-ts/blob/main/benchmarks/stress.md).
+See the [stress benchmark
+notes](https://github.com/astro-ascendant/ascendant-ts/blob/main/benchmarks/stress.md)
+for measured speedups on a warm cache.
 
 <Callout type="info" title="Create the runtime once">
-  The cache lives inside the layer. A `ManagedRuntime` builds its layers once and
-  keeps them, so one long-lived runtime shares one cache across all your requests.
-  Each additional runtime builds its own layer and gets its own, empty cache. That
-  is why the Quickstart tells you to create the runtime once and reuse it.
+  The cache lives inside the layer. A `ManagedRuntime` builds its layers once
+  and keeps them, so one long-lived runtime shares one cache across all
+  requests. Each additional runtime builds its own layer with its own empty
+  cache. That is why the Quickstart creates the runtime once and reuses it.
 </Callout>
 
 ### Tune the cache
 
-Wrap the plain layer yourself to change the capacity or the lifetime:
+Wrap the plain layer yourself to change the capacity or the lifetime.
 
 ```ts
 import { AstroParams, Chart, Ephemeris, Swisseph } from "astro-ascendant";
@@ -88,11 +84,11 @@ const runtime = ManagedRuntime.make(
 ```
 
 Raise the capacity for services that scan many moments, such as wide transit
-windows. Shorten the lifetime if memory matters more than speed. Because positions
-for a given moment never change, the lifetime only bounds memory use.
+windows. Shorten the lifetime if memory matters more than speed. Positions for
+a given moment never change, so the lifetime only bounds memory use.
 
-To keep the default settings but change only the ephemeris, reuse the runtime's
-settings layer:
+To keep the default settings and change only the ephemeris, reuse the
+runtime's settings layer:
 
 ```ts
 import { Runtime } from "astro-ascendant";
@@ -103,25 +99,26 @@ const layer = Layer.mergeAll(Runtime.AstroParamsSubgraph, tuned);
 `Runtime.AstroParamsSubgraph` is the AstroParams half of `MainLayer`, and
 `Runtime.EphemerisSubgraph` is the ephemeris half.
 
-## The Swiss Ephemeris adapter
+## Swiss Ephemeris adapter
 
-The built-in adapter wraps the native `@swisseph/node` package. It does the
-conversion work so the rest of the library does not have to:
+The built-in adapter wraps the native `@swisseph/node` package and does the
+conversion work for the rest of the library:
 
-- It decodes every native result into validated schemas, so corrupt output fails with
-  a typed `EphemerisError` and does not spread.
-- It reads Rahu from the mean lunar node and places Ketu opposite it.
-- It turns the native thirteen-slot cusp array into twelve sidereal cusps keyed by
-  house.
-- It applies the `WholeSign` convention itself.
+- Decodes every native result into validated schemas, so corrupt output fails
+  with a typed `EphemerisError` and does not spread
+- Reads Rahu from the mean lunar node and places Ketu opposite it
+- Turns the native thirteen-slot cusp array into twelve sidereal cusps keyed by
+  house
+- Applies the `WholeSign` convention itself
 
 ## Write your own adapter
 
-You can provide your own `Ephemeris` for unit tests, for another source of
-positions, or for an environment where the native library is not available. An
-adapter is a `Layer` that implements the three operations.
+Provide your own `Ephemeris` for unit tests, another position source, or an
+environment without the native library. An adapter is a `Layer` that
+implements the three operations.
 
-This one reports fixed longitudes, which makes charts exact and repeatable in tests:
+This one reports fixed longitudes, which makes charts exact and repeatable in
+tests:
 
 ```ts
 import { AstroParams, Chart, Ephemeris } from "astro-ascendant";
@@ -187,27 +184,27 @@ const calculation = await runtime.runPromise(Chart.generate(located));
 calculation.charts[0].houses[1].sign; // "Gemini"
 ```
 
-Nothing else in the library changes. `Chart.generate`, the dashas, and the other
-calculations use whichever `Ephemeris` you provide.
+Nothing else changes. `Chart.generate`, the dashas, and the other calculations
+use whichever `Ephemeris` you provide.
 
-### What an adapter must do
+### Adapter requirements
 
-- **Return sidereal longitudes.** Apply the `ayanamsa` argument yourself. The rest
-  of the library treats every longitude as sidereal.
-- **Handle all nine grahas.** Rahu and Ketu are positions like any other, so your
-  adapter decides how to place them.
-- **Return twelve cusps keyed 1 to 12 and the full set of chart angles.** Honor the
-  `houseSystem` argument, including `WholeSign`.
+- **Return sidereal longitudes.** Apply the `ayanamsa` argument yourself. The
+  rest of the library treats every longitude as sidereal.
+- **Handle all nine grahas.** Rahu and Ketu are positions like any other, so
+  your adapter decides how to place them.
+- **Return twelve cusps keyed 1 to 12 and the full set of chart angles.** Honor
+  the `houseSystem` argument, including `WholeSign`.
 - **Report real speeds for transit searches.** Stations are found where
-  `longitudeSpeed` changes sign, so a constant speed gives no stations. The fixed
-  adapter above is fine for charts, but not for station searches.
-- **Fail with `EphemerisError`.** Set `operation` to the name of the call that
-  failed and put the underlying reason in `cause`. See [Errors and typed
+  `longitudeSpeed` changes sign, so a constant speed gives no stations. The
+  fixed adapter above works for charts, not for station searches.
+- **Fail with `EphemerisError`.** Set `operation` to the name of the failed
+  call and put the underlying reason in `cause`. See [Errors and typed
   failures](/docs/guides/errors).
 
-### Add the cache to your adapter
+### Cache your adapter
 
-Wrap your adapter in the same decorator to get the cache for free:
+Wrap your adapter in the same decorator.
 
 ```ts
 const cachedFixed = Ephemeris.withPositionCache({ capacity: 1_000, timeToLive: "1 hour" }).pipe(
@@ -215,10 +212,10 @@ const cachedFixed = Ephemeris.withPositionCache({ capacity: 1_000, timeToLive: "
 );
 ```
 
-With this layer, the first chart for a moment makes nine position calls to your
-adapter, and a second chart for the same moment makes none.
+With this layer, the first chart for a moment makes nine position calls to
+your adapter, and a second chart for the same moment makes none.
 
-## Which layer to use
+## Choose a layer
 
 | You are | Provide |
 | --- | --- |

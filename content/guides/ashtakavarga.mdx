@@ -3,31 +3,28 @@ title: Ashtakavarga
 description: Calculate Bhinnashtakavarga, Sarvashtakavarga, reduced tables, and Shodhya Pinda from shared placements, and read them by sign and house.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 
-**Ashtakavarga** is a classical Parashari scoring system. Each of eight
-contributors, the Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, and the Lagna,
-gives a benefic point, called a **bindu**, to some of the twelve signs. The
-scores for a sign are then added up in several ways.
+**Ashtakavarga** is a classical Parashari scoring system. Eight contributors,
+the Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, and the Lagna, each give
+a benefic point, a **bindu**, to some of the twelve signs. The sign scores are
+then summed in several ways.
 
 Ascendant calculates the whole system from the **Placements** you already have.
-This guide runs the calculation, explains each table in the result, and shows how
-to read a score by sign and by house.
 
-## What goes in and what comes out
+## Inputs and results
 
-`SAV.calculate` takes only the placements. It reads the sign of each of the
-seven classical planets and of the Lagna. Rahu and Ketu take no part. It needs no
-moment or location, because everything it uses is already in the placements.
+`SAV.calculate` takes only the placements. It reads the signs of the seven
+classical planets and the Lagna. Rahu and Ketu take no part. It needs no moment
+or location.
 
 | Result field | What it holds |
 | --- | --- |
 | `bhinna` | The Bhinnashtakavarga (BAV): twelve sign scores for each of the eight entities. |
-| `sarva` | The Sarvashtakavarga (SAV): twelve sign scores, the sum of the seven planetary BAVs. The Lagna is not included. |
-| `reduced` | The seven planetary BAVs after Trikona and then Ekadhipatya reduction. |
-| `shodhya_pinda` | For each planet, its Rashi Pinda, Graha Pinda, and their sum, the Shodhya Pinda. |
+| `sarva` | The Sarvashtakavarga (SAV): twelve sign scores, the sum of the seven planetary BAVs. Excludes the Lagna. |
+| `reduced` | The seven planetary BAVs after Trikona, then Ekadhipatya reduction. |
+| `shodhya_pinda` | Each planet's Rashi Pinda, Graha Pinda, and their sum, the Shodhya Pinda. |
 | `totals` | The total of each BAV table, plus the SAV total. |
-| `provenance` | The method that made the result: Parashari `bphs-bav-trikona-ekadhipatya`. |
+| `provenance` | The method: Parashari `bphs-bav-trikona-ekadhipatya`. |
 
 ## Calculate
 
@@ -57,7 +54,7 @@ ashtakavarga.bhinna.Lagna.Cancer; // 6
 ashtakavarga.sarva.Leo; // 34
 ```
 
-For the birth above, these are the scores by sign:
+Scores by sign for the birth above:
 
 | Sign | Sun BAV | Lagna BAV | SAV |
 | --- | --- | --- | --- |
@@ -79,8 +76,8 @@ way.
 
 ### Checksums
 
-Each BAV table totals a fixed number, and the SAV totals 337. The `totals` field
-returns the sums so you can display or assert them:
+Each BAV table totals a fixed number, and the SAV totals 337. `totals` returns
+the sums to display or assert:
 
 | Entity | Total |
 | --- | --- |
@@ -94,16 +91,15 @@ returns the sums so you can display or assert them:
 | Lagna | 49 |
 | SAV | 337 |
 
-Ascendant checks these against the classical values on every calculation. If a
-table does not match, the calculation fails with a typed `SAVCalculationError`
-and names the entity, the total it found, and the total it expected, so you never
-receive a table that breaks the rules.
+Every calculation checks these against the classical values. A mismatch fails
+with a typed `SAVCalculationError` naming the entity, the total found, and the
+total expected. You never receive a table that breaks the rules.
 
 ## Reduced tables and Shodhya Pinda
 
-`reduced` applies two reductions to the seven planetary BAVs, Trikona first and
-then Ekadhipatya. The Ekadhipatya step looks at each pair of signs one planet
-rules and reduces it by whether the seven planets occupy them. Reduced scores are
+`reduced` applies two reductions to the seven planetary BAVs: Trikona, then
+Ekadhipatya. Ekadhipatya takes each pair of signs ruled by one planet and
+reduces it by whether the seven planets occupy them. Reduced scores are
 smaller, and many signs drop to zero:
 
 ```ts
@@ -113,8 +109,8 @@ ashtakavarga.reduced.Sun;
 ```
 
 `shodhya_pinda` builds on the reduced tables. For each planet it holds a
-**Rashi Pinda** (weighted by signs), a **Graha Pinda** (weighted by the signs the
-seven planets occupy), and their sum, the **Shodhya Pinda**:
+**Rashi Pinda** (weighted by signs), a **Graha Pinda** (weighted by the signs
+the seven planets occupy), and their sum, the **Shodhya Pinda**:
 
 | Planet | Rashi Pinda | Graha Pinda | Shodhya Pinda |
 | --- | --- | --- | --- |
@@ -126,13 +122,12 @@ seven planets occupy), and their sum, the **Shodhya Pinda**:
 | Venus | 130 | 69 | 199 |
 | Saturn | 59 | 5 | 64 |
 
-Use these as they are. A Shodhya Pinda is a weighted total for one planet, not a
-probability and not a prediction.
+Use these as they are. A Shodhya Pinda is a weighted total for one planet, not
+a probability and not a prediction.
 
 ## Score a house
 
-Ashtakavarga scores belong to signs. To score a house, find the sign of that house
-in D1 and look it up:
+Scores belong to signs. Look up the sign of the house in D1:
 
 ```ts
 const [d1] = charts;
@@ -142,7 +137,7 @@ ashtakavarga.sarva[tenth]; // 30
 ashtakavarga.bhinna.Sun[tenth]; // 4
 ```
 
-To score all twelve houses at once:
+Score all twelve houses at once:
 
 ```ts
 const houseScores = Object.entries(d1.houses).map(([house, { sign }]) => ({
@@ -152,27 +147,27 @@ const houseScores = Object.entries(d1.houses).map(([house, { sign }]) => ({
 }));
 ```
 
-For the birth above, with Gemini rising, the SAV scores of houses 1 to 12 are 22,
-26, 34, 33, 30, 30, 28, 21, 32, 30, 29, and 22. The highest is the third house,
-Leo, at 34.
+For the birth above, with Gemini rising, the SAV scores of houses 1 to 12 are
+22, 26, 34, 33, 30, 30, 28, 21, 32, 30, 29, and 22. The third house, Leo,
+scores highest at 34.
 
 <Callout type="info" title="Houses and house systems">
-  The sign scores do not depend on the house system. They were identical across
-  all 13 house systems for this birth. The ayanamsa can change them, because it
-  moves each planet's longitude and so can move it into a different sign. Which
-  sign a house maps to does depend on the house system. With a cusp-based system
-  such as Placidus, a house starts at a cusp and `houses[n].sign` is the sign of
-  that cusp. For Parashari work, where each house is one whole sign, use the
-  Lahiri and whole-sign settings from [Choose a school and
+  Sign scores do not depend on the house system: they were identical across all
+  13 house systems for this birth. The ayanamsa can change them, because it
+  moves each planet's longitude and can move it into another sign. The sign a
+  house maps to does depend on the house system. In a cusp-based system such
+  as Placidus, a house starts at a cusp and `houses[n].sign` is that cusp's
+  sign. For Parashari work, where each house is one whole sign, use the Lahiri
+  and whole-sign settings from [Choose a school and
   settings](/docs/guides/settings).
 </Callout>
 
-## Terms in this guide
+## Terms
 
 | Term | Meaning |
 | --- | --- |
-| **Bindu** | One benefic point assigned to a sign by one contributor. A sign's score is its number of bindus. |
+| **Bindu** | One benefic point given to a sign by one contributor. A sign's score is its number of bindus. |
 | **BAV** | The twelve sign scores for one entity. There are eight tables. |
-| **SAV** | The sum of the seven planetary BAV tables. It excludes the Lagna. |
+| **SAV** | The sum of the seven planetary BAV tables. Excludes the Lagna. |
 | **Reduced BAV** | The seven planetary BAVs after Trikona and Ekadhipatya reduction. |
 | **Shodhya Pinda** | A planet's weighted total: its Rashi Pinda plus its Graha Pinda. |

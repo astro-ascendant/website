@@ -4,13 +4,10 @@ description: Generate D9 and the other divisional charts, read their whole-sign 
 ---
 
 
-A **divisional chart** reworks the same planetary positions through a division
-of each sign. The D9, for example, splits every sign into nine parts. Ascendant
-derives all of them from the shared **Placements**, so asking for more divisions
-costs very little extra and never changes the D1.
-
-This guide shows how to request divisions, read the result, tell divisional
-charts apart from D1 in your types, and map one longitude on its own.
+A **divisional chart** reworks the planetary positions through a division of
+each sign. The D9 splits every sign into nine parts. Ascendant derives every
+division from the shared **Placements**, so extra divisions cost little and
+never change the D1.
 
 ## Supported divisions
 
@@ -27,12 +24,12 @@ Ascendant supports D1 plus fifteen divisional charts:
 | D12 | Dwadasamsa | D60 | Shashtiamsa |
 | D16 | Shodasamsa | | |
 
-The type `Chart.Division` lists exactly these numbers, so TypeScript rejects any
-other value at compile time.
+`Chart.Division` lists exactly these numbers. TypeScript rejects any other
+value at compile time.
 
 ## Request divisions
 
-Pass the divisions you want as the second argument to `Chart.generate`:
+Pass the divisions as the second argument to `Chart.generate`.
 
 ```ts
 import { Chart, Runtime } from "astro-ascendant";
@@ -49,11 +46,10 @@ const located = Chart.LocatedMoment.make({
 const calculation = await runtime.runPromise(Chart.generate(located, [9, 10]));
 ```
 
-The result's `charts` always starts with D1, followed by the divisions you asked
-for. They come back in numeric order with duplicates removed, so
-`[10, 9, 9]` gives D1, D9, and D10.
+`charts` always starts with D1, then the requested divisions in numeric order
+with duplicates removed. `[10, 9, 9]` gives D1, D9, and D10.
 
-To get every divisional chart at once, list them all:
+List them all to get every divisional chart:
 
 ```ts
 const everything = [2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60] as const;
@@ -62,8 +58,8 @@ const calculation = await runtime.runPromise(Chart.generate(located, everything)
 
 ## D1 versus a divisional chart
 
-`calculation.charts` is typed as a D1 chart followed by any number of divisional
-charts, so you can split it directly:
+`calculation.charts` is typed as a D1 chart followed by any number of
+divisional charts, so destructure it directly:
 
 ```ts
 const [d1, ...divisional] = calculation.charts;
@@ -73,15 +69,12 @@ d1.rulingPlanets; // only on D1
 d1.houses[1].subLord; // KP lords, only on D1
 ```
 
-When you have a `Chart.Chart`, a value that could be either, check its `division`
-to narrow it:
+A `Chart.Chart` can be either kind. Check `division` to narrow it:
 
 ```ts
 const describe = (chart: Chart.Chart) =>
   chart.division === 1 ? `D1 with ${chart.rulingPlanets.length} ruling planets` : `D${chart.division}`;
 ```
-
-The two kinds differ like this:
 
 | | D1 chart | Divisional chart |
 | --- | --- | --- |
@@ -90,9 +83,9 @@ The two kinds differ like this:
 | Angles, KP lords, significations, ruling planets | Yes | No |
 | Houses per chart | 12 | 12 |
 
-Divisional charts have no KP data because those belong to source longitudes, and
-a mapped longitude is not a source longitude. Their houses are whole signs
-whatever house system you chose.
+Divisional charts carry no KP data: KP data belongs to source longitudes, and a
+mapped longitude is not one. Their houses are whole signs under any house
+system.
 
 ## Read a divisional chart
 
@@ -101,18 +94,18 @@ fields:
 
 | Field | Meaning |
 | --- | --- |
-| `sign` | The sign of the house. |
-| `cusp` | Where the house begins, which is the start of its sign (for example `240` for Sagittarius). |
+| `sign` | The house's sign. |
+| `cusp` | Where the house begins: the start of its sign (for example `240` for Sagittarius). |
 | `signLord` | The lord of that sign. |
 | `significations` | The house's classical significations. |
 | `planets` | The planets in the house, with their mapped degree and sign. |
 | `lagna` | The mapped Lagna, in the house that holds it. Otherwise `null`. |
 
-A chart also records its `division` and its `provenance`, which for every
-divisional chart is the Parashari `whole-sign-from-mapped-lagna` method.
+A chart also records its `division` and its `provenance`. Every divisional
+chart uses the Parashari `whole-sign-from-mapped-lagna` method.
 
-To find where a planet sits, scan the houses. The data is one-directional on
-purpose: a house lists its planets, but a planet does not carry its house.
+Scan the houses to find a planet. The data is one-directional on purpose: a
+house lists its planets, but a planet does not carry its house.
 
 ```ts
 const signOf = (chart: Chart.Chart, planet: Chart.Planets) =>
@@ -126,7 +119,7 @@ const sunInD9 = d9 && signOf(d9, "Sun"); // "Leo" for the birth above
 
 ### Example: one birth through every division
 
-For the birth above, the Lagna and Sun land in these signs:
+The Lagna and Sun of the birth above land in these signs:
 
 | Division | Lagna | Sun |
 | --- | --- | --- |
@@ -147,14 +140,13 @@ For the birth above, the Lagna and Sun land in these signs:
 | D45 | Aquarius | Sagittarius |
 | D60 | Capricorn | Virgo |
 
-The D1 uses the default KP settings, Placidus houses, but the sign of each
-planet is the same under any house system. The house system changes only D1's
-cusps.
+The D1 uses the default KP settings with Placidus houses. Each planet's sign is
+the same under any house system, which changes only D1's cusps.
 
 ## Map one longitude
 
-If you need only the divisional position of a single longitude, skip the chart
-and use `getDivisionalTarget`:
+Use `getDivisionalTarget` for the divisional position of a single longitude,
+without a chart.
 
 ```ts
 import { getDivisionalTarget } from "astro-ascendant/chart";
@@ -168,27 +160,26 @@ const target = await runtime.runPromise(getDivisionalTarget(256.5924, 9));
 // }
 ```
 
-For the Sun at 256.59° in D1, the D9 target is Leo at 29.33°, which matches the
-Sun's D9 sign in the table above. For division `1`, the function returns the
-source position unchanged. The same function is also exported from
-`astro-ascendant/chart/divisional-mapping`.
+The Sun at 256.59° in D1 maps to Leo at 29.33° in D9, matching the table
+above. Division `1` returns the source position unchanged. The function is also
+exported from `astro-ascendant/chart/divisional-mapping`.
 
 ## Where divisions are used
 
-- **Karakamsha** reads the D9 sign of each Atmakaraka planet. See
+- **Karakamsha**: reads the D9 sign of each Atmakaraka planet. See
   [Jaimini calculations](/docs/guides/jaimini).
-- Parashari readings use divisional charts for the quality of a result, with the
-  Lahiri and whole-sign settings from [Choose a school and settings](/docs/guides/settings).
+- **Parashari readings**: use divisional charts for the quality of a result,
+  with the Lahiri and whole-sign settings from [Choose a school and
+  settings](/docs/guides/settings).
 
-## When it fails
+## Errors
 
-- An unsupported division number is a compile-time error. If a value gets past
-  the types, for example through a cast, `Chart.generate` ends in a defect, not a
-  typed failure, so validate numbers from untrusted input before you pass them
-  in.
-- `Chart.generate` fails with a `ChartCalculationError` at the `"houses"` stage if
-  the chosen house system's D1 cusps do not divide the circle into twelve houses.
-- `getDivisionalTarget` fails with a `DivisionalMappingError` when the longitude
-  cannot be used.
+- An unsupported division number is a compile-time error. A value that gets
+  past the types, for example through a cast, ends `Chart.generate` in a
+  defect, not a typed failure. Validate numbers from untrusted input first.
+- `Chart.generate` fails with a `ChartCalculationError` at the `"houses"` stage
+  if the house system's D1 cusps do not divide the circle into twelve houses.
+- `getDivisionalTarget` fails with a `DivisionalMappingError` when the
+  longitude cannot be used.
 
-See [Errors and typed failures](/docs/guides/errors) for how to handle them.
+See [Errors and typed failures](/docs/guides/errors) to handle them.

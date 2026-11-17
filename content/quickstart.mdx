@@ -1,32 +1,29 @@
 ---
 title: Quickstart
-description: Install Ascendant and calculate your first chart and Vimshottari dasha in a few minutes.
+description: Install Ascendant and calculate a chart and the running Vimshottari dasha.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-In this guide you will calculate a **D1** chart, a **D9** chart, and the
-**Vimshottari dasha** running today, for one birth. You will finish with a
-single TypeScript file you can run on Bun or Node.js and then grow into a
-real application.
+Calculate a **D1** chart, a **D9** chart, and the running **Vimshottari
+dasha** for one birth. The result is a single TypeScript file that runs on Bun
+or Node.js.
 
 <Callout
   type="warn"
-  title="Python SDK is not recommended"
-  className="leading-7 [&_p]:leading-7 [&_strong]:leading-7 [&>svg]:mt-1"
+  title="Use the TypeScript SDK"
 >
-  The Python SDK ([`astro-ascendant`](https://pypi.org/project/astro-ascendant/)
-  on PyPI) shares its name with the TypeScript SDK but is **not at feature
-  parity** and is **not actively developed**. Use the TypeScript SDK instead. If
-  you need it maintained, [fork it on
-  GitHub](https://github.com/astro-ascendant/ascendant).
+  The Python package [`astro-ascendant`](https://pypi.org/project/astro-ascendant/)
+  on PyPI shares the name but is **not at feature parity** and is **not
+  actively developed**. [Fork it on
+  GitHub](https://github.com/astro-ascendant/ascendant) if you need it
+  maintained.
 </Callout>
 
 ## Install
 
-You need an ES module project with TypeScript and Node.js 20 or later, or Bun.
+Ascendant needs an ES module project with TypeScript, and Bun or Node.js 20 or later.
 
 <Tabs items={["Bun", "Node"]} groupId="runtime" persist>
 <Tab value="Bun">
@@ -43,18 +40,19 @@ npm install astro-ascendant effect
 npm install --save-dev tsx
 ```
 
-Set `"type": "module"` in your `package.json` so the file below can use
-top-level `await`.
+Set `"type": "module"` in `package.json` to allow top-level `await`.
 
 </Tab>
 </Tabs>
 
-<Callout type="info" title="New to Effect?">
+<Callout
+  type="info"
+  title="New to Effect?"
+>
   Ascendant is built on [Effect](https://effect.website). Every calculation
-  returns an `Effect`: a description of work that does nothing until you run it.
-  You write programs with `Effect.gen` and `yield*`, and you run them once, at
-  the edge of your app. This page explains each piece as it appears. To learn
-  Effect itself, start with [effect.website](https://effect.website),
+  returns an `Effect`, a description of work that runs only when you run it.
+  Write programs with `Effect.gen` and `yield*`, and run them once at the edge
+  of your app. To learn Effect, start with [effect.website](https://effect.website),
   [effect.institute](https://effect.institute), or
   [effect.kitlangton.com](https://effect.kitlangton.com).
 </Callout>
@@ -75,11 +73,10 @@ const runtime = ManagedRuntime.make(Runtime.MainLayer);
 const degrees = (value: number) => Number(value.toFixed(2));
 ```
 
-`degrees` only rounds longitudes so the tables stay readable. A `ManagedRuntime` is how you run Effect programs from ordinary code, and it
-is the recommended way to do so. You build it once and reuse it for every
-calculation. `Runtime.MainLayer` supplies what Ascendant needs: the Swiss
-Ephemeris, with a cache for repeated position lookups, and the default
-calculation settings (see [Defaults and settings](#defaults-and-settings)).
+Build one `ManagedRuntime` and reuse it for every calculation.
+`Runtime.MainLayer` supplies the Swiss Ephemeris, a cache for repeated
+position lookups, and the [default settings](#settings). `degrees` rounds
+longitudes for display.
 
 </Step>
 <Step>
@@ -100,14 +97,12 @@ const program = Effect.gen(function* () {
   });
 ```
 
-Ascendant always works in UTC. Here the local wall-clock time and its IANA
-time zone are converted to a UTC `Moment`. A `LocatedMoment` pairs that moment
-with the latitude and longitude where the positions are calculated.
+Ascendant works in UTC. Convert the local time and its IANA time zone to a
+UTC `Moment`, then pair it with a latitude and longitude in a `LocatedMoment`.
 
 <Callout type="warn" title="Resolve the time zone from the place">
-  This example names the time zone directly. In a real application, you must
-  find the time zone for the birth place and date yourself, because the UTC
-  offset depends on both. See [From local time to a Located
+  The UTC offset depends on both the place and the date, so look up the time
+  zone for the birth place. See [From local time to a Located
   Moment](/docs/guides/located-moments).
 </Callout>
 
@@ -120,10 +115,10 @@ with the latitude and longitude where the positions are calculated.
   const { placements, charts, astroParams } = yield* Chart.generate(located, [9]);
 ```
 
-`Chart.generate` calculates the **Placements** once, then derives the charts
-from them. D1 is always first, and `[9]` adds the D9. `astroParams` records the
-ayanamsa and house system the calculation used. `yield*` runs the effect and
-gives you its result inside `Effect.gen`.
+`Chart.generate` calculates the **Placements** once and derives every chart
+from them. D1 always comes first, and `[9]` adds the D9. `astroParams` records
+the ayanamsa and house system used. Inside `Effect.gen`, `yield*` runs an
+effect and returns its result.
 
 </Step>
 <Step>
@@ -135,10 +130,10 @@ gives you its result inside `Effect.gen`.
   const current = yield* Dasha.at(timeline);
 ```
 
-The dasha reuses the same placements instead of recalculating them.
-`Dasha.calculate` builds the full Vimshottari timeline. `Dasha.at` finds the
-Mahadasha, Antardasha, Pratyantardasha and Sookshma active at a given moment,
-and now when you pass none. This example prints the first two.
+`Dasha.calculate` builds the full Vimshottari timeline from the same
+placements. `Dasha.at` returns the Mahadasha, Antardasha, Pratyantardasha, and
+Sookshma active at a moment, or now when you pass none. This example prints the
+first two.
 
 </Step>
 <Step>
@@ -189,21 +184,19 @@ await runtime.runPromise(program);
 await runtime.dispose();
 ```
 
-`Console.log` and `Console.table` are Effect's versions of the console methods.
-They are Effects too, so you `yield*` them inside the program like any other step.
-`Console.table` takes an array of objects and prints one row per object, with the
-keys as column headings.
+`Console.log` and `Console.table` are Effect versions of the console methods,
+so `yield*` them like any other step. `Console.table` prints one row per object,
+with the keys as column headings.
 
-Nothing has run yet. `runtime.runPromise` runs the program and returns a
-promise. `runtime.dispose()` releases the runtime's resources when you are
+Nothing runs until `runtime.runPromise`. Call `runtime.dispose()` when you are
 done.
 
 </Step>
 </Steps>
 
-## The full program
+## Full program
 
-Save this as `quickstart.ts`:
+Save it as `quickstart.ts`:
 
 ```ts title="quickstart.ts"
 import { Chart, Dasha, Runtime } from "astro-ascendant";
@@ -272,7 +265,7 @@ await runtime.runPromise(program);
 await runtime.dispose();
 ```
 
-## Run it
+## Run
 
 <Tabs items={["Bun", "Node"]} groupId="runtime" persist>
 <Tab value="Bun">
@@ -291,7 +284,7 @@ npx tsx quickstart.ts
 </Tab>
 </Tabs>
 
-You should see output like this:
+The output looks like this:
 
 ```text
 Placements (KrishnamurtiVP291, Placidus)
@@ -324,31 +317,27 @@ Running dasha
 └───┴───────────┴────────────┴──────────────────────────┴──────────────────────────┘
 ```
 
-The positions are fixed by the birth moment, so yours will match. The **Running
-dasha** table depends on the day you run it, and this output is from 1 November
-2026. The unnamed first column is the row number that `Console.table` adds.
+Positions depend only on the birth moment, so yours will match. The **Running
+dasha** table depends on the date; this output is from 1 November 2026.
+`Console.table` adds the unnamed row-number column.
 
-## What you got back
+## Results
 
-- `placements` holds the shared sidereal positions of the Lagna and the nine
-  grahas, each with its star and pada. Reuse it with every other calculation.
-- `charts[0]` is the **D1**. Its houses start at the house system's cusps, and
-  only D1 carries the chart angles and the KP star, sub, and sub-sub lords.
-- `charts[1]` is the **D9**. Its houses are whole signs counted from its mapped
-  Lagna.
-- `timeline` is the full Vimshottari timeline, and `current` is the period
-  active now.
+- `placements`: the sidereal positions of the Lagna and the nine grahas, each
+  with its star and pada. Reuse it for every other calculation.
+- `charts[0]`: the **D1**. Its houses start at the house system's cusps. Only
+  D1 carries the chart angles and the KP star, sub, and sub-sub lords.
+- `charts[1]`: the **D9**, with whole-sign houses counted from its mapped Lagna.
+- `timeline`: the full Vimshottari timeline. `current` is the period active now.
 
-The [Core concepts](/docs/concepts) page explains each of these terms.
+See [Core concepts](/docs/concepts) for each term.
 
-## Defaults and settings
+## Settings
 
-`Runtime.MainLayer` uses the library defaults: the KrishnamurtiVP291 ayanamsa
-and Placidus houses. Every calculation records the settings it used, so
-results stay reproducible.
+`Runtime.MainLayer` uses the KrishnamurtiVP291 ayanamsa and Placidus houses.
+Every result records the settings it used, so you can reproduce it.
 
-To use Lahiri with whole-sign houses, as Parashari readings do, build the
-runtime from your own settings:
+For Parashari readings, build the runtime with Lahiri and whole-sign houses:
 
 ```ts
 import { AstroParams, Swisseph } from "astro-ascendant";
@@ -362,16 +351,14 @@ const runtime = ManagedRuntime.make(
 );
 ```
 
-See [Choose a school and settings](/docs/guides/settings) for every
-ayanamsa and house system, and how to pick between them.
+See [Choose a school and settings](/docs/guides/settings) for every ayanamsa
+and house system.
 
-## Using it in a long-running app
+## Servers
 
-Create the runtime once, when your server starts, and call
-`runtime.runPromise` in each request handler. The ephemeris and its cache are
-then shared across requests. Call `runtime.dispose()` only when the process
-shuts down. In a short script, as above, dispose at the end.
+Create the runtime once at startup and call `runtime.runPromise` in each
+request handler, so requests share the ephemeris cache. Call
+`runtime.dispose()` at shutdown.
 
 Every calculation can fail with a typed error, such as an invalid division or
-an exhausted transit search. See [Errors and typed
-failures](/docs/guides/errors) to handle them.
+an exhausted transit search. See [Errors and typed failures](/docs/guides/errors).

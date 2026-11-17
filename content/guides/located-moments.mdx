@@ -3,15 +3,13 @@ title: From local time to a Located Moment
 description: Turn a birth date, local time, and place into the UTC moment and coordinates Ascendant calculates from.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 
-Every calculation in Ascendant starts from a **Located Moment**: one instant in
-UTC, plus the latitude and longitude where positions are calculated. People,
-though, give you a local date, a clock time, and a place. This guide covers the
-step in between: converting local time to UTC safely, handling times that
-are ambiguous or do not exist, and passing valid coordinates.
+Every calculation starts from a **Located Moment**: one UTC instant plus the
+latitude and longitude where positions are calculated. Convert a local date,
+clock time, and place to one safely, handle local times that are ambiguous or
+do not exist, and pass valid coordinates.
 
-## What the library expects
+## Input
 
 A Located Moment has three fields:
 
@@ -21,17 +19,17 @@ A Located Moment has three fields:
 | `latitude` | `number` | Decimal degrees, from -90 to 90. North is positive. |
 | `longitude` | `number` | Decimal degrees, from -180 to 180. East is positive, so west is negative. |
 
-Ascendant never reads a time zone. It works only in UTC, and the same
-Located Moment always gives the same Placements. Getting from local time to UTC
-is your job, and it is where most mistakes happen.
+Ascendant never reads a time zone. It works only in UTC, and the same Located
+Moment always gives the same Placements. Converting local time to UTC is your
+job, and it is where most mistakes happen.
 
 ## Build a Moment
 
-There are two common starting points. Both use Effect's `DateTime`.
+Both common starting points use Effect's `DateTime`.
 
-### From a timestamp that already has an offset
+### From a timestamp with an offset
 
-If your source gives an ISO 8601 string with an offset, parse it and you are done:
+Parse an ISO 8601 string that carries an offset:
 
 ```ts
 import { Chart } from "astro-ascendant";
@@ -43,13 +41,13 @@ const parsed = DateTime.make("2000-01-01T17:30:00+05:30");
 const moment = Option.map(parsed, (date) => Chart.Moment.make({ date }));
 ```
 
-`DateTime.make` returns an `Option`, because the string might not be valid.
-The result is already UTC.
+`DateTime.make` returns an `Option`, because the string might be invalid. The
+result is already UTC.
 
 ### From a local date, time, and time zone
 
-If you have a wall-clock time and an IANA time zone name such as
-`Asia/Kolkata`, convert it with `DateTime.makeZoned`:
+Convert a wall-clock time and an IANA time zone name, such as `Asia/Kolkata`,
+with `DateTime.makeZoned`:
 
 ```ts
 const zoned = DateTime.makeZoned("2000-01-01T17:30:00", {
@@ -62,28 +60,26 @@ const utc = Option.map(zoned, DateTime.toUtc);
 // Option.some(2000-01-01T12:00:00.000Z)
 ```
 
-Two options matter here:
-
-- `adjustForTimeZone: true` reads the string as a local wall-clock time in that
+- `adjustForTimeZone: true`: reads the string as a wall-clock time in that
   zone. Without it, the string is read as UTC and only labeled with the zone.
-- `disambiguation: "reject"` returns `Option.none()` for times that are ambiguous
-  or do not exist. See the next section.
+- `disambiguation: "reject"`: returns `Option.none()` for times that are
+  ambiguous or do not exist. See the next section.
 
-### Local times that are ambiguous or do not exist
+### Ambiguous and nonexistent times
 
-Clock changes create two kinds of bad local times:
+Clock changes create two kinds of bad local time:
 
 | Case | Example in `America/New_York` | With `"reject"` |
 | --- | --- | --- |
 | A **gap**, when clocks jump forward, so the time never happened | `2021-03-14 02:30` | `Option.none()` |
 | An **overlap**, when clocks fall back, so the time happened twice | `2021-11-07 01:30` | `Option.none()` |
 
-The other disambiguation modes (`"earlier"`, `"later"`, `"compatible"`) silently
-pick an answer. That can move a birth by an hour and change the Lagna. For
-astrology, prefer `"reject"` and ask the user which of the two moments they mean,
-or for the exact UTC offset from their birth record.
+The other modes (`"earlier"`, `"later"`, `"compatible"`) silently pick an
+answer. That can move a birth by an hour and change the Lagna. For astrology,
+prefer `"reject"`, then ask the user which moment they mean, or for the exact
+UTC offset from their birth record.
 
-### Convert in one function
+### One conversion function
 
 Put the conversion in one place so every input takes the same path:
 
@@ -116,8 +112,8 @@ export const toLocatedMoment = (input: {
   );
 ```
 
-It fails with a message you can show the user, and succeeds with a value you can
-pass straight to `Chart.generate`:
+It fails with a message you can show the user, and succeeds with a value that
+goes straight to `Chart.generate`:
 
 ```ts
 const calculation = yield* toLocatedMoment(input).pipe(Effect.flatMap(Chart.generate));
@@ -127,29 +123,28 @@ const calculation = yield* toLocatedMoment(input).pipe(Effect.flatMap(Chart.gene
 
 A Located Moment also records where the birth happened.
 
-### Find the time zone for a place
+### Time zone
 
-Ascendant does not map coordinates to a time zone, and the UTC offset depends on
-both the place and the date. A place can change its offset over time, and
+Ascendant does not map coordinates to a time zone. The UTC offset depends on
+both the place and the date: a place can change its offset over time, and
 daylight saving rules differ by year. Look the zone up with a time zone lookup
 package, or ask for it, and always combine it with the birth date.
 
 <Callout type="warn" title="Historical births">
-  `DateTime` uses the time zone data of the runtime it runs on. Rules for dates
-  before the mid-twentieth century, and for places that changed zones, can be
-  wrong or simplified in that data. If your birth record states the exact UTC
-  offset, pass it as an ISO string with the offset instead of converting from a
-  zone name.
+  `DateTime` uses the time zone data of its runtime. That data can be wrong or
+  simplified for dates before the mid-twentieth century and for places that
+  changed zones. If the birth record states the exact UTC offset, pass an ISO
+  string with that offset instead of converting from a zone name.
 </Callout>
 
 ### Coordinates
 
-Give latitude and longitude as decimal degrees. If you hold degrees, minutes, and
-seconds, convert them first: `degrees + minutes / 60 + seconds / 3600`, negated
-for south and west.
+Give latitude and longitude in decimal degrees. Convert degrees, minutes, and
+seconds first: `degrees + minutes / 60 + seconds / 3600`, negated for south and
+west.
 
-`Chart.generate` validates its input. A value outside the range fails with a typed
-`LocatedMomentValidationError`, so a bad latitude does not produce a chart:
+`Chart.generate` validates its input. An out-of-range value fails with a typed
+`LocatedMomentValidationError`, so a bad latitude never produces a chart:
 
 ```ts
 // latitude: 120 fails with:
@@ -157,21 +152,21 @@ for south and west.
 //   Expected a value between -90 and 90 at ["latitude"]
 ```
 
-Note that `Chart.LocatedMoment.make` throws on the same input, because it
-validates immediately. Use a plain object, as the function above does, when you
-want the failure to arrive as an Effect error instead of an exception.
+`Chart.LocatedMoment.make` throws on the same input, because it validates
+immediately. Pass a plain object, as the function above does, to get the
+failure as an Effect error instead of an exception.
 
-## Optional: the person's sex
+## Sex (optional)
 
-`Chart.generate` also accepts `Chart.ChartParams`, which is a Located Moment with
-an optional `sex` field. Ascendant copies it into each chart and does not use it
-in any calculation.
+`Chart.generate` also accepts `Chart.ChartParams`: a Located Moment with an
+optional `sex` field. Ascendant copies it into each chart and uses it in no
+calculation.
 
-## A short checklist
+## Checklist
 
 - Convert local time with the **birth date**, not today's date.
 - Use `disambiguation: "reject"` and handle `Option.none()`.
-- Remember that longitudes west of Greenwich are negative.
+- Longitudes west of Greenwich are negative.
 - Pass the exact offset when you have it, especially for historical births.
-- Keep the UTC moment and the original local input together if you will show the
+- Keep the UTC moment and the original local input together if you show the
   result back to the user.

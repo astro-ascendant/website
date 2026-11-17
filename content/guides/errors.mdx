@@ -3,22 +3,19 @@ title: Errors and typed failures
 description: Know which errors each Ascendant function can fail with, handle them by tag, and tell expected failures from defects.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 
-Ascendant functions return an `Effect`, and an Effect has three outcomes: it
-succeeds, it fails with a **typed error**, or it dies with a **defect**. This guide
-covers the first two, which are the failures your program should expect, and how to
-tell them from the third.
+Every Ascendant function returns an `Effect`, which succeeds, fails with a
+**typed error**, or dies with a **defect**. Handle typed errors, the failures
+your program should expect, and tell them from defects.
 
-The idea is simple. Anything that can go wrong because of the input or the data,
-such as an invalid latitude, a search window that ends too early, or placements
-missing a planet, is a typed error. TypeScript knows the exact list for each
-function, so you handle failures by name and the compiler tells you what you missed.
+Anything that goes wrong because of the input or the data is a typed error: an
+invalid latitude, a search window that ends too early, placements missing a
+planet. TypeScript knows the exact list for each function, so you handle
+failures by name and the compiler flags any you missed.
 
-## What each function can fail with
+## Errors by function
 
-TypeScript infers these from the function's return type. The table lists them so
-you can plan ahead.
+TypeScript infers these from each function's return type.
 
 | Function | Typed errors |
 | --- | --- |
@@ -36,13 +33,14 @@ you can plan ahead.
 | `RashiDrishti.calculate` | None |
 | `Transit.findTransits` | `TransitValidationError`, `TransitSearchExhausted`, `ChartCalculationError`, `LocatedMomentValidationError`, `LongitudeError`, `EphemerisError` |
 
-The names above are the error **tags**, the strings you pass to `catchTag`. They are
-also the names of the exported classes. Older code may use the unprefixed Jaimini
-names `EvidenceError` and `CalculationError`, which remain as deprecated aliases.
+These names are the error **tags**, the strings you pass to `catchTag`, and
+the names of the exported classes. Older code may use the unprefixed Jaimini
+names `EvidenceError` and `CalculationError`, which remain as deprecated
+aliases.
 
-## What an error looks like
+## Error shape
 
-Every error is an `Error` with a `_tag` and a `message`, plus fields specific to
+Every error is an `Error` with a `_tag`, a `message`, and fields specific to
 its kind. Most also carry a `cause` with the underlying detail.
 
 | Error | Extra fields | Meaning |
@@ -56,14 +54,14 @@ its kind. Most also carry a `cause` with the underlying detail.
 | `TransitValidationError` | `cause` | The request was incomplete or invalid, or the search window left the supported Julian Day range. |
 | `TransitSearchExhausted` | `found`, `searchedUntil` | The search window ended before `count` events were found. `found` holds the events it did find. |
 
-A `ChartCalculationError` at the `"houses"` stage means the chosen house system's
-D1 cusps did not divide the circle into twelve houses. See [Choose a school and
+A `ChartCalculationError` at the `"houses"` stage means the house system's D1
+cusps did not divide the circle into twelve houses. See [Choose a school and
 settings](/docs/guides/settings).
 
 ## Handle errors
 
-Recover from a failure inside Effect by matching its tag, or at the edge of
-your app, where the effect becomes a promise.
+Recover inside Effect by matching the tag, or at the edge of your app, where
+the effect becomes a promise.
 
 ### By tag
 
@@ -91,12 +89,12 @@ const message = await runtime.runPromise(
 // "Invalid input: Moment and geographic coordinates must be valid"
 ```
 
-The message is short and fixed. The detail is in `error.cause`, which for this
-error says `Expected a value between -90 and 90` at `latitude`. Show the message to
+The message is short and fixed. The detail is in `error.cause`, which here
+says `Expected a value between -90 and 90` at `latitude`. Show the message to
 users and log the cause.
 
-To handle several errors in one place, use `Effect.catchTags`. This maps each one
-to an HTTP-style response:
+Use `Effect.catchTags` to handle several errors in one place. This maps each to
+an HTTP-style response:
 
 ```ts
 const response = await runtime.runPromise(
@@ -113,15 +111,14 @@ const response = await runtime.runPromise(
 );
 ```
 
-Because `catchTags` lists every tag in the function's error type, the result no
-longer has an error channel, and TypeScript will flag the call if a future version
-adds a new error.
+`catchTags` lists every tag in the function's error type, so the result has
+no error channel left, and TypeScript flags the call if a future version adds
+an error.
 
 ### At the promise boundary
 
-`runtime.runPromise` rejects with the error itself. The rejection is a real
-`Error` instance with its `_tag`, so you can branch on the tag in an ordinary
-`catch`:
+`runtime.runPromise` rejects with the error itself: a real `Error` instance
+with its `_tag`. Branch on the tag in an ordinary `catch`:
 
 ```ts
 try {
@@ -135,8 +132,8 @@ try {
 }
 ```
 
-To inspect the outcome without throwing, use `runPromiseExit` and the `Cause`
-helpers:
+Use `runPromiseExit` and the `Cause` helpers to inspect the outcome without
+throwing:
 
 ```ts
 import { Cause, Exit } from "effect";
@@ -149,13 +146,13 @@ if (Exit.isFailure(exit)) {
 }
 ```
 
-Prefer `catchTag` and `catchTags` inside your Effect programs, and keep
-`runPromiseExit` for the edge of your application.
+Prefer `catchTag` and `catchTags` inside Effect programs. Keep
+`runPromiseExit` for the edge of your app.
 
 ## Partial results
 
-`TransitSearchExhausted` carries the events it did find, so you can keep a partial
-answer instead of discarding it:
+`TransitSearchExhausted` carries the events it found. Keep the partial answer
+instead of discarding it:
 
 ```ts
 import { Transit } from "astro-ascendant";
@@ -171,10 +168,10 @@ See [Transit searches](/docs/guides/transits).
 
 ## Defects are not for catching
 
-A defect is a bug in the calling code, not an expected failure. An Effect that dies
-does not appear in the typed error channel. A division number outside the supported
-list is one example. TypeScript rejects it at compile time, but if a cast gets a
-value like `5` through, `Chart.generate` dies:
+A defect is a bug in the calling code, not an expected failure, and never
+appears in the typed error channel. A division number outside the supported
+list is one. TypeScript rejects it at compile time, but if a cast lets a value
+like `5` through, `Chart.generate` dies:
 
 ```ts
 const exit = await runtime.runPromiseExit(
@@ -184,12 +181,12 @@ Exit.isFailure(exit) && Cause.hasDies(exit.cause); // true
 ```
 
 <Callout type="warn" title="Validate untrusted input first">
-  Do not catch defects to hide them. Validate numbers that come from outside your
-  program, such as a division from a query string, before you pass them in, and
-  fix the code that produced a value the types rule out.
+  Do not catch defects to hide them. Validate numbers from outside your
+  program, such as a division from a query string, before passing them in. Fix
+  the code that produced a value the types rule out.
 </Callout>
 
-## A checklist
+## Checklist
 
 - Handle `LocatedMomentValidationError` where you accept user input.
 - Treat `ChartCalculationError` and `EphemerisError` as server-side failures, and

@@ -1,69 +1,56 @@
 ---
 title: Getting started
-description: Generate a horoscope, build with the Effect-first TypeScript library, or let an AI assistant read your chart. Choose your path.
+description: Generate a horoscope, build with the Effect-first TypeScript library, or let an AI assistant read your chart.
 ---
 
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-Ascendant calculates sidereal (Vedic) astrology. It works out planetary
-**Placements** once for a moment and place, then derives everything else from them:
-charts, dasha timelines, Ashtakavarga, Jaimini results, and transit searches.
-
-There are three ways to use it, depending on what you want to do.
-
-## Choose your path
+Ascendant is a calculation engine for sidereal (Vedic) astrology. It works out
+planetary **Placements** once for a moment and place, then derives charts,
+dasha timelines, Ashtakavarga, Jaimini results, and transit searches from them.
 
 <Cards>
   <Card
     title="Generate a horoscope"
     href="/chart"
-    description="Enter a birth date, time, and place on the chart page and read your Rashi chart, KP chart, dashas, and more."
+    description="Enter a birth date, time, and place to read your Rashi chart, KP chart, dashas, and more."
   />
   <Card
     title="Build with the library"
     href="/docs/quickstart"
-    description="Install the astro-ascendant TypeScript library and calculate your first chart and dasha."
+    description="Install the TypeScript library and calculate your first chart and dasha."
   />
   <Card
     title="Ascendant AI Skill"
     href="/docs/skills"
-    description="Install the skill so your AI assistant answers from a saved birth chart, with its evidence cited."
+    description="Let your AI assistant answer from a saved birth chart, with cited evidence."
   />
 </Cards>
 
-## Start with a prompt
+## Prompt
 
-Copy this prompt into your coding agent (Claude Code, Codex, Cursor, Copilot,
-Gemini CLI, or any other) and replace the last line with what you want to
-build. It points the agent at these docs and sets the rules that keep
-Ascendant code correct.
+Paste this prompt into your coding agent and describe your goal on the last
+line. It points the agent at these docs, and the docs carry the rest.
 
 ```text
-I want to build an astrology feature in TypeScript with the astro-ascendant library (https://www.npmjs.com/package/astro-ascendant).
+I'm building with astro-ascendant, an Effect-based TypeScript library for sidereal (Vedic) astrology.
 
-Before writing code:
-1. Read https://astro-ascendant.vercel.app/llms.txt and open the pages relevant to my task. Use https://astro-ascendant.vercel.app/llms-full.txt if you need everything. Add .md to any docs page URL to get it as Markdown.
-2. Take names and signatures from the API reference. Do not invent functions, options, or ayanamsa and house system names.
+References:
+- Docs index: https://astro-ascendant.vercel.app/llms.txt
+- Full docs: https://astro-ascendant.vercel.app/llms-full.txt
+- Any docs page as Markdown: add .md to its URL
+- Package: https://www.npmjs.com/package/astro-ascendant
+- Source: https://github.com/astro-ascendant/ascendant
 
-Rules:
-- Install with `astro-ascendant` and `effect`. The library is Effect-based and every calculation returns an Effect.
-- Create one ManagedRuntime from `Runtime.MainLayer`, reuse it for every call, and dispose it only at shutdown.
-- All moments are UTC. Convert the birth's local date and time with its IANA time zone, which depends on the place and the date. If I haven't given a birth time, place, or time zone, ask me. Never guess them.
-- Calculate Placements once with `Chart.generate` and reuse them for dashas, Ashtakavarga, Jaimini results, and transits.
-- Defaults are the KrishnamurtiVP291 ayanamsa with Placidus houses (KP). Use Lahiri with WholeSign houses only for Parashari work, and never mix the two schools in one judgment. State the settings used.
-- Only D1 has cusp-based houses and KP data. Divisional charts use whole-sign houses from their mapped Lagna.
-- Handle failures through Effect's typed errors. Do not swallow them.
-- The library calculates mechanics, not predictions. Do not present interpretations as certainty or as medical, legal, or financial advice.
+Read the pages relevant to my goal before writing code.
 
-Start with a short plan, then implement it. Verify the code compiles and runs.
-
-My task: [describe what you want to build]
+My goal:
 ```
 
-## Install the library
+## Install
 
-Ascendant is published on npm as `astro-ascendant`. It needs `effect` alongside it.
+Install `astro-ascendant` with its `effect` peer dependency.
 
 <Tabs items={["Bun", "Node"]} groupId="runtime" persist>
 <Tab value="Bun">
@@ -82,12 +69,12 @@ npm install astro-ascendant effect
 </Tab>
 </Tabs>
 
-Then follow the [Quickstart](/docs/quickstart) to calculate your first chart and the
-Vimshottari dasha running today.
+Then follow the [Quickstart](/docs/quickstart) to calculate a chart and the
+running Vimshottari dasha.
 
-## What the library calculates
+## Calculations
 
-| Calculation | What you get | Guide |
+| Calculation | Result | Guide |
 | --- | --- | --- |
 | **Charts** | A cusp-aware D1 with KP evidence, and 15 whole-sign divisional charts. | [Divisional charts](/docs/guides/divisional-charts) |
 | **Dashas** | Vimshottari planetary periods, and Jaimini Chara and Sthira sign periods, with date queries. | [Dashas](/docs/guides/dashas) |
@@ -96,16 +83,16 @@ Vimshottari dasha running today.
 | **Transits** | The next or previous sign ingresses, longitude hits, cusp crossings, and stations of a graha. | [Transit searches](/docs/guides/transits) |
 | **Settings** | 47 ayanamsas and 13 house systems, recorded on every result. | [Choose a school and settings](/docs/guides/settings) |
 
-By default Ascendant uses the sidereal zodiac, the KrishnamurtiVP291 ayanamsa, and
-Placidus houses. Methods are named so you can check and repeat a result. A reading
-is guidance, not certainty, and not a substitute for medical, legal, or financial
-advice.
+Ascendant defaults to the sidereal zodiac, the KrishnamurtiVP291 ayanamsa, and
+Placidus houses. Every method is named, so you can check and repeat a result.
+A reading is guidance, not certainty, and not a substitute for medical, legal,
+or financial advice.
 
-## How these docs are organized
+## Sections
 
-| Section | Who it is for | Start with |
+| Section | For | Start with |
 | --- | --- | --- |
-| **For horoscope users** | Anyone who wants a horoscope and an assistant to help read it. | [Create a horoscope](/chart), then [Skills and plugins](/docs/skills) |
+| **For horoscope users** | Anyone who wants a horoscope and an assistant to read it. | [Create a horoscope](/chart), then [Skills and plugins](/docs/skills) |
 | **Start here** | Developers new to the library. | [Quickstart](/docs/quickstart), then [Core concepts](/docs/concepts) |
 | **Developer guides** | Developers building a feature. | [Choose a school and settings](/docs/guides/settings) |
 | **API reference** | Exact names, types, and errors. | [Chart](/docs/api-reference/chart) |

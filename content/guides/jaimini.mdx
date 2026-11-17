@@ -3,11 +3,10 @@ title: Jaimini calculations
 description: Calculate Chara Karakas, Rashi Drishti, Karakamsha, Arudha Pada, Upapada, and Argala from shared placements, one named result at a time.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
 
-**Jaimini** is a school of Jyotisha, not a single calculation. Ascendant exposes
-each Jaimini result as its own function, and you ask for exactly the one you
-want. There is no "run Jaimini" call.
+**Jaimini** is a school of Jyotisha, not a single calculation. Each Jaimini
+result has its own function; call the one you want. There is no "run Jaimini"
+call.
 
 | Function | Result |
 | --- | --- |
@@ -18,9 +17,8 @@ want. There is no "run Jaimini" call.
 | `Upapada.calculate` | The Arudha Pada of the twelfth house. |
 | `Argala.calculate` | Supporting and obstructing relationships around a reference. |
 
-Apart from `RashiDrishti`, which takes a sign, every function takes the
-**Placements** from `Chart.generate`. None of them needs a moment or location.
-This guide runs each one for the same birth and shows how to read the result.
+`RashiDrishti` takes a sign. Every other function takes the **Placements** from
+`Chart.generate`. None needs a moment or location.
 
 ## Set up
 
@@ -49,17 +47,16 @@ const { placements, charts } = await runtime.runPromise(Chart.generate(located, 
 const lagnaSign = charts[0].houses[1].sign; // "Gemini"
 ```
 
-The Jaimini functions read sign positions and degrees from the placements, so the
-ayanamsa you choose can change their results. See [Choose a school and
-settings](/docs/guides/settings). The examples below use the library defaults, and
-the results are the same for any house system.
+The Jaimini functions read signs and degrees from the placements, so the
+ayanamsa can change their results. The examples use the library defaults, and
+the results are the same under any house system. See [Choose a school and
+settings](/docs/guides/settings).
 
 ## Chara Karakas
 
-The Chara Karakas are seven roles given to the seven classical planets in
-descending order of degree within their signs. The planet with the highest degree
-is the **Atmakaraka**, and the lowest is the **Darakaraka**. Rahu and Ketu take
-no role.
+The seven classical planets take seven roles in descending order of degree
+within their signs. The highest degree is the **Atmakaraka**, the lowest the
+**Darakaraka**. Rahu and Ketu take no role.
 
 ```ts
 const karakas = await runtime.runPromise(CharaKarakas.calculate(placements));
@@ -83,12 +80,12 @@ For the birth above:
 | Darakaraka | Jupiter | 1.48° |
 
 Each role maps to a non-empty list of holders. Ties are exact: planets at the
-same degree share every role their tied ranks cover, so a role can have more than
-one holder. Always treat `assignments[role]` as a list.
+same degree share every role their tied ranks cover, so a role can have more
+than one holder. Always treat `assignments[role]` as a list.
 
 ## Rashi Drishti
 
-Rashi Drishti gives the signs that one reference sign influences under Jaimini's
+Rashi Drishti gives the signs one reference sign influences under Jaimini's
 sign aspects. It takes a sign, not placements:
 
 ```ts
@@ -96,34 +93,34 @@ const drishti = await runtime.runPromise(RashiDrishti.calculate(lagnaSign));
 console.log(drishti.targets); // ["Virgo", "Sagittarius", "Pisces"]
 ```
 
-Gemini is a dual sign, and its three targets are the other dual signs. The
-result's provenance method is `movable-fixed-dual`.
+Gemini is a dual sign, so its three targets are the other dual signs. The
+provenance method is `movable-fixed-dual`.
 
 ## Karakamsha
 
-The Karakamsha is the D9 sign occupied by the planet holding the Atmakaraka role:
+The Karakamsha is the D9 sign of the planet holding the Atmakaraka role:
 
 ```ts
 const karakamsha = await runtime.runPromise(Karakamsha.calculate(placements));
 console.log(karakamsha.placements); // [{ planet: "Moon", sign: "Pisces" }]
 ```
 
-The result is a list. If planets tie for the Atmakaraka role, each of them
-contributes a Karakamsha sign. The Chara Karakas that led to it are not returned,
-so call `CharaKarakas.calculate` as well if you need them.
+The result is a list: planets tied for Atmakaraka each contribute a sign. The
+Chara Karakas behind it are not returned; call `CharaKarakas.calculate` if you
+need them.
 
 ## Arudha Pada
 
 An Arudha Pada projects a house onto a sign. Count from the house's sign to its
-lord, then count the same distance again from the lord. Ask for the house you want
-by number, 1 to 12:
+lord, then the same distance again from the lord. Pass the house number, 1 to
+12:
 
 ```ts
 const a1 = await runtime.runPromise(ArudhaPada.calculate(placements, 1));
 const a7 = await runtime.runPromise(ArudhaPada.calculate(placements, 7));
 ```
 
-Each result carries the working, so you can show it:
+Each result carries its working:
 
 | House | Source sign | Lord | Lord's sign | Arudha sign |
 | --- | --- | --- | --- | --- |
@@ -133,12 +130,12 @@ Each result carries the working, so you can show it:
 The fields are `house`, `sourceSign`, `lord`, `lordSign`, and `sign`.
 
 <Callout type="warn" title="Plain projection only">
-  Ascendant calculates the plain projection, and its provenance method is
-  `plain-projection`. It does not apply the classical adjustments for a projection
-  that lands on the source sign or on the seventh sign from it. In the example,
-  both Arudhas land on their own source signs, which is exactly where some
-  traditions apply an adjustment. Apply that rule yourself if your tradition
-  requires it, and say so alongside the result.
+  Ascendant calculates the plain projection, with provenance method
+  `plain-projection`. It skips the classical adjustments for a projection that
+  lands on the source sign or the seventh sign from it. In the example, both
+  Arudhas land on their own source signs, exactly where some traditions adjust.
+  Apply that rule yourself if your tradition requires it, and say so alongside
+  the result.
 </Callout>
 
 ### Upapada
@@ -150,13 +147,13 @@ const upapada = await runtime.runPromise(Upapada.calculate(placements));
 // { house: 12, sourceSign: "Taurus", lord: "Venus", lordSign: "Scorpio", sign: "Taurus" }
 ```
 
-Its provenance method is `twelfth-house-plain-projection`, so the same
+Its provenance method is `twelfth-house-plain-projection`, so the
 plain-projection note applies.
 
 ## Argala
 
-Argala describes the planets that support or obstruct a reference from the signs
-around it. The reference is either a sign or Ketu:
+Argala describes the planets that support or obstruct a reference from the
+signs around it. The reference is a sign or Ketu:
 
 ```ts
 const argala = await runtime.runPromise(
@@ -164,15 +161,15 @@ const argala = await runtime.runPromise(
 );
 ```
 
-A sign reference counts in the ordinary direction. A Ketu reference starts at the
-sign Ketu occupies and counts in the reverse direction:
+A sign reference counts forward. A Ketu reference starts at Ketu's sign and
+counts in reverse:
 
 ```ts
 const fromKetu = await runtime.runPromise(Argala.calculate(placements, { kind: "Ketu" }));
 // fromKetu.referenceSign === "Capricorn", fromKetu.direction === "reverse"
 ```
 
-The result separates the relations by position. For Gemini:
+The result groups relations by position. For Gemini:
 
 | Kind | Position from the reference | Sign | Planets |
 | --- | --- | --- | --- |
@@ -185,14 +182,14 @@ The result separates the relations by position. For Gemini:
 | Secondary supporting | 5 | Libra | Moon |
 | Secondary obstructing | 9 | Aquarius | Mars |
 
-Read the fields as `supporting` and `obstructing`, each with three relations, plus
-`secondarySupporting` and `secondaryObstructing`, each with one. The result also
-records `direction` (`forward` or `reverse`) and the `referenceSign`.
+`supporting` and `obstructing` hold three relations each;
+`secondarySupporting` and `secondaryObstructing` hold one each. The result also
+records `direction` (`forward` or `reverse`) and `referenceSign`.
 
 ## Provenance
 
 Every Jaimini result carries a `provenance` with `school: "Jaimini"`, a method,
-and a version. Store it with the result, because it names the exact rule used:
+and a version. Store it with the result: it names the exact rule used.
 
 | Result | Method |
 | --- | --- |
@@ -206,9 +203,11 @@ and a version. Store it with the result, because it names the exact rule used:
 The version is the date the method last changed, currently `2026-11-01` for all
 six. See [Provenance and verification](/docs/guides/provenance).
 
-## When it fails
+## Errors
 
 Each function fails with its own typed errors. An evidence error means the
-placements did not contain exactly one entry for a planet the calculation needs, which
-points to placements built or edited by hand. Karakamsha and Argala can also fail
-with a calculation error. See [Errors and typed failures](/docs/guides/errors).
+placements did not hold exactly one entry for a planet the calculation needs,
+which
+points to placements built or edited by hand. Karakamsha and Argala can also
+fail with a calculation error. See [Errors and typed
+failures](/docs/guides/errors).

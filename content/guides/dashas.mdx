@@ -1,13 +1,11 @@
 ---
 title: Dashas
-description: Calculate Vimshottari, Chara, and Sthira dasha timelines from shared placements, split Vimshottari down to Pratyantardasha and Sookshma, and query the period active on any date.
+description: Calculate Vimshottari, Chara, and Sthira dasha timelines, split Vimshottari to Sookshma, and query the period active on any date.
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
-
-A **dasha** is a timeline of periods. Each period has a lord, a start, and an end,
-and each Mahadasha is divided into Antardashas. Ascendant calculates three
-systems from the same **Placements** you already have from `Chart.generate`:
+A **dasha** is a timeline of periods. Each period has a lord, a start, and an
+end, and each Mahadasha divides into Antardashas. Ascendant calculates three
+systems from the **Placements** that `Chart.generate` returns:
 
 | System | Periods are ruled by | Mahadashas | Antardashas in each | School |
 | --- | --- | --- | --- | --- |
@@ -18,13 +16,10 @@ systems from the same **Placements** you already have from `Chart.generate`:
 Vimshottari goes two levels deeper: each Antardasha splits into nine
 **Pratyantardashas**, and each of those into nine **Sookshma** dashas.
 
-This guide builds each one, reads it, splits Vimshottari down to Sookshma, and
-asks which period is running on a given date.
-
-## Start from placements
+## Placements
 
 Every dasha function takes the birth **Moment** and the **Placements**.
-Calculate the placements once and reuse them:
+Calculate the placements once and reuse them.
 
 ```ts
 import { Chart, Dasha, Runtime } from "astro-ascendant";
@@ -41,13 +36,13 @@ const located = Chart.LocatedMoment.make({
 const { placements } = await runtime.runPromise(Chart.generate(located));
 ```
 
-The dasha is anchored to the birth moment, so pass the same `located.moment`
-you used for the chart.
+The dasha is anchored to the birth moment. Pass the same `located.moment` you
+used for the chart.
 
 ## Vimshottari
 
-`Dasha.calculate` builds the Vimshottari timeline. It starts from the Moon's
-star and the portion of that star's period still left at birth.
+`Dasha.calculate` builds the Vimshottari timeline from the Moon's star and the
+portion of that star's period left at birth.
 
 ```ts
 const timeline = await runtime.runPromise(
@@ -55,8 +50,8 @@ const timeline = await runtime.runPromise(
 );
 ```
 
-The result is an array of nine Mahadashas covering the full 120-year cycle. Each
-has a `mahadasha` lord, a `start`, an `end`, and nine `antardashas`:
+The result is an array of nine Mahadashas covering the full 120-year cycle.
+Each has a `mahadasha` lord, a `start`, an `end`, and nine `antardashas`.
 
 ```ts
 const day = (date: DateTime.Utc) => DateTime.formatIso(date).slice(0, 10);
@@ -66,7 +61,7 @@ for (const period of timeline) {
 }
 ```
 
-For the birth above this prints:
+For the birth above:
 
 | Mahadasha | Start | End |
 | --- | --- | --- |
@@ -81,10 +76,9 @@ For the birth above this prints:
 | Mars | `2095-08-12` | `2102-08-12` |
 
 <Callout type="info" title="The first period starts before birth">
-  The first Mahadasha begins before the birth date, here in 1982, because the
-  person is born part-way through the period of the Moon's star lord. The
-  timeline shows the whole Rahu period, and the birth falls inside it. Use the
-  query below to find what is running on a given date.
+  The birth falls part-way through the period of the Moon's star lord, so the
+  first Mahadasha begins before it, here in 1982. The timeline shows the whole
+  Rahu period. Use the query below to find what is running on a given date.
 </Callout>
 
 Each Mahadasha holds its own Antardashas. The first three of the Rahu Mahadasha
@@ -99,11 +93,15 @@ for (const sub of first.antardashas) {
 
 ### Pratyantardasha and Sookshma
 
-The timeline stops at Antardashas, because the deeper levels multiply fast: 729
+The timeline stops at Antardashas because the deeper levels multiply fast: 729
 Pratyantardashas and 6,561 Sookshmas across 120 years. Split a period only when
-you need it. `Dasha.pratyantardashas` takes an Antardasha and returns its nine
-Pratyantardashas, and `Dasha.sookshmas` takes a Pratyantardasha and returns its
-nine Sookshmas. Both are plain functions, not effects, so no runtime is needed:
+you need it.
+
+- `Dasha.pratyantardashas`: takes an Antardasha, returns its nine
+  Pratyantardashas
+- `Dasha.sookshmas`: takes a Pratyantardasha, returns its nine Sookshmas
+
+Both are plain functions, not effects, so they need no runtime.
 
 ```ts
 const saturn = timeline[2];
@@ -117,9 +115,9 @@ for (const period of pratyantardashas) {
 const sookshmas = Dasha.sookshmas(pratyantardashas[0]);
 ```
 
-Each level starts from its parent's lord and follows the Vimshottari order, taking
-the same share of its parent that the lord takes of the 120-year cycle. For the
-Saturn Mahadasha's Sun Antardasha, the nine Pratyantardashas are:
+Each level starts from its parent's lord, follows the Vimshottari order, and
+gives each lord the same share of its parent that the lord takes of the
+120-year cycle. For the Saturn Mahadasha's Sun Antardasha:
 
 | Pratyantardasha | Start | End |
 | --- | --- | --- |
@@ -134,18 +132,17 @@ Saturn Mahadasha's Sun Antardasha, the nine Pratyantardashas are:
 | Venus | `2027-05-18` | `2027-07-15` |
 
 The first Sookshma of the Sun Pratyantardasha runs from `2026-08-02T12:48Z` to
-`2026-08-03T09:37Z`, under a day. Sookshma boundaries are rounded to the minute,
-and the last child always ends exactly where its parent ends, so the levels line
-up with no gaps.
+`2026-08-03T09:37Z`, under a day. Sookshma boundaries are rounded to the
+minute. The last child always ends exactly where its parent ends, so the levels
+line up with no gaps.
 
 KP practice calls the third level **Antara**. It is the same period:
 `PratyantarDasha` in the API.
 
 ### Find the running period
 
-`Dasha.at` returns the whole chain active at a moment: the Mahadasha,
-Antardasha, Pratyantardasha and Sookshma. It uses the current time when you
-pass none:
+`Dasha.at` returns the chain active at a moment: the Mahadasha, Antardasha,
+Pratyantardasha, and Sookshma. Pass no moment to use the current time.
 
 ```ts
 const when = DateTime.makeUnsafe("2026-11-01T00:00:00Z");
@@ -163,16 +160,15 @@ if (current) {
 }
 ```
 
-Only the running branch is split, so the query stays cheap however deep it
-goes. Call `Dasha.pratyantardashas` or `Dasha.sookshmas` yourself for any other
-period.
+Only the running branch is split, so the query stays cheap at any depth. Call
+`Dasha.pratyantardashas` or `Dasha.sookshmas` yourself for any other period.
 
-It returns `null` when the date falls outside the timeline, for example in 1900 or
-2500, so always check before reading the result.
+`Dasha.at` returns `null` when the date falls outside the timeline, for example
+in 1900 or 2500. Always check before reading the result.
 
 ## Chara and Sthira
 
-The Jaimini systems are sign-based. Call them with the same arguments:
+The Jaimini systems are sign-based. Call them with the same arguments.
 
 ```ts
 const chara = await runtime.runPromise(
@@ -184,29 +180,28 @@ const sthira = await runtime.runPromise(
 ```
 
 Both return an object with a `system` tag, a `provenance`, and twelve
-`mahadashas`, each with twelve `antardashas`. Their lords are signs, not planets.
-For the birth above, both begin at the birth moment:
+`mahadashas`, each with twelve `antardashas`. Their lords are signs, not
+planets. For the birth above, both begin at the birth moment:
 
 | System | First four Mahadashas |
 | --- | --- |
 | Chara | Gemini `2000-01-01` to `2006-01-01`, Taurus to `2012-01-01`, Aries to `2022-01-01`, Pisces to `2033-01-01` |
 | Sthira | Libra `2000-01-01` to `2007-01-01`, Scorpio to `2015-01-01`, Sagittarius to `2024-01-01`, Capricorn to `2031-01-01` |
 
-Because the result is tagged by `system`, you can tell the two apart in your own
-types:
+The `system` tag tells the two apart in your own types:
 
 ```ts
 const describe = (dasha: Dasha.RashiDasha) =>
   dasha.system === "Sthira" ? `Brahma: ${dasha.brahma.planet} in ${dasha.brahma.sign}` : "Chara";
 ```
 
-Sthira also returns the data behind its **Brahma** selection: the winning planet
-and sign, the Atmakaraka used as the reference, the sign strengths for the two
-candidate signs, and a score for each eligible planet. Here the Brahma is the
-Moon in Libra. Show or log `sthira.brahma.selection` if you need to explain the
+Sthira also returns the data behind its **Brahma** selection: the winning
+planet and sign, the Atmakaraka used as the reference, the sign strengths of
+the two candidate signs, and a score for each eligible planet. Here the Brahma
+is the Moon in Libra. Show or log `sthira.brahma.selection` to explain the
 choice.
 
-Query them with `Dasha.atRashi`, which works for both:
+Query either system with `Dasha.atRashi`.
 
 ```ts
 const running = await runtime.runPromise(Dasha.atRashi(chara, when));
@@ -222,40 +217,45 @@ For the same date, the Chara period is Pisces-Virgo, from `2026-08-01` to
 `2027-07-01`, and the Sthira period is Capricorn-Taurus.
 
 <Callout type="warn" title="Use the matching query">
-  `Dasha.at` takes a Vimshottari timeline and `Dasha.atRashi` takes a Chara or
-  Sthira one. Each result carries the types of its own system, so TypeScript
-  stops you from mixing them. `Dasha.atRashi` goes to the Antardasha only: the
+  `Dasha.at` takes a Vimshottari timeline; `Dasha.atRashi` takes a Chara or
+  Sthira one. Each result carries its own system's types, so TypeScript stops
+  you mixing them. `Dasha.atRashi` goes to the Antardasha only: the
   Pratyantardasha and Sookshma levels are Vimshottari's.
 </Callout>
 
-## How dates are counted
+## Date boundaries
 
-The systems measure time differently, and you can see it in the boundaries:
+The systems measure time differently, and it shows in the boundaries:
 
-- **Vimshottari** periods are decimal years converted into calendar months, days,
-  hours, and minutes. Their boundaries fall at any time of day. In the example,
-  Saturn begins at `12:48 UTC` on `2016-08-12`. Pratyantardashas and Sookshmas
-  divide their parent's actual span, rounded to the minute.
-- **Chara and Sthira** periods are whole calendar months. Their boundaries fall
-  on the first of a month, such as `2026-08-01`.
+- **Vimshottari**: decimal years converted to calendar months, days, hours, and
+  minutes. Boundaries fall at any time of day. In the example, Saturn begins at
+  `12:48 UTC` on `2016-08-12`. Pratyantardashas and Sookshmas divide their
+  parent's actual span, rounded to the minute.
+- **Chara and Sthira**: whole calendar months. Boundaries fall on the first of
+  a month, such as `2026-08-01`.
 
-Treat the exact instants as part of the result. Do not round them to a day if
+Treat the exact instants as part of the result. Do not round them to a day when
 you compare periods across systems.
 
-## Which method was used
+## Provenance
 
-Every dasha records its method in `provenance`. Chara reports the Jaimini method
-`kn-rao-co-lord-strength` and Sthira reports `bv-raman-koch-brahma-strength`.
-Vimshottari returns a plain array, so its provenance sits on each Mahadasha, as the
-Parashari method `moon-nakshatra-balance`. The version of each is a date, currently
-`2026-11-01`. Store these with the timeline if you will show it later. See
-[Provenance and verification](/docs/guides/provenance).
+Every dasha records its method in `provenance`:
 
-## When it fails
+- Chara: Jaimini method `kn-rao-co-lord-strength`
+- Sthira: Jaimini method `bv-raman-koch-brahma-strength`
+- Vimshottari: Parashari method `moon-nakshatra-balance`, on each Mahadasha,
+  since the timeline is a plain array
 
-Dasha functions fail with typed errors. `DashaCalculationError` covers a
-calculation that cannot complete, and `DashaEvidenceError` means the placements
-did not contain exactly one entry for a required planet or the Lagna. It
-points to placements that were built or edited by hand instead of coming from
-`Chart.generate`. See
-[Errors and typed failures](/docs/guides/errors).
+Each version is a date, currently `2026-11-01`. Store these with the timeline
+if you show it later. See [Provenance and verification](/docs/guides/provenance).
+
+## Errors
+
+Dasha functions fail with typed errors:
+
+- `DashaCalculationError`: a calculation cannot complete
+- `DashaEvidenceError`: the placements do not hold exactly one entry for a
+  required planet or the Lagna. This points to placements built or edited by
+  hand instead of coming from `Chart.generate`.
+
+See [Errors and typed failures](/docs/guides/errors).
