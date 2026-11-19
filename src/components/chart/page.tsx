@@ -139,7 +139,7 @@ function useChartSummary(): { items: SummaryItem[] } | null {
       { label: "Ascendant", value: facts.ascendant },
       { label: "Moon", value: facts.moon },
       { label: "Star", value: facts.star },
-      { label: "Mahadasha · Antardasha", value: facts.dasha },
+      { label: "Dasha", value: facts.dasha },
     ],
   };
 }

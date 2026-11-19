@@ -17,11 +17,8 @@ import {
 import { ChartCalculating, ChartFailure } from "@/components/chart/results";
 import { useChartSession } from "@/components/chart/session";
 import { ChartSignHouseCharts } from "@/components/chart/sign-house-chart";
-import { OrreryHero } from "@/components/orrery-hero";
 import {
   gutterClassName,
-  heroLeadClassName,
-  heroTitleClassName,
   SiteFrame,
   SiteFrameEnd,
   SiteHeader,
@@ -49,7 +46,7 @@ import { formatTimeZoneLabel } from "@/lib/timezone";
 import { formatLongitude } from "@/lib/zodiac";
 import { getChart } from "@/server/chart.functions";
 
-const TITLE = "Planets now";
+const TITLE = "Current planetary positions";
 
 interface SkyPlace {
   place: string;
@@ -156,19 +153,19 @@ function skySummary(result: ChartResult): SummaryItem[] {
   };
   const moon = find("Moon");
   return [
-    { label: "Sun", value: at("Sun") },
+    {
+      label: "Ascendant",
+      value: `${result.lagna.sign} ${formatLongitude(result.lagna.longitude)}`,
+    },
     { label: "Moon", value: at("Moon") },
     {
-      label: "Moon star",
+      label: "Star",
       value:
         moon && moon.star !== ""
           ? `${moon.star}${moon.pada ? ` · Pada ${moon.pada}` : ""}`
           : "-",
     },
-    {
-      label: "Ascendant",
-      value: `${result.lagna.sign} ${formatLongitude(result.lagna.longitude)}`,
-    },
+    { label: "Sun", value: at("Sun") },
   ];
 }
 
@@ -284,9 +281,6 @@ function formatInstant(iso: string) {
   };
 }
 
-/** How often the positions follow the clock while the page is visible. */
-const REFRESH_MS = 60_000;
-
 type PlaceSource = "device" | "chosen" | "fallback";
 
 function locateDevice(): Promise<{ latitude: number; longitude: number }> {
@@ -340,9 +334,9 @@ function SkyContent() {
 
   const cast = (target: SkyPlace) => calculateFor(nowAt(target));
 
-  // The clock tick reads the latest place and editor state without re-arming.
-  const latest = useRef({ cast, place, editorOpen, source });
-  latest.current = { cast, place, editorOpen, source };
+  // The location lookup reads the latest cast and source without re-running.
+  const latest = useRef({ cast, source });
+  latest.current = { cast, source };
 
   // Show the last chosen place (or Ujjain) at once, then move to the device's
   // location when it arrives. A location prompt the reader never answers has
@@ -375,25 +369,6 @@ function SkyContent() {
       cancelled = true;
     };
   }, []);
-
-  // Keep "now" current: recast every minute, and on returning to the tab.
-  useEffect(() => {
-    if (source === null) {
-      return;
-    }
-    const tick = () => {
-      const { cast: run, place: at, editorOpen: editing } = latest.current;
-      if (document.visibilityState === "visible" && !editing) {
-        void run(at).catch(() => {});
-      }
-    };
-    const timer = setInterval(tick, REFRESH_MS);
-    document.addEventListener("visibilitychange", tick);
-    return () => {
-      clearInterval(timer);
-      document.removeEventListener("visibilitychange", tick);
-    };
-  }, [source]);
 
   // The picker mirrors the place in use: it shows it when opened, drops an
   // unapplied pick when reopened, and never lets a stale pick override a place
@@ -456,17 +431,15 @@ function SkyContent() {
     <>
       <section
         aria-label={TITLE}
-        className="section-ticks divide-border grid md:min-h-[38rem] md:grid-cols-2 md:divide-x"
+        className="section-ticks"
       >
         <div
-          className={`flex flex-col items-center justify-center py-14 text-center sm:py-20 md:items-start md:text-left ${gutterClassName}`}
+          className={`flex flex-col items-center justify-center py-8 text-center sm:py-12 md:items-start md:text-left ${gutterClassName}`}
         >
-          <h1 className={`max-w-xl ${heroTitleClassName}`}>{TITLE}</h1>
-          <p className={heroLeadClassName}>
-            Where the Sun, Moon and planets stand at this moment in the
-            sidereal zodiac, updated every minute.
-          </p>
-          <dl className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 sm:gap-y-2 md:justify-start">
+          <h1 className="text-foreground max-w-xl text-2xl font-medium tracking-tight text-balance sm:text-4xl">
+            {TITLE}
+          </h1>
+          <dl className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 sm:gap-y-2 md:justify-start">
             <MetaFact
               icon={CalendarBlankIcon}
               label="Date"
@@ -487,11 +460,10 @@ function SkyContent() {
               className="max-sm:basis-full max-sm:justify-center"
             />
           </dl>
-          <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+          <div className="mt-5 flex w-full items-center gap-2 sm:w-auto">
             <Button
               type="button"
-              size="lg"
-              className="w-full sm:w-auto"
+              className="flex-1 sm:flex-none"
               disabled={loading}
               onClick={() => {
                 setLocationError("");
@@ -504,8 +476,7 @@ function SkyContent() {
             <Button
               type="button"
               variant="secondary"
-              size="lg"
-              className="w-full sm:w-auto"
+              className="flex-1 sm:flex-none"
               disabled={loading || status === "calculating"}
               onClick={() => void cast(place).catch(() => {})}
             >
@@ -513,11 +484,6 @@ function SkyContent() {
               Refresh
             </Button>
           </div>
-        </div>
-        <div
-          className={`border-border flex items-center justify-center py-14 max-md:border-t sm:py-20 ${gutterClassName}`}
-        >
-          <OrreryHero />
         </div>
       </section>
 
