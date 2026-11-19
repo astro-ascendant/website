@@ -529,7 +529,7 @@ export function ChartDocument({
   const headline = [
     { label: "Ascendant", value: `${result.lagna.sign} ${formatLongitude(result.lagna.longitude)}` },
     { label: "Moon", value: moon ? `${moon.sign} ${formatLongitude(moon.longitude)}` : "-" },
-    { label: "Moon star", value: moon ? star(moon.star, moon.pada) : "-" },
+    { label: "Star", value: moon ? star(moon.star, moon.pada) : "-" },
     {
       label: "Dasha at birth",
       value: birthDasha ? `${birthDasha.mahadasha} Mahadasha` : "-",
