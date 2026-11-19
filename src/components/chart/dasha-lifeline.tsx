@@ -475,6 +475,16 @@ export function DashaLifeline({
   );
   const failed = (level >= 2 && pratyantaras.failed) || (level >= 3 && sookshmas.failed);
   const segments = visibleIn(levelSpans[level]!, view);
+  // The period the header names: the one running now while it is in view,
+  // else the one under the middle of the rail. A parent standing in for
+  // children still loading has a shorter path, so it does not count.
+  const runningAtLevel = chain[level];
+  const focus =
+    runningAtLevel && runningAtLevel.end > view.start && runningAtLevel.start < view.end
+      ? runningAtLevel
+      : containing(levelSpans[level]!, (view.start + view.end) / 2);
+  const focused = focus && focus.path.length === level + 1 ? focus : undefined;
+  const focusIsNow = focused !== undefined && focused.start <= now && now < focused.end;
   const parents = level > 0 ? visibleIn(levelSpans[level - 1]!, view) : [];
   const ticks = width ? rulerTicks(view, width) : [];
 
@@ -591,11 +601,19 @@ export function DashaLifeline({
         {/* Where the rail is, and the ways to move it. */}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="text-muted-foreground text-xs sm:text-sm">
-            <span className="text-foreground font-medium">{LEVEL_PLURAL[level]}</span>
-            <span className="tabular-nums">
-              {" · "}
-              {formatDashaDate(iso(view.start))} to {formatDashaDate(iso(view.end))}
+            <span className="text-foreground font-medium">
+              {LEVELS[level]} {focused?.lord ?? "…"}
             </span>
+            {focused ? (
+              <span className="ms-1.5 tabular-nums">
+                {formatDashaDate(iso(focused.start))} to {formatDashaDate(iso(focused.end))}
+              </span>
+            ) : null}
+            {focusIsNow ? (
+              <span className="border-border bg-muted text-foreground ms-2 inline-flex items-center rounded-full border px-2 py-0.5 align-[0.0625rem] text-[11px] leading-none font-medium sm:text-xs">
+                Current
+              </span>
+            ) : null}
           </p>
           <div className="flex items-center gap-0.5">
             <button
@@ -668,8 +686,8 @@ export function DashaLifeline({
             })}
           </div>
 
-          {/* The rail. */}
-          <div className="relative h-16">
+          {/* The rail. Each period is a full-height button, so this height is the tap target. */}
+          <div className="relative h-24">
             <span
               aria-hidden="true"
               className="border-border absolute inset-x-0 top-0 origin-left border-t border-dashed motion-safe:animate-[dasha-rail-in_700ms_ease-out_both]"
@@ -697,7 +715,7 @@ export function DashaLifeline({
                   }}
                   style={{ left, width: segmentWidth, paddingInlineStart: hidden + 6 }}
                   className={cn(
-                    "group absolute inset-y-0 flex flex-col items-start overflow-hidden pt-3 text-left outline-none transition-colors duration-150 ease-out",
+                    "group absolute inset-y-0 flex flex-col items-start overflow-hidden pt-4 text-left outline-none transition-colors duration-150 ease-out",
                     isNow
                       ? "bg-foreground/[0.06] text-foreground"
                       : "text-muted-foreground hover:bg-foreground/[0.03] hover:text-foreground",
