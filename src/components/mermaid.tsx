@@ -1,29 +1,15 @@
-import { render } from "pele";
+import { lazy, Suspense } from "react";
 
-/**
- * Renders Mermaid source to themed SVG with pele. `render` is synchronous and
- * pure, so the diagram is part of the server-rendered HTML and needs no effect.
- */
+// pele is most of a megabyte, and only a few docs pages draw diagrams. Lazy,
+// it leaves the shared bundle. The server still renders the SVG into the
+// HTML, and hydration keeps that markup until the chunk arrives, so the
+// diagram shows at once and does not flash.
+const MermaidDiagram = lazy(() => import("./mermaid-diagram"));
+
 export function Mermaid({ chart }: { chart: string }) {
-  const { svg } = render(chart.trim());
   return (
-    <div
-      role="img"
-      aria-label="Diagram"
-      className="pele not-prose my-6 overflow-x-auto"
-      style={
-        {
-          "--pele-fg": "var(--color-fd-foreground)",
-          "--pele-bg": "transparent",
-          "--pele-line": "var(--color-fd-muted-foreground)",
-          "--pele-border": "var(--color-fd-border)",
-          "--pele-surface": "var(--color-fd-card)",
-          "--pele-surface-alt": "var(--color-fd-muted)",
-          "--pele-accent": "var(--color-fd-primary)",
-          "--pele-muted": "var(--color-fd-muted-foreground)",
-        } as React.CSSProperties
-      }
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <Suspense fallback={null}>
+      <MermaidDiagram chart={chart} />
+    </Suspense>
   );
 }

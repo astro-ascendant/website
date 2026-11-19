@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreDependencies": ["sharp", "svgo"],
+  "ignoreDependencies": ["allo-font", "sharp", "svgo"],
   "ignoreExportsUsedInFile": true,
   "rules": {
     "types": "off"

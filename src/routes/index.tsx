@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createFileRoute, createLink, Link } from "@tanstack/react-router";
 import { ArrowRightIcon } from "@phosphor-icons/react";
-import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { OrreryHero } from "../components/orrery-hero";
 import { ExpandingArrowButton } from "../components/motion/expanding-arrow-button";
@@ -43,6 +43,44 @@ const INSTALL_COMMANDS = [
   { runtime: "Bun", command: "bun add astro-ascendant effect" },
   { runtime: "Node", command: "npm install astro-ascendant effect" },
 ] as const;
+
+/**
+ * A one-line shell command, coloured as Shiki's github-light and github-dark
+ * themes colour bash: the command as a function, its arguments as strings.
+ * DynamicCodeBlock would load Shiki, its regex engine, both themes and the
+ * shell grammar in the browser to re-highlight what the server already did.
+ */
+function ShellCommand({ command }: { command: string }) {
+  const [program, ...args] = command.split(" ");
+  return (
+    <CodeBlock
+      className="shiki shiki-themes github-light github-dark my-0"
+      style={
+        {
+          "--shiki-light": "#24292e",
+          "--shiki-dark": "#e1e4e8",
+          "--shiki-light-bg": "#fff",
+          "--shiki-dark-bg": "#24292e",
+        } as React.CSSProperties
+      }
+    >
+      <Pre>
+        <code>
+          <span className="line">
+            <span style={{ "--shiki-light": "#6F42C1", "--shiki-dark": "#B392F0" } as React.CSSProperties}>
+              {program}
+            </span>
+            {args.map((arg, i) => (
+              <span key={i} style={{ "--shiki-light": "#032F62", "--shiki-dark": "#9ECBFF" } as React.CSSProperties}>
+                {` ${arg}`}
+              </span>
+            ))}
+          </span>
+        </code>
+      </Pre>
+    </CodeBlock>
+  );
+}
 
 /** Router-aware versions: client navigation, preloading and typed routes. */
 const ArrowLink = createLink(ExpandingArrowButton);
@@ -229,11 +267,7 @@ function LandingPage() {
           >
             {INSTALL_COMMANDS.map(({ runtime, command }) => (
               <Tab key={runtime} value={runtime} keepMounted>
-                <DynamicCodeBlock
-                  lang="bash"
-                  code={command}
-                  codeblock={{ className: "my-0" }}
-                />
+                <ShellCommand command={command} />
               </Tab>
             ))}
           </Tabs>

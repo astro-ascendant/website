@@ -32,16 +32,16 @@ const C = {
   brandWash: "#f5ecea",
 };
 
-const SANS = "Inter";
+const SANS = "Allo";
 const SERIF = "Libre Baskerville";
 const MONO = "JetBrains Mono";
 
 /** Font files, as URLs in the browser or bytes when rendering from disk. */
 export interface PdfAssets {
   fonts: Record<
-    | "interRegular"
-    | "interMedium"
-    | "interSemibold"
+    | "sansRegular"
+    | "sansMedium"
+    | "sansSemibold"
     | "serifRegular"
     | "serifItalic"
     | "mono",
@@ -57,9 +57,9 @@ export interface PdfAssets {
 function fontsFrom(assets: PdfAssets): FontRegistration[] {
   const { fonts } = assets;
   return [
-    { family: SANS, src: fonts.interRegular, fontWeight: 400 },
-    { family: SANS, src: fonts.interMedium, fontWeight: 500 },
-    { family: SANS, src: fonts.interSemibold, fontWeight: 600 },
+    { family: SANS, src: fonts.sansRegular, fontWeight: 400 },
+    { family: SANS, src: fonts.sansMedium, fontWeight: 500 },
+    { family: SANS, src: fonts.sansSemibold, fontWeight: 600 },
     { family: SERIF, src: fonts.serifRegular, fontStyle: "normal" },
     { family: SERIF, src: fonts.serifItalic, fontStyle: "italic" },
     { family: MONO, src: fonts.mono, fontWeight: 400 },

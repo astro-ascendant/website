@@ -1,9 +1,9 @@
 // The PDF's fonts and wordmark, as the browser loads them. Kept apart from
 // the document so it only loads on the first Save as PDF, and so scripts can
 // render the same document with files read from disk instead.
-import interRegular from "../../assets/fonts/inter-latin-400-normal.ttf?url";
-import interMedium from "../../assets/fonts/inter-latin-500-normal.ttf?url";
-import interSemibold from "../../assets/fonts/inter-latin-600-normal.ttf?url";
+import sansRegular from "../../assets/fonts/allo-400-normal.otf?url";
+import sansMedium from "../../assets/fonts/allo-500-normal.otf?url";
+import sansSemibold from "../../assets/fonts/allo-600-normal.otf?url";
 import serifRegular from "../../assets/fonts/libre-baskerville-latin-400-normal.ttf?url";
 import serifItalic from "../../assets/fonts/libre-baskerville-latin-400-italic.ttf?url";
 import mono from "../../assets/fonts/jetbrains-mono-latin-400-normal.ttf?url";
@@ -29,9 +29,9 @@ async function dataUri(url: string): Promise<string> {
 export async function loadPdfAssets(): Promise<PdfAssets> {
   return {
     fonts: {
-      interRegular,
-      interMedium,
-      interSemibold,
+      sansRegular,
+      sansMedium,
+      sansSemibold,
       serifRegular,
       serifItalic,
       mono,

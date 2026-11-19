@@ -4,7 +4,6 @@
 @import "fumadocs-ui/css/preset.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
 @import "@fontsource/libre-baskerville/400.css";
 @import "@fontsource/libre-baskerville/400-italic.css";
@@ -12,8 +11,128 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Allo, cut by scripts/build-fonts.py. Browsers search faces of one family
+ * from the last rule up, so Latin wins for the text nearly every page has,
+ * Latin Extended loads only for diacritics, and the full font only for a
+ * character neither covers.
+ */
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-full.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-latin-ext.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-100.woff2") format("woff2");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-200.woff2") format("woff2");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Allo";
+  src: url("../../assets/fonts/allo/allo-oblique-900.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Arial sized to Allo's metrics, so text keeps its box when Allo swaps in. */
+@font-face {
+  font-family: "Allo Fallback";
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 102.29%;
+  ascent-override: 94.71%;
+  descent-override: 23.58%;
+  line-gap-override: 0%;
+}
+
 :root {
-  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-sans: "Allo", "Allo Fallback", system-ui, sans-serif;
   --font-mono:
     "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
     "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
@@ -218,7 +337,7 @@
   --shadow-resting: 0 1px 2px oklch(0% 0 0 / 0.18);
   --shadow-floating: 0 16px 40px oklch(0% 0 0 / 0.5);
   --radius: 0.625rem;
-  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-sans: "Allo", "Allo Fallback", system-ui, sans-serif;
   --font-serif: "Libre Baskerville", Georgia, serif;
   --font-mono:
     "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
@@ -301,7 +420,7 @@ body {
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-paper: var(--paper);
-  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-sans: "Allo", "Allo Fallback", system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono:
     "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,

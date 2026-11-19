@@ -7,6 +7,7 @@ import {
 import appCss from "@/styles/app.css?url";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import favicon from "../../assets/brand/favicon.svg";
+import alloLatin from "../../assets/fonts/allo/allo-latin.woff2?url";
 import { siteUrl } from "@/lib/shared";
 
 export const Route = createRootRoute({
@@ -81,6 +82,16 @@ export const Route = createRootRoute({
       ],
       links: [
         { rel: "canonical", href: canonical },
+        // Every page sets text in Allo's Latin cut; fetch it alongside the
+        // stylesheet instead of after it. Fonts are always fetched in CORS
+        // mode, so the preload must be too or the browser fetches it twice.
+        {
+          rel: "preload",
+          href: alloLatin,
+          as: "font",
+          type: "font/woff2",
+          crossOrigin: "anonymous",
+        },
         { rel: "stylesheet", href: appCss },
         { rel: "icon", type: "image/svg+xml", href: favicon },
       ],

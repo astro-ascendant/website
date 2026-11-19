@@ -95,7 +95,7 @@ function AboutPage() {
         {/* 4. Colophon */}
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
-            <p>Typeset in Inter, JetBrains Mono, and Libre Baskerville</p>
+            <p>Typeset in Allo, JetBrains Mono, and Libre Baskerville</p>
 
             <button
               type="button"

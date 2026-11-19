@@ -1,7 +1,6 @@
 import * as React from "react";
 import { CalendarBlankIcon } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -124,6 +123,15 @@ function useDateParser(): { parse: DateParser; load: () => void } {
   return { parse, load };
 }
 
+// The calendar (react-day-picker and date-fns) is the largest part of the
+// chart form and shows only in the date popover, so it loads on demand.
+// Hovering or focusing the date field starts the fetch, so it is usually in
+// before the popover opens.
+const loadCalendar = () => import("@/components/ui/calendar");
+const Calendar = React.lazy(() =>
+  loadCalendar().then((module) => ({ default: module.Calendar })),
+);
+
 function formatBirthDate(date: Date | undefined): string {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
@@ -171,7 +179,10 @@ export function ChartDateField() {
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "chart-date-error" : undefined}
-          onFocus={loadDateParser}
+          onFocus={() => {
+            loadDateParser();
+            void loadCalendar();
+          }}
           onChange={(event) => setText(event.target.value)}
           onBlur={commitText}
           onKeyDown={(event) => {
@@ -192,33 +203,39 @@ export function ChartDateField() {
                   size="icon-xs"
                   variant="ghost"
                   aria-label="Select date"
+                  onPointerEnter={() => void loadCalendar()}
+                  onFocus={() => void loadCalendar()}
                 />
               }
             >
               <CalendarBlankIcon aria-hidden="true" />
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end" sideOffset={8}>
-              <Calendar
-                mode="single"
-                selected={preview}
-                onSelect={(date) => {
-                  if (date) {
-                    updateBirth({ date: toBirthDateString(date) });
-                    setText(formatBirthDate(date));
-                    setOpen(false);
+              <React.Suspense
+                fallback={<div className="h-80 w-64" aria-busy="true" />}
+              >
+                <Calendar
+                  mode="single"
+                  selected={preview}
+                  onSelect={(date) => {
+                    if (date) {
+                      updateBirth({ date: toBirthDateString(date) });
+                      setText(formatBirthDate(date));
+                      setOpen(false);
+                    }
+                  }}
+                  captionLayout="dropdown"
+                  startMonth={
+                    new Date(today.getFullYear() - 120, today.getMonth())
                   }
-                }}
-                captionLayout="dropdown"
-                startMonth={
-                  new Date(today.getFullYear() - 120, today.getMonth())
-                }
-                endMonth={today}
-                disabled={{ after: today }}
-                defaultMonth={
-                  preview ??
-                  new Date(today.getFullYear() - 30, today.getMonth())
-                }
-              />
+                  endMonth={today}
+                  disabled={{ after: today }}
+                  defaultMonth={
+                    preview ??
+                    new Date(today.getFullYear() - 30, today.getMonth())
+                  }
+                />
+              </React.Suspense>
             </PopoverContent>
           </Popover>
         </InputGroupAddon>
