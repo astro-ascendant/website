@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 import { gutterClassName, SectionHeading } from "@/components/site-frame";
 import { cn } from "cn";
-import { ChartCode } from "@/components/chart/quote";
+import { InfoTip } from "@/components/info-tip";
+import { SubsectionTitle } from "@/components/subsection-title";
 import { ChartActions } from "@/components/chart/results";
 import { useChartSession } from "@/components/chart/session";
 import { ChartSignHouseCharts } from "@/components/chart/sign-house-chart";
@@ -25,24 +26,19 @@ import {
 } from "@/components/chart/kp-table";
 import { ChartKpCircularChart } from "@/components/chart/kp-circular-chart";
 
-/** One Jaimini reading, styled like the chart subsections: heading, caption, table. */
+/** One Jaimini reading, styled like the chart subsections: heading, then table. */
 function JaiminiPart({
   title,
-  caption,
+  info,
   children,
 }: {
   title: string;
-  caption: string;
+  info: string;
   children: ReactNode;
 }) {
   return (
     <section className="flex min-w-0 flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-foreground text-base font-medium">{title}</h3>
-        <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
-          {caption}
-        </p>
-      </div>
+      <SubsectionTitle title={title} info={info} />
       {children}
     </section>
   );
@@ -63,7 +59,7 @@ function ChartJaiminiTables() {
     <div className="grid items-start gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
       <JaiminiPart
         title="Chara Karakas"
-        caption="The cast of your chart. The planet furthest along in its journey is your Atmakaraka, your own soul, and the next strongest is your advisor."
+        info="Planets ranked by degree. The highest is your Atmakaraka, the soul of the chart."
       >
         <Table>
           <TableHeader>
@@ -85,7 +81,7 @@ function ChartJaiminiTables() {
 
       <JaiminiPart
         title="Arudha Pada"
-        caption="How you are seen. A house says what is true in your life; its arudha says what the world believes about it."
+        info="How the world sees each house, as against what it truly holds."
       >
         <Table>
           <TableHeader>
@@ -107,7 +103,7 @@ function ChartJaiminiTables() {
 
       <JaiminiPart
         title="Karakamsha and Upapada"
-        caption="Karakamsha points to what you came here to become, read for purpose and livelihood. Upapada is read first for marriage."
+        info="Karakamsha is read for purpose and livelihood; Upapada for marriage."
       >
         <Table>
           <TableBody tone="muted">
@@ -125,7 +121,7 @@ function ChartJaiminiTables() {
 
       <JaiminiPart
         title="Drishti and Argala"
-        caption="Drishti shows which parts of your chart are in conversation. Argala shows who holds a door open for a house, and who stands in its way."
+        info="Drishti: the signs that aspect your Lagna. Argala: what supports or blocks it."
       >
         <Table>
           <TableBody tone="muted">
@@ -159,7 +155,7 @@ function Subsection({
 }) {
   return (
     <div className={cn("flex min-w-0 flex-col gap-4", className)}>
-      <h3 className="text-foreground text-base font-medium">{title}</h3>
+      <SubsectionTitle title={title} />
       {children}
     </div>
   );
@@ -274,12 +270,13 @@ type SectionId = (typeof REPORT_SECTIONS)[number]["id"];
 function ReportSection({
   id,
   title,
-  subtitle,
+  info,
   children,
 }: {
   id: SectionId;
   title: string;
-  subtitle: ReactNode;
+  /** The essentials, behind an info button beside the title. */
+  info?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -288,7 +285,11 @@ function ReportSection({
       aria-labelledby={`${id}-title`}
       className={`section-ticks scroll-mt-6 py-14 sm:py-20 ${gutterClassName}`}
     >
-      <SectionHeading id={`${id}-title`} title={title} subtitle={subtitle} />
+      <SectionHeading
+        id={`${id}-title`}
+        title={title}
+        info={info ? <InfoTip label={title}>{info}</InfoTip> : undefined}
+      />
       <div className="mt-10 sm:mt-14">{children}</div>
     </section>
   );
@@ -393,7 +394,6 @@ export default function ChartReport() {
       <ReportSection
         id="charts"
         title="Birth charts"
-        subtitle="The Rashi chart shows the sky at your birth. The Navamsha zooms into it for marriage and the real strength of each planet."
       >
         <ChartSignHouseCharts />
       </ReportSection>
@@ -401,7 +401,7 @@ export default function ChartReport() {
       <ReportSection
         id="dasha"
         title="Dashas"
-        subtitle="The planetary periods of your life, with the one running now marked. Pick any period to zoom into the periods inside it."
+        info="Periods of your life, each ruled by a planet or a sign. Open one to see the periods inside it."
       >
         <ChartDashaTimelines />
       </ReportSection>
@@ -409,14 +409,7 @@ export default function ChartReport() {
       <ReportSection
         id="kp"
         title="Krishnamurthi Paddhati"
-        subtitle={
-          <>
-            A precise system built for timing questions, using the{" "}
-            <ChartCode>{result.kp.astroParams.ayanamsa}</ChartCode> ayanamsa
-            and{" "}
-            {result.kp.astroParams.houseSystem} houses.
-          </>
-        }
+        info={`A timing system using the ${result.kp.astroParams.ayanamsa} ayanamsa and ${result.kp.astroParams.houseSystem} houses.`}
       >
         <ChartKpPanels />
       </ReportSection>
@@ -424,7 +417,6 @@ export default function ChartReport() {
       <ReportSection
         id="jaimini"
         title="Jaimini"
-        subtitle="The cast of your chart, how the world sees you, and which houses help or block each other."
       >
         <ChartJaiminiTables />
       </ReportSection>
@@ -432,7 +424,7 @@ export default function ChartReport() {
       <ReportSection
         id="sav"
         title="Sarvashtakavarga"
-        subtitle="A score for every sign by how much it supports your planets. Highlighted numbers back you up most; red marks where a planet runs weakest."
+        info="How strongly each sign supports each planet. Highlighted is a planet's strongest sign; red its weakest."
       >
         <ChartSavTable />
       </ReportSection>

@@ -331,15 +331,17 @@ export function SiteFrameEnd() {
   return <div aria-hidden="true" className="section-ticks pb-6 sm:pb-10" />;
 }
 
-/** A band's centred title and lead, as on the landing page. */
+/** A band's centred title and lead, as on the landing page. `info` sits beside the title. */
 export function SectionHeading({
   id,
   title,
   subtitle,
+  info,
 }: {
   id?: string;
   title: string;
-  subtitle: ReactNode;
+  subtitle?: ReactNode;
+  info?: ReactNode;
 }) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -348,10 +350,13 @@ export function SectionHeading({
         className="text-foreground text-2xl font-medium tracking-tight text-balance sm:text-3xl"
       >
         {title}
+        {info ? <span className="ms-1.5 inline-flex align-middle">{info}</span> : null}
       </h2>
-      <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty sm:text-base">
-        {subtitle}
-      </p>
+      {subtitle ? (
+        <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty sm:text-base">
+          {subtitle}
+        </p>
+      ) : null}
     </div>
   );
 }

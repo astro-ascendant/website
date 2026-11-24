@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { formatLongitude, starAt } from "@/lib/zodiac";
+import { SubsectionTitle } from "@/components/subsection-title";
 
 function Root({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -300,8 +301,8 @@ function DivisionTable({ division }: { division: number }) {
 }
 
 const BIRTH_CAPTIONS = {
-  d1: "Your chart as the sky was at the moment of birth: where each planet sat, and the sign rising on the eastern horizon.",
-  d9: "The chart of what ripens underneath. Read for marriage and for a planet's true strength.",
+  d1: "The sky at your birth: where each planet sat and which sign was rising.",
+  d9: "Read for marriage and for a planet's true strength.",
 };
 
 const DIVISIONS = [
@@ -312,7 +313,7 @@ const DIVISIONS = [
 /**
  * Rashi and Navamsha side by side (stacked on narrower screens), each with
  * its own planets table underneath, so a row never mixes the two charts.
- * `captions` swaps the birth-chart copy; `null` hides it.
+ * `captions` swaps the notes behind each chart's info button; `null` drops them.
  */
 export function ChartSignHouseCharts({
   captions = BIRTH_CAPTIONS,
@@ -328,19 +329,18 @@ export function ChartSignHouseCharts({
           key={entry.division}
           className="flex min-w-0 flex-col gap-4 lg:row-span-3 lg:grid lg:grid-rows-subgrid"
         >
-          <div className="flex flex-col gap-1">
-            <h3 className="text-foreground text-base font-medium">
-              {entry.name}{" "}
-              <span className="text-muted-foreground font-mono text-sm font-normal">
-                {entry.code}
-              </span>
-            </h3>
-            {captions ? (
-              <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
-                {captions[entry.caption]}
-              </p>
-            ) : null}
-          </div>
+          <SubsectionTitle
+            label={entry.name}
+            info={captions?.[entry.caption]}
+            title={
+              <>
+                {entry.name}{" "}
+                <span className="text-muted-foreground font-mono text-sm font-normal">
+                  {entry.code}
+                </span>
+              </>
+            }
+          />
           <SignHouseChart division={entry.division} />
           <DivisionTable division={entry.division} />
         </section>

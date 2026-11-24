@@ -714,16 +714,6 @@ body {
   }
 }
 
-/* The dasha lifeline: each rail draws in from the left. */
-@keyframes dasha-rail-in {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 /*
  * Docs heading scale. Each level steps down clearly from the one above:
  * page title 36px (set on DocsTitle), sections 24px under a hairline rule,

@@ -1,36 +1,34 @@
 import type { ChartDashaPeriod } from "@/lib/chart";
+import { SubsectionTitle } from "@/components/subsection-title";
 import { useChartSession } from "@/components/chart/session";
-import { DashaLifeline } from "@/components/chart/dasha-lifeline";
+import { DashaOutline } from "@/components/chart/dasha-outline";
 
 const dashaIntros: Record<string, string> = {
   Vimshottari:
-    "Vimshottari breaks your life into planetary periods. The period running now is the planet steering your life. Pick a period to zoom into its Antardashas, Pratyantaras and Sookshmas.",
+    "Planetary periods, four levels deep. The planet running now steers your life.",
   Chara:
-    "Chara dasha treats your life as chapters, each owned by a zodiac sign. The sign in charge today shows the area of life in the spotlight right now.",
+    "Chapters ruled by signs. Today's sign shows the area of life in focus.",
   Sthira:
-    "Sthira dasha walks your chart through the fixed signs. It is the reading astrologers lean on when the question is about health, stability and how long something will last.",
+    "Periods through the fixed signs, read for health and stability.",
 };
 
 function DashaSystem({
   name,
   periods,
   now,
+  birth,
   depth,
 }: {
   name: string;
+  birth: string;
   periods: ChartDashaPeriod[];
   now: string;
   depth: 2 | 4;
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-foreground text-base font-medium">{name}</h3>
-        <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
-          {dashaIntros[name]}
-        </p>
-      </div>
-      <DashaLifeline periods={periods} now={now} depth={depth} label={name} />
+    <div className="flex min-w-0 flex-col gap-4">
+      <SubsectionTitle title={name} info={dashaIntros[name]} />
+      <DashaOutline periods={periods} now={now} birth={birth} depth={depth} label={name} />
     </div>
   );
 }
@@ -45,17 +43,19 @@ export function ChartDashaTimelines() {
     return null;
   }
   const now = clock();
+  const birth = result.birth.utcIso;
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
       <DashaSystem
         name="Vimshottari"
         periods={result.dasha.vimshottari}
         now={now}
+        birth={birth}
         depth={4}
       />
-      <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-10">
-        <DashaSystem name="Chara" periods={result.dasha.chara} now={now} depth={2} />
-        <DashaSystem name="Sthira" periods={result.dasha.sthira} now={now} depth={2} />
+      <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-6">
+        <DashaSystem name="Chara" periods={result.dasha.chara} now={now} birth={birth} depth={2} />
+        <DashaSystem name="Sthira" periods={result.dasha.sthira} now={now} birth={birth} depth={2} />
       </div>
     </div>
   );
@@ -75,9 +75,10 @@ export function ChartKpDashaTimeline() {
     return null;
   }
   return (
-    <DashaLifeline
+    <DashaOutline
       periods={result.kp.dasha.vimshottari}
       now={clock()}
+      birth={result.birth.utcIso}
       depth={4}
       label="KP Vimshottari"
     />
