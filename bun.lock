@@ -16,11 +16,11 @@
         "@phosphor-icons/react": "^2.1.10",
         "@tanstack/react-router": "1.170.46",
         "@tanstack/react-start": "1.169.5",
-        "astro-ascendant": "6.2.0",
+        "astro-ascendant": "6.2.1",
         "chrono-node": "^2.10.3",
         "class-variance-authority": "^0.7.1",
         "cn": "^0.5.2",
-        "effect": "^4.1.4",
+        "effect": "^4.1.5",
         "fumadocs-core": "16.19.3",
         "fumadocs-mdx": "15.6.3",
         "fumadocs-ui": "npm:@fumadocs/base-ui@16.19.3",
@@ -684,7 +684,7 @@
 
     "astring": ["astring@1.9.0", "", { "bin": { "astring": "bin/astring" } }, "sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg=="],
 
-    "astro-ascendant": ["astro-ascendant@6.2.0", "", { "dependencies": { "@swisseph/node": "^1.4.0" }, "peerDependencies": { "effect": "^4.0.0" } }, "sha512-zQ1GOLQgY/m7/jU8uFL/iBEO0Veqhwk8ejnkq7pA25nyvmgz4B3tbDMoaWiWjlwx78B7pGLAlMFokXHU8mA4LA=="],
+    "astro-ascendant": ["astro-ascendant@6.2.1", "", { "dependencies": { "@swisseph/node": "^1.4.0" }, "peerDependencies": { "effect": "^4.0.0" } }, "sha512-OKUjCZgGUO4KBXucMRVXMj1wxxT5SxnWK9ihZTk9wQzaG7h2YmLBJcdxn2Q1oT70/QYW/ZV9oI9TG33KKk/UvA=="],
 
     "atomically": ["atomically@1.7.0", "", {}, "sha512-Xcz9l0z7y9yQ9rdDaxlmaI4uJHf/T8g9hOEzJcsEqX2SjCj4J20uK7+ldkDHMbpJDK76wF7xEIgxc/vSlsfw5w=="],
 
@@ -812,7 +812,7 @@
 
     "dotenv": ["dotenv@17.4.2", "", {}, "sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw=="],
 
-    "effect": ["effect@4.1.4", "", {}, "sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ=="],
+    "effect": ["effect@4.1.5", "", {}, "sha512-xyR20KhQI0vg2gD8ILUSQRTTESEYJ0JKdP+QD8J37xbwPTqXRxFM/l0+vUVD9fuSvoYruoTqyt33C4FZv1s4TQ=="],
 
     "electron-to-chromium": ["electron-to-chromium@1.5.459", "", {}, "sha512-4SC9HHSFjO/liAhifpdOL5hG9b4BP7/5G3y3UPZVO8trlAXr1CaUEEJL0gWK3kOcYcZrOA5rkwG45Gra/lTIgg=="],
 

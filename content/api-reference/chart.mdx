@@ -3,7 +3,7 @@ title: Chart
 description: Chart generation and placement models for D1 and divisional charts.
 ---
 
-{/* Generated from astro-ascendant@6.2.0. Do not edit by hand. Run `make sync-api` to regenerate. */}
+{/* Generated from astro-ascendant@6.2.1. Do not edit by hand. Run `make sync-api` to regenerate. */}
 
 Import from `astro-ascendant/chart`:
 
@@ -46,6 +46,78 @@ const getDivisionalTarget: (
 ) => Effect.Effect<
   import("./model.js").SourcePosition,
   DivisionalMappingError,
+  never
+>;
+```
+
+### `starOf`
+
+```ts
+const starOf: (
+  longitude: number & import("effect/Brand").Brand<"Longitude">,
+) => Effect.Effect<
+  {
+    readonly name:
+      | "Anuradha"
+      | "Ardra"
+      | "Ashlesha"
+      | "Ashwini"
+      | "Bharani"
+      | "Chitra"
+      | "Dhanishta"
+      | "Hasta"
+      | "Jyeshtha"
+      | "Krittika"
+      | "Magha"
+      | "Mrigashira"
+      | "Mula"
+      | "Punarvasu"
+      | "Purva Ashadha"
+      | "Purva Bhadrapada"
+      | "Purva Phalguni"
+      | "Pushya"
+      | "Revati"
+      | "Rohini"
+      | "Shatabhisha"
+      | "Shravana"
+      | "Swati"
+      | "Uttara Ashadha"
+      | "Uttara Bhadrapada"
+      | "Uttara Phalguni"
+      | "Vishakha";
+    readonly lord:
+      | "Jupiter"
+      | "Ketu"
+      | "Mars"
+      | "Mercury"
+      | "Moon"
+      | "Rahu"
+      | "Saturn"
+      | "Sun"
+      | "Venus";
+    readonly pada: 1 | 2 | 3 | 4;
+  },
+  import("../utils/position.js").LongitudeError,
+  never
+>;
+```
+
+### `subLordOf`
+
+```ts
+const subLordOf: (
+  longitude: number & import("effect/Brand").Brand<"Longitude">,
+) => Effect.Effect<
+  | "Jupiter"
+  | "Ketu"
+  | "Mars"
+  | "Mercury"
+  | "Moon"
+  | "Rahu"
+  | "Saturn"
+  | "Sun"
+  | "Venus",
+  import("../utils/position.js").LongitudeError,
   never
 >;
 ```
