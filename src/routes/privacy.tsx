@@ -5,7 +5,7 @@ import { saveBirthProfiles } from "@/lib/birth-profiles";
 import { deleteAllBirthProfiles } from "@/server/profile.functions";
 
 const DESCRIPTION =
-  "What Ascendant stores when you cast a chart, why, for how long, and how to delete it.";
+  "What Ascendant saves when you create a horoscope, why, who sees it, and how to delete it.";
 
 export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
@@ -40,7 +40,7 @@ type DeleteStatus = "idle" | "deleting" | "deleted" | "failed";
 const DELETE_MESSAGES: Record<DeleteStatus, string> = {
   idle: "",
   deleting: "Deleting...",
-  deleted: "Deleted. Nothing from this browser is stored any more.",
+  deleted: "Done. Nothing from this browser is saved any more.",
   failed: "That did not work. Please try again in a moment.",
 };
 
@@ -68,7 +68,7 @@ function DeleteMyData() {
         type="button"
         onClick={remove}
         disabled={status === "deleting"}
-        className="inline-flex h-9 cursor-pointer items-center rounded-md border border-border px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:cursor-default disabled:opacity-60"
+        className={`${linkClassName} cursor-pointer text-sm disabled:cursor-default disabled:opacity-60`}
       >
         Delete my saved birth details
       </button>
@@ -97,69 +97,51 @@ function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-xs text-muted-foreground">
-            Last updated 16 November 2026
+            Last updated 24 November 2026
           </p>
         </header>
 
-        <Section title="What we store">
+        <Section title="What we save">
           <p>
-            Every time you cast a chart on the{" "}
+            When you create a horoscope on the{" "}
             <Link to="/chart" className={linkClassName}>
               chart page
             </Link>
-            , we save the birth details you entered: the name, birth date, birth
-            time, place with its latitude and longitude, and sex if you gave
-            one. The sky page does not save anything.
-          </p>
-          <p>
-            Your browser also keeps the charts you cast under a name, so the
-            name field can offer them again.
-          </p>
-        </Section>
-
-        <Section title="How it is linked to you">
-          <p>
-            There are no accounts. The first chart you cast sets a random,
-            anonymous id in a cookie named <code>ascendant_owner</code>. Your
-            birth details are stored under that id, and only a request carrying
-            the same cookie can list or delete them. The cookie lasts a year
-            from your latest chart. We do not store your IP address or link the
-            id to anything else.
+            , we save the birth details you enter: the name, the date, time and
+            place of birth, and gender if you choose one. Looking at the sky
+            page saves nothing.
           </p>
         </Section>
 
         <Section title="Why">
           <p>
-            So the people you look up are there again on your next visit, even
-            after your browser clears its storage. We do not sell or share these
-            details, and we do not use them for advertising.
+            So the people you have looked up are ready for you next time. We
+            never sell your details, share them with advertisers, or use them
+            for ads.
           </p>
         </Section>
 
-        <Section title="Where it is kept">
+        <Section title="Who can see it">
           <p>
-            In a Postgres database hosted by Neon, reached from the site's
-            servers on Vercel.
+            Only you, from this browser. There are no accounts, and we never
+            ask who you are.
           </p>
           <p>
-            Two other services see some of what you type, only when you use
-            them: OpenStreetMap's Nominatim receives the place you search for,
-            and the AI button sends your chart to the assistant you pick.
-          </p>
-        </Section>
-
-        <Section title="How long">
-          <p>
-            Until you delete it. Deleting removes every chart this browser has
-            cast from our database and from your browser at once.
+            Two things leave the site only when you use them: the place you
+            search for is looked up with a map service, and a chart you send to
+            an AI assistant goes to the assistant you pick.
           </p>
         </Section>
 
-        <Section title="Delete your data">
+        <Section title="How long we keep it">
+          <p>Until you delete it.</p>
+        </Section>
+
+        <Section title="Delete your details">
           <p>
-            This deletes everything stored for this browser. To ask about data
-            cast from a browser you no longer have, contact the author named on
-            the{" "}
+            This removes every chart saved from this browser, straight away. If
+            you no longer have the browser you used, contact the author named
+            on the{" "}
             <Link to="/about" className={linkClassName}>
               About page
             </Link>
